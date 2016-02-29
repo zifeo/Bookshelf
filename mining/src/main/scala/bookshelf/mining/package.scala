@@ -1,5 +1,7 @@
 package bookshelf
 
+import java.text.SimpleDateFormat
+
 import scala.io.{Codec, Source}
 import scala.util.Try
 
@@ -32,9 +34,28 @@ package object mining {
   def longOrNone(raw: String): Option[Long] =
     Try(raw.toLong).toOption
 
+  private val FORMAT_DATE_1 = new SimpleDateFormat("yyyy-MM-dd")
+  private val FORMAT_DATE_2 = new SimpleDateFormat("dd/MM/yy")
+
+  def stringToDate(raw: String): java.util.Date = {
+    if (raw.contains("-")) {
+      FORMAT_DATE_1.parse(raw)
+    }
+    else if (raw.contains("/")) {
+      FORMAT_DATE_2.parse(raw)
+    } else {
+      if (true) {
+        // above if the is a full integer, so we can convert it and therefore it is the number of days after y. 1970
+        return new java.util.Date();
+      } else {
+        return new java.util.Date()
+      }
+    }
+  }
+
   /**
     * Convert a roman number to an integer
-    *kado
+    * kado
     *
     * @param number the number to be converted
     * @return the converted number

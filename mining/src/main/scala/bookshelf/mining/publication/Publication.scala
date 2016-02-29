@@ -46,9 +46,6 @@ case class Publications(
 
 object Publications {
 
-  val FORMAT_1 = new SimpleDateFormat("yyyy-MM-dd")
-  val FORMAT_2 = new SimpleDateFormat("dd/MM/yy")
-
   val PATTERN_PAGES_1 = "(\\d*)\\+([A-z]*)".r
   val PATTERN_PAGES_2 = "([A-z]*)\\+(\\d*)".r
   val PATTERN_PAGES_3 = "(?:\\[(\\d)\\]*)\\+(\\d*)".r
@@ -80,7 +77,7 @@ object Publications {
         Publications(
           id.toInt,
           title,
-          FORMAT_1.parse(date), // need to manage the litteral without -
+          stringToDate(date), // need to manage the litteral without -
           intOrNone(publisher_id),
           getPages(pages),
           packaging,

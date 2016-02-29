@@ -14,11 +14,9 @@ object Main extends App {
   /*
   println("\n\n===== Authors =====")
   prettyPrint(Author.all.filter(_.isFailure))
-  */
   println("\n\n===== Publications =====")
   val data = Publications.all
-  //prettyPrint(data.filter(_.isFailure))
-  /*
+  prettyPrint(data.filter(_.isFailure))
     println("\n\n===== Publication authors =====")
     prettyPrint(Publication_author.all.filter(_.isFailure))
 
@@ -31,6 +29,27 @@ object Main extends App {
     println("\n\n===== Publishers =====")
     prettyPrint(Publisher.all.filter(_.isFailure))
     */
+  println("\n\n===== Awards =====")
+  prettyPrint(Award.all.filter(_.isFailure))
+
+  println("\n\n===== Awards categories =====")
+  prettyPrint(Award_category.all.filter(_.isFailure))
+
+  println("\n\n===== Awards types =====")
+  prettyPrint(Award_type.all.filter(_.isFailure))
+
+  println("\n\n===== Tags =====")
+  prettyPrint(Tag.all.filter(_.isFailure))
+
+  println("\n\n===== Languages =====")
+  prettyPrint(Language.all.filter(_.isFailure))
+
+  println("\n\n===== Webpages =====")
+  prettyPrint(Webpage.all.filter(_.isFailure))
+
+  println("\n\n===== Notes =====")
+  prettyPrint(Note.all.filter(_.isFailure))
+
   println("\n==============\n===== DONE =====\n==============")
 
 }
