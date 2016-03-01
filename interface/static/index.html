@@ -1,150 +1,197 @@
 <!DOCTYPE html>
 <html lang="fr">
-	<head>
-		<meta charset="utf-8">
-		<title>Bookshelf</title>
-		<script src="jquery.js"></script>
-		<script src="semantic.js"></script>
-		<script src="tablesort.js"></script>
-		<link rel="stylesheet" type="text/css" class="ui" href="semantic.css">
-		<script>
-			$(function() {
-				$('.ui.search').search({
-					apiSettings: {
-				      url: '#?q={query}'
-				    },
-					"action": {
-					    "url": '/path/to/results',
-					    "text": "View all 202 results"
-					  }
-				});
-				$('table').tablesort();
-				$('.ui.dropdown').dropdown();
-				$(document).on('click', '#demo', function() {
-					$('.ui.modal').modal('show');
-				});
-				
-			});
-		</script>
-		<style>
-			body {
-				padding-top: 50px;
-			}
-		</style>
-	</head>
-	<body>
-<div class="ui fixed menu">
-	<div class="ui container">
-
-<div class="header item">
-    BOOKSHELF
-  </div>
-  <div class="ui search item">
-    <div class="ui transparent icon input">
-      <input class="prompt" type="text" placeholder="Search animals...">
-      <i class="search link icon"></i>
-    </div>
-  </div>
-  <div class="ui pointing dropdown link item">
-    <span class="text">Presets</span>
-    <i class="dropdown icon"></i>
-    <div class="menu">
-      <div class="header">Categories</div>
-      <div class="item">
-        <i class="dropdown icon"></i>
-        <span class="text">Clothing</span>
-        <div class="menu">
-          <div class="header">Mens</div>
-          <div class="item">Shirts</div>
-          <div class="item">Pants</div>
-          <div class="item">Jeans</div>
-          <div class="item">Shoes</div>
-          <div class="divider"></div>
-          <div class="header">Womens</div>
-          <div class="item">Dresses</div>
-          <div class="item">Shoes</div>
-          <div class="item">Bags</div>
+  <head>
+    <meta charset="utf-8">
+    <title>Bookshelf</title>
+    <script src="jquery.js"></script>
+    <script src="semantic.js"></script>
+    <script src="tablesort.js"></script>
+    <link rel="stylesheet" type="text/css" class="ui" href="semantic.css">
+    <script>
+      $(function() {
+      	$('.ui.search').search({
+      	  apiSettings: {
+      	    url: '#?q={query}'
+      	  },
+      	  minCharacters: 2,
+          "action": {
+      	    "url": '/path/to/results',
+      		"text": "View all 202 results"
+      	  }
+      	});
+      	$('.table').tablesort();
+      	$('.ui.dropdown').dropdown();
+      	$(document).on('click', '#demo', function() {
+      	  $('.ui.modal').modal('show');
+      	});
+      	$('.table').visibility({
+          onUpdate: function(calculations) {
+		  	console.log(calculations);
+          }
+        });
+      });
+    </script>
+    <style>
+      body {
+      padding-top: 50px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="ui fixed menu">
+      <div class="ui container">
+        <a class="header item" href="">
+          BOOKSHELF
+        </a>
+        <div class="ui search item">
+          <div class="ui transparent icon input">
+            <input class="prompt" type="text" placeholder="Search animals...">
+            <i class="search link icon"></i>
+          </div>
+        </div>
+        <div class="ui pointing dropdown link item">
+          <span class="text">Presets</span>
+          <i class="dropdown icon"></i>
+          <div class="menu">
+            <div class="header">Categories</div>
+            <div class="item">
+              <i class="dropdown icon"></i>
+              <span class="text">Clothing</span>
+              <div class="menu">
+                <div class="header">Mens</div>
+                <div class="item">Shirts</div>
+                <div class="item">Pants</div>
+                <div class="item">Jeans</div>
+                <div class="item">Shoes</div>
+                <div class="divider"></div>
+                <div class="header">Womens</div>
+                <div class="item">Dresses</div>
+                <div class="item">Shoes</div>
+                <div class="item">Bags</div>
+              </div>
+            </div>
+            <div class="item">Home Goods</div>
+            <div class="item">Bedroom</div>
+            <div class="divider"></div>
+            <div class="header">Order</div>
+            <div class="item">Status</div>
+            <div class="item">Cancellations</div>
+          </div>
         </div>
       </div>
-      <div class="item">Home Goods</div>
-      <div class="item">Bedroom</div>
-      <div class="divider"></div>
-      <div class="header">Order</div>
-      <div class="item">Status</div>
-      <div class="item">Cancellations</div>
     </div>
-  </div>
-	</div>
-</div>
-
-<div class="ui container">
-<table class="ui selectable sortable celled table">
-  <thead>
-    <tr>
-      <th>Name</th>
-      <th>Status</th>
-      <th>Notes</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td><a href="#" id="demo">John</a></td>
-      <td>No Action</td>
-      <td>None</td>
-    </tr>
-    <tr>
-      <td>Jamie</td>
-      <td>Approved</td>
-      <td>Requires call</td>
-    </tr>
-    <tr>
-      <td>Jill</td>
-      <td>Denied</td>
-      <td>None</td>
-    </tr>
-    <tr>
-      <td>John</td>
-      <td>No Action</td>
-      <td>None</td>
-    </tr>
-    <tr>
-      <td>Jamie</td>
-      <td>Approved</td>
-      <td>Requires call</td>
-    </tr>
-    <tr>
-      <td>Jill</td>
-      <td>Denied</td>
-      <td>None</td>
-    </tr>
-  </tbody>
-</table>
-</div>		
-<div class="ui modal">
-	<i class="close icon"></i>
-	<div class="content">
-		<div class="ui list">
-			<div class="item">
-				<div class="content">
-					<div class="header">Snickerdoodle</div>
-					An excellent companion
-				</div>
-			</div>
-			<div class="item">
-				<div class="content">
-					<div class="header">Poodle</div>
-					A poodle, its pretty basic
-				</div>
-			</div>
-			<div class="item">
-				<div class="content">
-					<div class="header">Paulo</div>
-					He's also a dog
-				</div>
-			</div>
-		</div>
-	</div>
-</div>
-
-	</body>
+    <div class="ui container">
+      <table class="ui selectable sortable celled table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Status</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><a href="#" id="demo">John</a></td>
+            <td>No Action</td>
+            <td>None</td>
+          </tr>
+          <tr>
+            <td>Jamie</td>
+            <td>Approved</td>
+            <td>Requires call</td>
+          </tr>
+          <tr>
+            <td>Jill</td>
+            <td>Denied</td>
+            <td>None</td>
+          </tr>
+          <tr>
+            <td>John</td>
+            <td>No Action</td>
+            <td>None</td>
+          </tr>
+          <tr>
+            <td>Jamie</td>
+            <td>Approved</td>
+            <td>Requires call</td>
+          </tr>
+		  <tr>
+            <td>Jill</td>
+            <td>Denied</td>
+            <td>None</td>
+          </tr>
+          <tr>
+            <td>Jill</td>
+            <td>Denied</td>
+            <td>None</td>
+          </tr>
+          <tr>
+            <td>Jill</td>
+            <td>Denied</td>
+            <td>None</td>
+          </tr>
+          <tr>
+            <td>Jill</td>
+            <td>Denied</td>
+            <td>None</td>
+          </tr>
+          <tr>
+            <td>Jill</td>
+            <td>Denied</td>
+            <td>None</td>
+          </tr>
+          <tr>
+            <td>Jill</td>
+            <td>Denied</td>
+            <td>None</td>
+          </tr>
+          <tr>
+            <td>Jill</td>
+            <td>Denied</td>
+            <td>None</td>
+          </tr>
+          <tr>
+            <td>Jill</td>
+            <td>Denied</td>
+            <td>None</td>
+          </tr>
+          <tr>
+            <td>Jill</td>
+            <td>Denied</td>
+            <td>None</td>
+          </tr>
+          <tr>
+            <td>Jill</td>
+            <td>Denied</td>
+            <td>None</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="ui modal">
+      <i class="close icon"></i>
+      <div class="content">
+        <div class="ui list">
+          <div class="item">
+            <div class="content">
+              <div class="header">Snickerdoodle</div>
+              An excellent companion
+            </div>
+          </div>
+          <div class="item">
+            <div class="content">
+              <div class="header">Poodle</div>
+              A poodle, its pretty basic
+            </div>
+          </div>
+          <div class="item">
+            <div class="content">
+              <div class="header">Paulo</div>
+              He's also a dog
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
 </html>
