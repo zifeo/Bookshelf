@@ -1,0 +1,12 @@
+
+bookshelf_data:
+  container_name: bookshelf_data
+  image: postgres
+  restart: always
+  ports:
+    - "35432:5432"
+  environment:
+    - POSTGRES_USER=bookshelf
+    - POSTGRES_PASSWORD=j8z7338uaAHafjs
+    - POSTGRES_DB=data
+
