@@ -1,13 +1,14 @@
 package bookshelf.mining
 
 import bookshelf.mining.publication._
+import bookshelf.mining.title.Title
 
 object Main extends App {
 
   def prettyPrint[T](data: List[T]): Unit =
     println(data.mkString("\n"))
 
-  println("\n\n===== Authors =====")
+  /* println("\n\n===== Authors =====")
   prettyPrint(Author.all.filter(_.isFailure))
 
   println("\n\n===== Publications =====")
@@ -44,7 +45,10 @@ object Main extends App {
   prettyPrint(Webpage.all.filter(_.isFailure))
 
   println("\n\n===== Notes =====")
-  prettyPrint(Note.all.filter(_.isFailure))
+  prettyPrint(Note.all.filter(_.isFailure)) */
+
+  println("\n\n===== Titles =====")
+  prettyPrint(Title.all.filter(_.isFailure))
 
   println("\n==============\n===== DONE =====\n==============")
 
