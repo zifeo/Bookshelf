@@ -1,7 +1,7 @@
 package bookshelf.mining
 
 import bookshelf.mining.publication._
-import bookshelf.mining.title.Title
+import bookshelf.mining.title.{Titles_tag, Titles_series, Titles_awards, Title}
 
 object Main extends App {
 
@@ -45,10 +45,19 @@ object Main extends App {
   prettyPrint(Webpage.all.filter(_.isFailure))
 
   println("\n\n===== Notes =====")
-  prettyPrint(Note.all.filter(_.isFailure)) */
+  prettyPrint(Note.all.filter(_.isFailure))
 
   println("\n\n===== Titles =====")
   prettyPrint(Title.all.filter(_.isFailure))
+
+  println("\n\n===== Titles award =====")
+  prettyPrint(Titles_awards.all.filter(_.isFailure))
+
+  println("\n\n===== Titles series =====")
+  prettyPrint(Titles_series.all.filter(_.isFailure)) */
+
+  println("\n\n===== Titles tag =====")
+  prettyPrint(Titles_tag.all.filter(_.isSuccess))
 
   println("\n==============\n===== DONE =====\n==============")
 
