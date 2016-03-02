@@ -1,9 +1,6 @@
-package bookshelf.mining
+package bookshelf.mine
 
-/**
-  * Created by asoccard on 29/02/16.
-  */
-class Test {
+object Tests extends App {
 
   def pagesTest() = {
     val values = List(("40", (40, 0)), ("374+[2]", (374, 2)), ("413+[2]", (413, 2)), ("395+[3]", (395, 3)),

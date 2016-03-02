@@ -1,6 +1,6 @@
-package bookshelf.mining.title
+package bookshelf.mine.titles
 
-import bookshelf.mining._
+import bookshelf.mine._
 
 import scala.util.Try
 

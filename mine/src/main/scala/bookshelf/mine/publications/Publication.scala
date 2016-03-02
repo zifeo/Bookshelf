@@ -1,9 +1,9 @@
-package bookshelf.mining.publication
+package bookshelf.mine.publications
 
 import java.text.SimpleDateFormat
 
-import bookshelf.mining._
-import bookshelf.mining.publication.Publication_Type.Publication_Type
+import bookshelf.mine._
+import bookshelf.mine.publications.Publication_Type.Publication_Type
 
 import scala.util.Try
 

@@ -2,13 +2,13 @@ package bookshelf
 
 import java.text.SimpleDateFormat
 
-import bookshelf.mining._
+import bookshelf.mine._
 
 import scala.io.{Codec, Source}
 import scala.util.Try
 import scala.util.matching.Regex
 
-package object mining {
+package object mine {
 
   /**
     * Returns the given file as lists of lists.
@@ -17,7 +17,7 @@ package object mining {
     * @return rows of columns
     */
   def getDataset(name: String): List[List[String]] =
-    Source.fromFile(s"../datasets/$name")(Codec.ISO8859).getLines().map(_.split('\t').toList).toList
+    Source.fromFile(s"./datasets/$name")(Codec.ISO8859).getLines().map(_.split('\t').toList).toList
 
   /**
     * Parse an integer as an option.

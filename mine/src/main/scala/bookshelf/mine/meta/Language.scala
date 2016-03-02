@@ -1,4 +1,4 @@
-package bookshelf.mining
+package bookshelf.mine
 
 import scala.util.Try
 
