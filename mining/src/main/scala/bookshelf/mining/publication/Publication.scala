@@ -33,12 +33,14 @@ case class Publications(
                          title: String,
                          date: java.util.Date,
                          publisher_id: Option[Int],
-                         pages: Option[(Int, Int)], // book and preface
+                         pages: Option[Int],
+                         preface: Option[Int],
                          packaging: String,
                          pub_type: Option[Publication_Type],
                          isbn: Option[Long],
                          image: String,
-                         price: Option[(Double, String)], // amount and currency
+                         price: Option[Double],
+                         currency: String,
                          note_id: Option[Int],
                          pub_series_id: Option[Int],
                          pub_series_nb: Option[Int]
@@ -46,49 +48,41 @@ case class Publications(
 
 object Publications {
 
-  val PATTERN_PAGES_1 = "(\\d*)\\+([A-z]*)".r
-  val PATTERN_PAGES_2 = "([A-z]*)\\+(\\d*)".r
-  val PATTERN_PAGES_3 = "(?:\\[(\\d)\\]*)\\+(\\d*)".r
-  val PATTERN_PAGES_4 = "(\\d*)\\+(?:\\[(\\d)\\]*)".r
-
   val PATTERN_MONEY_1 = "([\\d|\\.]*)([\\D]|\\.]*)".r
   val PATTERN_MONEY_2 = "([\\D]|\\.]*)([\\d|\\.]*)".r
 
   val raw = getDataset("publications.csv")
   val all = raw.map(parseCols)
 
-  def getPages(pages: String): Option[(Int, Int)] = Try(pages match {
-    case PATTERN_PAGES_1(g1, g2) => (g1.toInt, toArabic(g2))
-    case PATTERN_PAGES_2(g1, g2) => (g2.toInt, toArabic(g1))
-    case PATTERN_PAGES_3(g1, g2) => (g2.toInt, g1.toInt)
-    case PATTERN_PAGES_4(g1, g2) => (g1.toInt, g2.toInt)
-    case _ => (pages.toInt, 0)
-  }).toOption
-
-  def getCurrency(money: String): Option[(Double, String)] = Try(money match {
-    case PATTERN_MONEY_1(g1, g2) => (g1.toDouble, g2)
-    case PATTERN_MONEY_2(g1, g2) => (g2.toDouble, g1)
-    case _ => (money.toDouble, "")
-  }).toOption
+  def getCurrency(money: String): (Option[Double], String) = money match {
+    case PATTERN_MONEY_1(g1, g2) => (Try(g1.toDouble).toOption, g2)
+    case PATTERN_MONEY_2(g1, g2) => (Try(g2.toDouble).toOption, g1)
+    case _ => (Try(money.toDouble).toOption, "")
+  }
 
   def parseCols(raw: List[String]): Try[Publications] = Try {
     raw match {
-      case List(id, title, date, publisher_id, pages, packaging, pub_type, isbn, image, price, note_id, pub_series_id, pub_series_nb) =>
+      case List(id, title, date, publisher_id, pages, packaging, pub_type, isbn, image, price, note_id, pub_series_id, pub_series_nb) => {
+        val (book_pages, pages_prefaces) = getPages(pages)
+        val (money, currency) = getCurrency(price)
         Publications(
           id.toInt,
           title,
           stringToDate(date), // need to manage the litteral without -
           intOrNone(publisher_id),
-          getPages(pages),
+          book_pages,
+          pages_prefaces,
           packaging,
           Publication_Type.values.find(_.equals(pub_type)),
           longOrNone(isbn),
           image,
-          getCurrency(price),
+          money,
+          currency,
           intOrNone(note_id),
           intOrNone(pub_series_id),
           intOrNone(pub_series_nb)
         )
+      }
     }
   }
 

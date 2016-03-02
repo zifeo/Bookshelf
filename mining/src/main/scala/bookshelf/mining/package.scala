@@ -2,8 +2,11 @@ package bookshelf
 
 import java.text.SimpleDateFormat
 
+import bookshelf.mining._
+
 import scala.io.{Codec, Source}
 import scala.util.Try
+import scala.util.matching.Regex
 
 package object mining {
 
@@ -46,21 +49,33 @@ package object mining {
     } else {
       if (true) {
         // above if the is a full integer, so we can convert it and therefore it is the number of days after y. 1970
-        return new java.util.Date();
+        new java.util.Date()
       } else {
-        return new java.util.Date()
+        new java.util.Date()
       }
     }
   }
 
-  /**
-    * Convert a roman number to an integer
-    * kado
-    *
-    * @param number the number to be converted
-    * @return the converted number
-    */
-  def toArabic(number: String): Int = toArabic(number.toUpperCase().toList)
+  val REGEX_PAGES_1 = "([\\d|+]*)([A-z]*)([\\d|+]*)\\[(\\d*)\\]([\\d|+]*)".r
+  val REGEX_PAGES_2 = "([\\d|+]*)\\[(\\d*)\\]([\\d|+]*)([A-z]*)([\\d|+]*)".r
+  val REGEX_PAGES_3 = "([\\d|+]*)\\[(\\d*)\\]([\\d|+]*)".r
+  val REGEX_PAGES_4 = "([\\d|+]*)([A-z]*)([\\d|+]*)".r
+
+
+  def getPages(raw: String): (Option[Int], Option[Int]) = {
+    val pages = inner(raw)
+    (Try(pages._1.split('+').toList.map(x => if (x.isEmpty) 0 else x.toInt).sum).toOption, Try(if (pages._2.isEmpty) 0 else pages._2.toInt).toOption)
+  }
+
+  private def inner(raw: String): (String, String) = raw match {
+    case REGEX_PAGES_1(g1, g2, g3, g4, g5) => (g1 + g3 + g5, (toArabic(g2) + g4.toInt).toString)
+    case REGEX_PAGES_2(g1, g2, g3, g4, g5) => (g1 + g3 + g5, (g2.toInt + toArabic(g4)).toString)
+    case REGEX_PAGES_3(g1, g2, g3) => (g1 + g3, g2)
+    case REGEX_PAGES_4(g1, g2, g3) => (g1 + g3, toArabic(g2).toString)
+    case x => (x, "")
+  }
+
+  private def toArabic(number: String): Int = toArabic(number.toUpperCase().toList)
 
   private def toArabic(digits: List[Char]): Int = digits match {
     case Nil => 0

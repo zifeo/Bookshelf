@@ -7,12 +7,13 @@ object Main extends App {
   def prettyPrint[T](data: List[T]): Unit =
     println(data.mkString("\n"))
 
+  /*
   println("\n\n===== Authors =====")
   prettyPrint(Author.all.filter(_.isFailure))
-
+  */
   println("\n\n===== Publications =====")
   prettyPrint(Publications.all.filter(_.isFailure))
-
+  /*
   println("\n\n===== Publication authors =====")
   prettyPrint(Publication_author.all.filter(_.isFailure))
 
@@ -45,6 +46,8 @@ object Main extends App {
 
   println("\n\n===== Notes =====")
   prettyPrint(Note.all.filter(_.isFailure))
+  */
+
 
   println("\n==============\n===== DONE =====\n==============")
 
