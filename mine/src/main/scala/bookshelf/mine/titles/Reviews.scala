@@ -11,8 +11,9 @@ case class Reviews(
                   )
 
 object Reviews {
-  val raw = getDataset("reviews.csv")
-  val all = raw.map(parseCols)
+
+  private[mine] lazy val raw = getDataset("reviews.csv")
+  private[mine] lazy val all = raw.map(parseCols)
 
   def parseCols(raw: List[String]): Try[Reviews] = Try {
     raw match {

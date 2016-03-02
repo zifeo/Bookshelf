@@ -9,8 +9,8 @@ case class Note(
 
 object Note {
 
-  val raw = getDataset("notes.csv")
-  val all = raw.map(parseCols)
+  private[mine] lazy val raw = getDataset("notes.csv")
+  private[mine] lazy val all = raw.map(parseCols)
 
   def parseCols(raw: List[String]): Try[Note] = Try {
     raw match {

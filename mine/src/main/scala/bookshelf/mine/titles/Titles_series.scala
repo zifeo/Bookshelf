@@ -12,8 +12,9 @@ case class Titles_series(
                         )
 
 object Titles_series {
-  val raw = getDataset("titles_series.csv")
-  val all = raw.map(parseCols)
+
+  private[mine] lazy val raw = getDataset("titles_series.csv")
+  private[mine] lazy val all = raw.map(parseCols)
 
   def parseCols(raw: List[String]): Try[Titles_series] = Try {
     raw match {
@@ -26,4 +27,5 @@ object Titles_series {
         )
     }
   }
+
 }

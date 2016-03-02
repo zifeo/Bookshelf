@@ -12,8 +12,8 @@ case class Publication_content(
 
 object Publication_content {
 
-  val raw = getDataset("publications_content.csv")
-  val all = raw.map(parseCols)
+  private[mine] lazy val raw = getDataset("publications_content.csv")
+  private[mine] lazy val all = raw.map(parseCols)
 
   def parseCols(raw: List[String]): Try[Publication_content] = Try {
     raw match {

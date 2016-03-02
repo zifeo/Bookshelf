@@ -1,24 +1,10 @@
 package bookshelf.mine.titles
 
 import bookshelf.mine._
-import bookshelf.mine.titles.SLength.SLength
-import bookshelf.mine.titles.Type.Type
+import bookshelf.mine.titles.Title.SLength.SLength
+import bookshelf.mine.titles.Title.Type.Type
 
 import scala.util.Try
-
-object Type extends Enumeration {
-  type Type = Value
-  val ANTHOLOGY, BACKCOVERART, COLLECTION, COVERART, INTERIORART, EDITOR, ESSAY, INTERVIEW, NOVEL = Value
-}
-
-object SLength extends Enumeration {
-  type SLength = Value
-  val nv = Value("novella")
-  val ss = Value("short story")
-  val jvn = Value("juvenile fiction")
-  val nvz = Value("novellization")
-  val sf = Value("short fiction")
-}
 
 case class Title(
                   title_id: Int,
@@ -37,8 +23,22 @@ case class Title(
 
 object Title {
 
-  val raw = getDataset("titles.csv")
-  val all = raw.map(parseCols)
+  object Type extends Enumeration {
+    type Type = Value
+    val ANTHOLOGY, BACKCOVERART, COLLECTION, COVERART, INTERIORART, EDITOR, ESSAY, INTERVIEW, NOVEL = Value
+  }
+
+  object SLength extends Enumeration {
+    type SLength = Value
+    val nv = Value("novella")
+    val ss = Value("short story")
+    val jvn = Value("juvenile fiction")
+    val nvz = Value("novellization")
+    val sf = Value("short fiction")
+  }
+
+  private[mine] lazy val raw = getDataset("titles.csv")
+  private[mine] lazy val all = raw.map(parseCols)
 
   def parseCols(raw: List[String]): Try[Title] = Try {
     raw match {

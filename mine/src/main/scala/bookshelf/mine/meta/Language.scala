@@ -11,8 +11,8 @@ case class Language(
 
 object Language {
 
-  val raw = getDataset("languages.csv")
-  val all = raw.map(parseCols)
+  private[mine] lazy val raw = getDataset("languages.csv")
+  private[mine] lazy val all = raw.map(parseCols)
 
   def parseCols(raw: List[String]): Try[Language] = Try {
     raw match {

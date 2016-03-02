@@ -16,8 +16,8 @@ case class Award_type(
 
 object Award_type {
 
-  val raw = getDataset("award_types.csv")
-  val all = raw.map(parseCols)
+  private[mine] lazy val raw = getDataset("award_types.csv")
+  private[mine] lazy val all = raw.map(parseCols)
 
   def getBoolean(raw: String): Boolean = raw.toLowerCase.equals("yes")
 

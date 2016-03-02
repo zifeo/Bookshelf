@@ -16,7 +16,7 @@ package object mine {
     * @param name file name
     * @return rows of columns
     */
-  def getDataset(name: String): List[List[String]] =
+  private[mine] def getDataset(name: String): List[List[String]] =
     Source.fromFile(s"./datasets/$name")(Codec.ISO8859).getLines().map(_.split('\t').toList).toList
 
   /**

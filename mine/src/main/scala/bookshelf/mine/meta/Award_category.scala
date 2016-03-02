@@ -12,8 +12,8 @@ case class Award_category(
 
 object Award_category {
 
-  val raw = getDataset("award_categories.csv")
-  val all = raw.map(parseCols)
+  private[mine] lazy val raw = getDataset("award_categories.csv")
+  private[mine] lazy val all = raw.map(parseCols)
 
   def parseCols(raw: List[String]): Try[Award_category] = Try {
     raw match {

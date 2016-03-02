@@ -1,4 +1,6 @@
-package bookshelf.mine
+package bookshelf.mine.meta
+
+import bookshelf.mine._
 
 import scala.util.Try
 
@@ -19,8 +21,8 @@ case class Author(
 
 object Author {
 
-  val raw = getDataset("authors.csv")
-  val all = raw.map(parseCols)
+  private[mine] lazy val raw = getDataset("authors.csv")
+  private[mine] lazy val all = raw.map(parseCols)
 
   def parseCols(raw: List[String]): Try[Author] = Try {
     raw match {
