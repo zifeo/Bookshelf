@@ -1,6 +1,6 @@
 package bookshelf.mine
 
-object Main extends App {
+private[mine] object Main extends App {
 
   def prettyPrint[T](data: List[T]): Unit =
     println(data.mkString("\n"))
