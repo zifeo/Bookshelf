@@ -1,4 +1,6 @@
-package bookshelf.mine
+package bookshelf.mine.meta
+
+import bookshelf.mine._
 
 import scala.util.Try
 

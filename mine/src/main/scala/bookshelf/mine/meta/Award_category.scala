@@ -1,14 +1,16 @@
-package bookshelf.mine
+package bookshelf.mine.meta
+
+import bookshelf.mine._
 
 import scala.util.Try
 
 case class Award_category(
-                  id: Int,
-                  name: String,
-                  type_id: Int,
-                  category_order: String,
-                  note_id: Option[Int]
-                )
+                           id: Int,
+                           name: String,
+                           type_id: Int,
+                           category_order: String,
+                           note_id: Option[Int]
+                         )
 
 object Award_category {
 

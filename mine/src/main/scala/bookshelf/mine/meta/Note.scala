@@ -1,11 +1,13 @@
-package bookshelf.mine
+package bookshelf.mine.meta
+
+import bookshelf.mine._
 
 import scala.util.Try
 
 case class Note(
-                id: Int,
-                note: String
-              )
+                 id: Int,
+                 note: String
+               )
 
 object Note {
 
