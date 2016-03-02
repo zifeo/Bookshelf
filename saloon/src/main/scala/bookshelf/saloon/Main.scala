@@ -18,10 +18,12 @@ private[saloon] object Main extends App {
   implicit val ec = system.dispatcher
 
   val routes =
-    path("q") {
+    path("search" / Segment) { terms =>
       get {
         complete {
-          "hello"
+
+
+          s"hello $terms"
         }
       }
     } ~
@@ -31,11 +33,15 @@ private[saloon] object Main extends App {
       getFromDirectory("static")
 
 
-  val bindingFuture = Http().bindAndHandle(logRequestResult("Bookshelf", Logging.InfoLevel)(routes), config.getString("http.interface"), config.getInt("http.port"))
+  val bind = Http().bindAndHandle(
+    logRequestResult("Bookshelf", Logging.InfoLevel)(routes),
+    config.getString("http.interface"),
+    config.getInt("http.port")
+  )
 
   println("Press ENTER to stop.")
   StdIn.readLine()
-  bindingFuture
+  bind
     .flatMap(_.unbind())
     .onComplete(_ => system.terminate())
 
