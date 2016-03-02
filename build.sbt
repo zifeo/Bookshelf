@@ -34,6 +34,9 @@ lazy val saloon = project
       "io.getquill" %% "quill-jdbc" % "0.4.1",
       "io.getquill" %% "quill-async" % "0.4.1",
       "com.github.nscala-time" %% "nscala-time" % "2.10.0"
-    )
+    ),
+    assemblyJarName in assembly := "bookshelf-saloon.jar",
+    test in assembly := {},
+    mainClass in assembly := Some("bookshelf.saloon.Main")
   )
 
