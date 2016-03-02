@@ -3,6 +3,7 @@ package bookshelf.saloon
 import akka.actor.ActorSystem
 import akka.event.Logging
 import akka.http.scaladsl.Http
+import akka.http.scaladsl.model.{ContentType, HttpEntity, MediaTypes, HttpResponse}
 import akka.http.scaladsl.server.Directives._
 import akka.stream.ActorMaterializer
 import com.typesafe.config.ConfigFactory
@@ -21,9 +22,37 @@ private[saloon] object Main extends App {
     path("search" / Segment) { terms =>
       get {
         complete {
-
-
-          s"hello $terms"
+          val json = s"""
+            |{
+            |	"results": {
+            |		"category1": {
+            |			"name": "Category 1",
+            |			"results": [{
+            |				"title": "Result Title",
+            |				"url": "/optional/url/on/click",
+            |				"description": "Optional Description"
+            |			}, {
+            |				"title": "Result Title",
+            |				"url": "/optional/url/on/click",
+            |				"description": "Just typing $terms"
+            |			}]
+            |		},
+            |		"category2": {
+            |			"name": "Category 2",
+            |			"results": [{
+            |				"title": "Result Title",
+            |				"url": "/optional/url/on/click",
+            |				"description": "Optional Description"
+            |			}]
+            |		}
+            |	},
+            |	"action": {
+            |		"url": "/path/to/results",
+            |		"text": "View all 202 results"
+            |	}
+            |}
+          """.stripMargin
+          HttpResponse(entity = HttpEntity(ContentType(MediaTypes.`application/json`), json))
         }
       }
     } ~
