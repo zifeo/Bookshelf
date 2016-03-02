@@ -1,19 +1,19 @@
 package bookshelf.mining
 
 import bookshelf.mining.publication._
+import bookshelf.mining.title._
 
 object Main extends App {
 
   def prettyPrint[T](data: List[T]): Unit =
     println(data.mkString("\n"))
 
-  /*
   println("\n\n===== Authors =====")
   prettyPrint(Author.all.filter(_.isFailure))
-  */
+  /*
   println("\n\n===== Publications =====")
   prettyPrint(Publications.all.filter(_.isFailure))
-  /*
+
   println("\n\n===== Publication authors =====")
   prettyPrint(Publication_author.all.filter(_.isFailure))
 
@@ -46,9 +46,22 @@ object Main extends App {
 
   println("\n\n===== Notes =====")
   prettyPrint(Note.all.filter(_.isFailure))
+
+  println("\n\n===== Titles =====")
+  prettyPrint(Title.all.filter(_.isFailure))
+
+  println("\n\n===== Titles award =====")
+  prettyPrint(Titles_awards.all.filter(_.isFailure))
+
+  println("\n\n===== Titles series =====")
+  prettyPrint(Titles_series.all.filter(_.isFailure))
+
+  println("\n\n===== Titles tag =====")
+  prettyPrint(Titles_tag.all.filter(_.isFailure))
+
+  println("\n\n===== reviews =====")
+  prettyPrint(Reviews.all.filter(_.isFailure))
   */
-
-
   println("\n==============\n===== DONE =====\n==============")
 
 }
