@@ -19,7 +19,10 @@ lazy val mine = project
   .settings(commonSettings: _*)
   .settings(
     name := "Mine",
-    javaOptions += "-Xmx4G"
+    javaOptions += "-Xmx4G",
+    libraryDependencies ++= Seq(
+      "org.scalatest" % "scalatest_2.11" % "2.2.6"
+    )
   )
 
 lazy val saloon = project
