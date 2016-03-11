@@ -69,9 +69,9 @@ private[saloon] object Main extends App {
   )
 
   println("Press ENTER to stop.")
-  StdIn.readLine()
+  /*StdIn.readLine()
   bind
     .flatMap(_.unbind())
-    .onComplete(_ => system.terminate())
+    .onComplete(_ => system.terminate())*/
 
 }
