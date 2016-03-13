@@ -6,14 +6,14 @@ import scala.util.Try
 
 case class Webpage(
                     id: Int,
-                    author_id: Option[Int],
-                    publisher_id: Option[Int],
-                    URL: String,
-                    publication_series_id: Option[Int],
-                    title_id: Option[Int],
-                    award_type_id: Option[Int],
-                    title_series_id: Option[Int],
-                    award_category_id: Option[Int]
+                    authorId: Option[Int],
+                    publisherId: Option[Int],
+                    titleId: Option[Int],
+                    url: String,
+                    publicationsSeriesId: Option[Int],
+                    awardTypeId: Option[Int],
+                    titleSeriesId: Option[Int],
+                    awardCategoryId: Option[Int]
                   )
 
 object Webpage {

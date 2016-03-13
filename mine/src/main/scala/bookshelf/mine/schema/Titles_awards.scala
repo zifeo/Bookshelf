@@ -5,9 +5,8 @@ import bookshelf.mine._
 import scala.util.Try
 
 case class Titles_awards(
-                          taw_id: Int,
-                          award_id: Int,
-                          title_id: Int
+                          awardId: Int,
+                          titleId: Int
                         )
 
 object Titles_awards {
@@ -17,9 +16,8 @@ object Titles_awards {
 
   def parseCols(raw: List[String]): Try[Titles_awards] = Try {
     raw match {
-      case List(taw_id, aw, title) =>
+      case List(tawId, aw, title) =>
         Titles_awards(
-          taw_id.toInt,
           aw.toInt,
           title.toInt
         )

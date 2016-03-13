@@ -5,9 +5,9 @@ import bookshelf.mine._
 import scala.util.Try
 
 case class Publisher(
-                              publisher_id: Int,
-                              publisher_name: String,
-                              note_id: Option[Int]
+                              id: Int,
+                              name: String,
+                              noteId: Option[Int]
                             )
 
 object Publisher {

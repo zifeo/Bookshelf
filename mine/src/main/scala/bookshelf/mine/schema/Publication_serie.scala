@@ -5,9 +5,9 @@ import bookshelf.mine._
 import scala.util.Try
 
 case class Publication_serie(
-                                ps_id: Int,
-                                ps_name: String,
-                                note_id: Option[Int]
+                                id: Int,
+                                name: String,
+                                noteId: Option[Int]
                               )
 
 object Publication_serie {

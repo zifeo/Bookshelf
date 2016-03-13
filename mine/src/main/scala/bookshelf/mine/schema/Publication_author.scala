@@ -5,9 +5,8 @@ import bookshelf.mine._
 import scala.util.Try
 
 case class Publication_author(
-                               pa_id: Int,
-                               publication_id: Int,
-                               author_id: Int
+                               publicationId: Int,
+                               authorId: Int
                              )
 
 object Publication_author {
@@ -19,7 +18,6 @@ object Publication_author {
     raw match {
       case List(id, pub, auth) =>
         Publication_author(
-          id.toInt,
           pub.toInt,
           auth.toInt
         )

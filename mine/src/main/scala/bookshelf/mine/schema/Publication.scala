@@ -8,19 +8,19 @@ import scala.util.Try
 case class Publication(
                          id: Int,
                          title: String,
-                         date: java.util.Date,
-                         publisher_id: Option[Int],
+                         datePub: java.util.Date,
+                         publisherId: Option[Int],
                          pages: Option[Int],
                          preface: Option[Int],
                          packaging: String,
-                         pub_type: Option[Publication_Type],
+                         `type`: Option[Publication_Type],
                          isbn: Option[Long],
                          image: String,
                          price: Option[Double],
                          currency: String,
-                         note_id: Option[Int],
-                         pub_series_id: Option[Int],
-                         pub_series_nb: Option[Int]
+                         noteId: Option[Int],
+                         pubSeriesId: Option[Int],
+                         pubSeriesNb: Option[Int]
                        )
 
 object Publication {

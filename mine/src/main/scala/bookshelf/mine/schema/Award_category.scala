@@ -7,9 +7,9 @@ import scala.util.Try
 case class Award_category(
                            id: Int,
                            name: String,
-                           type_id: Int,
-                           category_order: String,
-                           note_id: Option[Int]
+                           typeId: Int,
+                           order: String,
+                           noteId: Option[Int]
                          )
 
 object Award_category {

@@ -6,14 +6,14 @@ import scala.util.Try
 
 case class Award_type(
                        id: Int,
-                       type_code: String,
-                       type_name: String,
-                       note_id: Option[Int],
-                       awarded_by: String,
-                       awarded_for: String,
-                       short_name: String,
+                       code: String,
+                       name: String,
+                       noteId: Option[Int],
+                       awardedBy: String,
+                       awardedFor: String,
+                       shortName: String,
                        poll: Boolean,
-                       non_genre: Boolean
+                       nonGenre: Boolean
                      )
 
 object Award_type {
