@@ -2,6 +2,7 @@ package bookshelf.mine
 
 import io.getquill._
 import io.getquill.naming.SnakeCase
+import scala.concurrent.ExecutionContext.Implicits.global
 
 object Quill extends App {
 

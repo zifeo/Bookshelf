@@ -2,7 +2,7 @@
 lazy val commonSettings = Seq(
   organization := "bookshelf",
   version := "1.0",
-  scalaVersion := "2.11.7",
+  scalaVersion := "2.11.8",
   scalacOptions ++= Seq(
     "-deprecation",
     "-feature",
@@ -13,7 +13,8 @@ lazy val commonSettings = Seq(
   libraryDependencies ++= Seq(
     "org.postgresql" % "postgresql" % "9.4-1206-jdbc41",
     "io.getquill" %% "quill-jdbc" % "0.4.1",
-    "io.getquill" %% "quill-async" % "0.4.1"
+    "io.getquill" %% "quill-async" % "0.4.1",
+    "ch.qos.logback" % "logback-classic" % "1.1.6"
   ),
   cancelable in Global := true,
   fork := true
