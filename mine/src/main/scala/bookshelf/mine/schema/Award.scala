@@ -8,10 +8,8 @@ case class Award(
                   id: Int,
                   title: String,
                   date: java.util.Date,
-                  type_code: String,
-                  type_id: Int,
-                  category_id: Int,
-                  note_id: Option[Int]
+                  categoryId: Int,
+                  noteId: Option[Int]
                 )
 
 object Award {
@@ -26,8 +24,6 @@ object Award {
           id.toInt,
           title,
           stringToDate(date),
-          type_code,
-          type_id.toInt,
           category_id.toInt,
           intOrNone(note_id)
         )

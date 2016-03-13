@@ -8,7 +8,7 @@ case class Titles_series(
                           id: Int,
                           title: String,
                           parent: Option[Int],
-                          note_id: Option[Int]
+                          noteId: Option[Int]
                         )
 
 object Titles_series {

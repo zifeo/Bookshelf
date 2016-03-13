@@ -7,18 +7,18 @@ import bookshelf.mine.schema.Title.Type.Type
 import scala.util.Try
 
 case class Title(
-                  title_id: Int,
+                  id: Int,
                   title: String,
                   translator: Option[String],
                   synopsis: Option[String],
-                  note_id: Option[Int],
-                  serie_id: Option[Int],
-                  serie_number: Option[Int],
-                  length: Option[SLength],
-                  title_type: Option[Type],
-                  parent_id: Option[Int],
-                  language_id: Option[Int],
-                  title_graphic: String
+                  noteId: Option[Int],
+                  seriesId: Option[Int],
+                  seriesNum: Option[Int],
+                  storyLength: Option[SLength],
+                  `type`: Option[Type],
+                  parent: Option[Int],
+                  languageId: Option[Int],
+                  graphic: Boolean
                 )
 
 object Title {

@@ -5,9 +5,8 @@ import bookshelf.mine._
 import scala.util.Try
 
 case class Reviews(
-                    id: Int,
-                    title_id: Int,
-                    review_id: Int
+                    titleId: Int,
+                    reviewId: Int
                   )
 
 object Reviews {
@@ -19,7 +18,6 @@ object Reviews {
     raw match {
       case List(id, title, review) =>
         Reviews(
-          id.toInt,
           title.toInt,
           review.toInt
         )
