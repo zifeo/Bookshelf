@@ -1,6 +1,8 @@
 package bookshelf.mine.schema
 
 import bookshelf.mine._
+import bookshelf.mine.schema.Title.SLength.SLength
+import bookshelf.mine.schema.Title.Type.Type
 
 import scala.util.Try
 
@@ -23,16 +25,31 @@ object Title {
 
   object Type extends Enumeration {
     type Type = Value
-    val ANTHOLOGY, BACKCOVERART, COLLECTION, COVERART, INTERIORART, EDITOR, ESSAY, INTERVIEW, NOVEL = Value
+    val ANTHOLOGY = Value("ANTHOLOGY")
+    val BACKCOVERART = Value("BACKCOVERART")
+    val COLLECTION = Value("COLLECTION")
+    val COVERART = Value("COVERART")
+    val INTERIORART = Value("INTERIORART")
+    val EDITOR = Value("EDITOR")
+    val ESSAY = Value("ESSAY")
+    val INTERVIEW = Value("INTERVIEW")
+    val NOVEL = Value("NOVEL")
+    val NONFICTION = Value("NONFICTION")
+    val OMNIBUS = Value("OMNIBUS")
+    val POEM = Value("POEM")
+    val REVIEW = Value("REVIEW")
+    val SERIAL = Value("SERIAL")
+    val SHORTFICTION = Value("SHORTFICTION")
+    val CHAPBOOK = Value("CHAPBOOK")
   }
 
   object SLength extends Enumeration {
     type SLength = Value
-    val nv = Value("novella")
-    val ss = Value("short story")
-    val jvn = Value("juvenile fiction")
-    val nvz = Value("novellization")
-    val sf = Value("short fiction")
+    val nv = Value("NOVELLA")
+    val ss = Value("SHORTSTORY")
+    val jvn = Value("JUVENILE_FICTION")
+    val nvz = Value("NOVELIZATION")
+    val sf = Value("SHORT_FICTION")
   }
 
   private[mine] lazy val raw = getDataset("titles.csv")

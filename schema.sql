@@ -27,11 +27,15 @@ CREATE TABLE publications
   publisher_id INT NOT NULL, -- fk
   pages INT,
   packaging_type VARCHAR(50) NOT NULL,
-  type VARCHAR(30) NOT NULL, -- CHECK (VALUE IN ('..', '..', '..', '..', '..')))
+  type VARCHAR(30) NOT NULL CHECK (
+    VALUE IN ('ANTHOLOGY', 'COLLECTION', 'MAGAZINE', 'NONFICTION', 'NOVEL', 'OMNIBUS', 'FANZINE', 'CHAPBOOK')
+  ),
   isbn INT UNIQUE,
   cover VARCHAR(200),
   price FLOAT,
-  currency VARCHAR(5),
+  currency VARCHAR(5) CHECK (
+    VALUE IN ('€', '$', '£', 'CH')
+  ),
   pub_series_id INT, -- fk
   pub_series_num INT,
   note_id INT -- fk
@@ -46,11 +50,16 @@ CREATE TABLE titles
   note_id INT, -- fk
   series_id INT, -- fk
   series_num INT,
-  story_length VARCHAR(10),
-  type VARCHAR(30),
+  story_length VARCHAR(10) CHECK (
+    VALUE IN ('NOVELLA', 'SHORTSTORY', 'JUVENILE_FICTION', 'NOVELIZATION', 'SHORT_FICTION')
+  ),
+  type VARCHAR(30) CHECK (
+    VALUE IN ('ANTHOLOGY', 'BACKCOVERART', 'COLLECTION', 'COVERART', 'INTERIORART', 'EDITOR', 'ESSAY', 'INTERVIEW',
+              'NOVEL', 'NONFICTION', 'OMNIBUS', 'POEM', 'REVIEW', 'SERIAL', 'SHORTFICTION', 'CHAPBOOK')
+  ),
   parent INT NOT NULL DEFAULT 0, -- fk, 0 on not defined
   language_id INT, -- fk
-  graphic BOOLEAN NOT NULL,
+  graphic BOOLEAN NOT NULL
 );
 
 CREATE TABLE languages
