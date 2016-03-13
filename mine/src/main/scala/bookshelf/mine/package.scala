@@ -40,16 +40,10 @@ package object mine {
   def stringToDate(raw: String): java.util.Date = {
     if (raw.contains("-")) {
       FORMAT_DATE_1.parse(raw)
-    }
-    else if (raw.contains("/")) {
+    } else if (raw.contains("/")) {
       FORMAT_DATE_2.parse(raw)
     } else {
-      if (true) {
-        // above if the is a full integer, so we can convert it and therefore it is the number of days after y. 1970
-        new java.util.Date()
-      } else {
-        new java.util.Date()
-      }
+      new java.util.Date()
     }
   }
 
@@ -112,7 +106,5 @@ package object mine {
       case x => Some(x)
     }
   }
-
-  def parseEnum = ???
 
 }
