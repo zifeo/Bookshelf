@@ -58,8 +58,8 @@ object Titles {
         Titles(
           id.toInt,
           title,
-          nullOrString(translator),
-          nullOrString(synopsis),
+          stringOrNone(translator),
+          stringOrNone(synopsis),
           intOrNone(noteId),
           intOrNone(serieId),
           intOrNone(serieNb),

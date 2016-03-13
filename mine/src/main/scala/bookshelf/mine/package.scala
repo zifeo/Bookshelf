@@ -90,9 +90,9 @@ package object mine {
     impl(number.toUpperCase().toList)
   }
 
-  def nullOrString(raw: String): Option[String] = {
+  def stringOrNone(raw: String): Option[String] = {
     raw match {
-      case "\\N" => None
+      case "\\N" | "" => None
       case x => Some(x)
     }
   }
