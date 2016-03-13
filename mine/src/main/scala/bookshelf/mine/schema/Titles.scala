@@ -57,20 +57,21 @@ object Titles {
 
   def parseCols(raw: List[String]): Try[Titles] = Try {
     raw match {
-      case List(id, title, translator, synopsis, note_id, serie_id, serie_nb, length, t_type, parent, language, graphic) =>
+      case List(id, title, translator, synopsis, noteId, serieId, serieNb, length, tType, parent, language, graphic) =>
         Titles(
           id.toInt,
           title,
-          parseString(translator),
-          parseString(synopsis),
-          intOrNone(note_id),
-          intOrNone(serie_id),
-          intOrNone(serie_nb),
+          nullOrString(translator),
+          nullOrString(synopsis),
+          intOrNone(noteId),
+          intOrNone(serieId),
+          intOrNone(serieNb),
           parseLength(length),
-          parseType(t_type),
+          parseType(tType),
           intOrNone(parent),
           intOrNone(language),
-          graphic)
+          parseBool(graphic)
+        )
     }
   }
 

@@ -59,29 +59,29 @@ object Publications {
 
   def parseCols(raw: List[String]): Try[Publications] = Try {
     raw match {
-      case List(id, title, date, publisher_id, pages, packaging, pub_type, isbn, image, price, note_id, pub_series_id, pub_series_nb) => {
+      case List(id, title, date, publisherId, pages, packaging, pubType, isbn, image, price, noteId, pubSeriesId, pubSeriesNb) =>
         val (book_pages, pages_prefaces) = getPages(pages)
         val (money, currency) = parseCurrency(price)
         Publications(
           id.toInt,
           title,
           stringToDate(date), // need to manage the litteral without -
-          intOrNone(publisher_id),
+          intOrNone(publisherId),
           book_pages,
           pages_prefaces,
           packaging,
-          Publication_Type.values.find(_.equals(pub_type)),
+          Publication_Type.values.find(_.equals(pubType)),
           longOrNone(isbn),
           image,
           money,
           currency,
-          intOrNone(note_id),
-          intOrNone(pub_series_id),
-          intOrNone(pub_series_nb)
+          intOrNone(noteId),
+          intOrNone(pubSeriesId),
+          intOrNone(pubSeriesNb)
         )
       }
     }
-  }
+
 
 }
 
