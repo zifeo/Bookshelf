@@ -1,4 +1,4 @@
-package bookshelf.mine.titles
+package bookshelf.mine.schema
 
 import bookshelf.mine._
 

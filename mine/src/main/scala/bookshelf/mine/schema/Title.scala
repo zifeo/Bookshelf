@@ -1,8 +1,6 @@
-package bookshelf.mine.titles
+package bookshelf.mine.schema
 
 import bookshelf.mine._
-import bookshelf.mine.titles.Title.SLength.SLength
-import bookshelf.mine.titles.Title.Type.Type
 
 import scala.util.Try
 
