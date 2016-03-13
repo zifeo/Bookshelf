@@ -5,24 +5,21 @@ import bookshelf.mine._
 import scala.util.Try
 
 case class Authors(
-                   id: Int,
-                   name: String,
-                   legalName: String,
-                   lastName: String,
-                   pseudonym: String,
-                   birthPlace: String,
-                   birthDate: java.util.Date,
-                   deathDate: java.util.Date,
-                   email: String,
-                   image: String,
-                   languageId: Option[Int],
-                   noteId: Option[Int]
-                 )
+                    id: Int,
+                    name: String,
+                    legalName: String,
+                    lastName: String,
+                    pseudonym: String,
+                    birthPlace: String,
+                    birthDate: java.util.Date,
+                    deathDate: java.util.Date,
+                    email: String,
+                    image: String,
+                    languageId: Option[Int],
+                    noteId: Option[Int]
+                  )
 
 object Authors {
-
-  private[mine] lazy val raw = getDataset("authors.csv")
-  private[mine] lazy val all = raw.map(parseCols)
 
   def parseCols(raw: List[String]): Try[Authors] = Try {
     raw match {

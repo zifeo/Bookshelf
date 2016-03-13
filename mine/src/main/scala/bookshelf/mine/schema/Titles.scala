@@ -1,25 +1,25 @@
 package bookshelf.mine.schema
 
 import bookshelf.mine._
-import bookshelf.mine.schema.Titles.SLength.SLength
+import bookshelf.mine.schema.Titles.Length.Length
 import bookshelf.mine.schema.Titles.Type.Type
 
 import scala.util.Try
 
 case class Titles(
-                  id: Int,
-                  title: String,
-                  translator: Option[String],
-                  synopsis: Option[String],
-                  noteId: Option[Int],
-                  seriesId: Option[Int],
-                  seriesNum: Option[Int],
-                  storyLength: Option[SLength],
-                  `type`: Option[Type],
-                  parent: Option[Int],
-                  languageId: Option[Int],
-                  graphic: Boolean
-                )
+                   id: Int,
+                   title: String,
+                   translator: Option[String],
+                   synopsis: Option[String],
+                   noteId: Option[Int],
+                   seriesId: Option[Int],
+                   seriesNum: Option[Int],
+                   storyLength: Option[Length],
+                   `type`: Option[Type],
+                   parent: Option[Int],
+                   languageId: Option[Int],
+                   graphic: Boolean
+                 )
 
 object Titles {
 
@@ -43,17 +43,14 @@ object Titles {
     val CHAPBOOK = Value("CHAPBOOK")
   }
 
-  object SLength extends Enumeration {
-    type SLength = Value
+  object Length extends Enumeration {
+    type Length = Value
     val nv = Value("NOVELLA")
     val ss = Value("SHORTSTORY")
     val jvn = Value("JUVENILE_FICTION")
     val nvz = Value("NOVELIZATION")
     val sf = Value("SHORT_FICTION")
   }
-
-  private[mine] lazy val raw = getDataset("titles.csv")
-  private[mine] lazy val all = raw.map(parseCols)
 
   def parseCols(raw: List[String]): Try[Titles] = Try {
     raw match {
@@ -70,18 +67,18 @@ object Titles {
           parseType(tType),
           intOrNone(parent),
           intOrNone(language),
-          parseBool(graphic)
+          parseBoolean(graphic)
         )
     }
   }
 
-  def parseLength(raw: String): Option[SLength] = {
+  def parseLength(raw: String): Option[Length] = {
     raw match {
-      case "nv" => Some(SLength.nv)
-      case "ss" => Some(SLength.ss)
-      case "jvn" => Some(SLength.jvn)
-      case "nvz" => Some(SLength.nvz)
-      case "sf" => Some(SLength.sf)
+      case "nv" => Some(Length.nv)
+      case "ss" => Some(Length.ss)
+      case "jvn" => Some(Length.jvn)
+      case "nvz" => Some(Length.nvz)
+      case "sf" => Some(Length.sf)
       case _ => None
     }
   }

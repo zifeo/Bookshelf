@@ -21,8 +21,6 @@ object AwardsTypes {
   private[mine] lazy val raw = getDataset("award_types.csv")
   private[mine] lazy val all = raw.map(parseCols)
 
-  def getBoolean(raw: String): Boolean = raw.toLowerCase.equals("yes")
-
   def parseCols(raw: List[String]): Try[AwardsTypes] = Try {
     raw match {
       case List(id, code, name, noteId, awardedBy, awardedFor, shortName, poll, nonGenre) =>
@@ -34,8 +32,8 @@ object AwardsTypes {
           awardedBy,
           awardedFor,
           shortName,
-          getBoolean(poll),
-          getBoolean(nonGenre)
+          parseBoolean(poll),
+          parseBoolean(nonGenre)
         )
     }
   }

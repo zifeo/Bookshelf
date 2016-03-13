@@ -13,9 +13,6 @@ case class TitlesSeries(
 
 object TitlesSeries {
 
-  private[mine] lazy val raw = getDataset("titles_series.csv")
-  private[mine] lazy val all = raw.map(parseCols)
-
   def parseCols(raw: List[String]): Try[TitlesSeries] = Try {
     raw match {
       case List(id, title, parent, noteId) =>
