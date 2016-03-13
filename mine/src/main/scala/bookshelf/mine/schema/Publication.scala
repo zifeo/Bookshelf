@@ -51,7 +51,7 @@ object Publication {
   private[mine] lazy val raw = getDataset("publications.csv")
   private[mine] lazy val all = raw.map(parseCols)
 
-  def getCurrency(money: String): (Option[Double], String) = money match {
+  def parseCurrency(money: String): (Option[Double], String) = money match {
     case PATTERN_MONEY_1(g1, g2) => (Try(g1.toDouble).toOption, g2)
     case PATTERN_MONEY_2(g1, g2) => (Try(g2.toDouble).toOption, g1)
     case _ => (Try(money.toDouble).toOption, "")
@@ -61,7 +61,7 @@ object Publication {
     raw match {
       case List(id, title, date, publisher_id, pages, packaging, pub_type, isbn, image, price, note_id, pub_series_id, pub_series_nb) => {
         val (book_pages, pages_prefaces) = getPages(pages)
-        val (money, currency) = getCurrency(price)
+        val (money, currency) = parseCurrency(price)
         Publication(
           id.toInt,
           title,
