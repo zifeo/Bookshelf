@@ -1,11 +1,11 @@
 package bookshelf.mine.schema
 
 import bookshelf.mine._
-import bookshelf.mine.schema.Publication.Publication_Type.Publication_Type
+import bookshelf.mine.schema.Publications.Publication_Type.Publication_Type
 
 import scala.util.Try
 
-case class Publication(
+case class Publications(
                          id: Int,
                          title: String,
                          datePub: java.util.Date,
@@ -23,7 +23,7 @@ case class Publication(
                          pubSeriesNb: Option[Int]
                        )
 
-object Publication {
+object Publications {
 
   object Publication_Type extends Enumeration {
     type Publication_Type = Value
@@ -57,12 +57,12 @@ object Publication {
     case _ => (Try(money.toDouble).toOption, "")
   }
 
-  def parseCols(raw: List[String]): Try[Publication] = Try {
+  def parseCols(raw: List[String]): Try[Publications] = Try {
     raw match {
       case List(id, title, date, publisher_id, pages, packaging, pub_type, isbn, image, price, note_id, pub_series_id, pub_series_nb) => {
         val (book_pages, pages_prefaces) = getPages(pages)
         val (money, currency) = parseCurrency(price)
-        Publication(
+        Publications(
           id.toInt,
           title,
           stringToDate(date), // need to manage the litteral without -

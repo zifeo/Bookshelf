@@ -1,12 +1,12 @@
 package bookshelf.mine.schema
 
 import bookshelf.mine._
-import bookshelf.mine.schema.Title.SLength.SLength
-import bookshelf.mine.schema.Title.Type.Type
+import bookshelf.mine.schema.Titles.SLength.SLength
+import bookshelf.mine.schema.Titles.Type.Type
 
 import scala.util.Try
 
-case class Title(
+case class Titles(
                   id: Int,
                   title: String,
                   translator: Option[String],
@@ -21,7 +21,7 @@ case class Title(
                   graphic: Boolean
                 )
 
-object Title {
+object Titles {
 
   object Type extends Enumeration {
     type Type = Value
@@ -55,10 +55,10 @@ object Title {
   private[mine] lazy val raw = getDataset("titles.csv")
   private[mine] lazy val all = raw.map(parseCols)
 
-  def parseCols(raw: List[String]): Try[Title] = Try {
+  def parseCols(raw: List[String]): Try[Titles] = Try {
     raw match {
       case List(id, title, translator, synopsis, note_id, serie_id, serie_nb, length, t_type, parent, language, graphic) =>
-        Title(
+        Titles(
           id.toInt,
           title,
           parseString(translator),
