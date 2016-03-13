@@ -74,13 +74,6 @@ object Title {
     }
   }
 
-  def parseString(raw: String): Option[String] = {
-    raw match {
-      case "\\N" => None
-      case x => Some(x)
-    }
-  }
-
   def parseLength(raw: String): Option[SLength] = {
     raw match {
       case "nv" => Some(SLength.nv)
