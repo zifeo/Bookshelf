@@ -1,4 +1,4 @@
-package bookshelf.mine.meta
+package bookshelf.mine.schema
 
 import bookshelf.mine._
 

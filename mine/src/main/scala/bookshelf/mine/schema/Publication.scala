@@ -1,7 +1,7 @@
-package bookshelf.mine.publications
+package bookshelf.mine.schema
 
 import bookshelf.mine._
-import bookshelf.mine.publications.Publication.Publication_Type.Publication_Type
+import bookshelf.mine.schema.Publication.Publication_Type.Publication_Type
 
 import scala.util.Try
 
