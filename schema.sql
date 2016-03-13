@@ -28,15 +28,11 @@ CREATE TABLE publications
   pages          INT,
 
   packaging_type VARCHAR(50)     NOT NULL,
-  type           VARCHAR(30)     NOT NULL CHECK (
-    VALUE IN ('ANTHOLOGY', 'COLLECTION', 'MAGAZINE', 'NONFICTION', 'NOVEL', 'OMNIBUS', 'FANZINE', 'CHAPBOOK')
-  ),
+  type           VARCHAR(30)     NOT NULL,
   isbn           INT UNIQUE,
   cover          VARCHAR(200),
   price          FLOAT,
-  currency       VARCHAR(5) CHECK (
-    VALUE IN ('€', '$', '£', 'CH')
-  ),
+  currency       VARCHAR(5),
   pub_series_id  INT, -- fk
   pub_series_num INT,
   note_id        INT -- fk
@@ -51,13 +47,8 @@ CREATE TABLE titles
   note_id      INT, -- fk
   series_id    INT, -- fk
   series_num   INT,
-  story_length VARCHAR(10) CHECK (
-    VALUE IN ('NOVELLA', 'SHORTSTORY', 'JUVENILE_FICTION', 'NOVELIZATION', 'SHORT_FICTION')
-  ),
-  type         VARCHAR(30) CHECK (
-    VALUE IN ('ANTHOLOGY', 'BACKCOVERART', 'COLLECTION', 'COVERART', 'INTERIORART', 'EDITOR', 'ESSAY', 'INTERVIEW',
-                           'NOVEL', 'NONFICTION', 'OMNIBUS', 'POEM', 'REVIEW', 'SERIAL', 'SHORTFICTION', 'CHAPBOOK')
-  ),
+  story_length VARCHAR(10),
+  type         VARCHAR(30),
   parent       INT             NOT NULL DEFAULT 0, -- fk, 0 on not defined
   language_id  INT, -- fk
   graphic      BOOLEAN         NOT NULL
@@ -157,35 +148,35 @@ CREATE TABLE publications_authors
 (
   publication_id INT NOT NULL, -- fk
   author_id      INT NOT NULL, -- fk
-  CONSTRAINT PK PRIMARY KEY (publication_id, author_id)
+  CONSTRAINT pk_publications_authors PRIMARY KEY (publication_id, author_id)
 );
 
 CREATE TABLE titles_awards
 (
   title_id INT NOT NULL, -- fk
   award_id INT NOT NULL, -- fk
-  CONSTRAINT PK PRIMARY KEY (title_id, award_id)
+  CONSTRAINT pk_titles_awards PRIMARY KEY (title_id, award_id)
 );
 
 CREATE TABLE titles_tags
 (
   title_id INT NOT NULL, -- fk
   tag_id   INT NOT NULL, -- fk
-  CONSTRAINT PK PRIMARY KEY (title_id, tag_id)
+  CONSTRAINT pk_titles_tags PRIMARY KEY (title_id, tag_id)
 );
 
 CREATE TABLE reviews
 (
   title_id  INT NOT NULL, -- fk
   review_id INT NOT NULL, -- fk
-  CONSTRAINT PK PRIMARY KEY (title_id, review_id)
+  CONSTRAINT pk_reviews PRIMARY KEY (title_id, review_id)
 );
 
 CREATE TABLE publications_contents
 (
   title_id       INT NOT NULL, -- fk
   publication_id INT NOT NULL, -- fk
-  CONSTRAINT PK PRIMARY KEY (title_id, publication_id)
+  CONSTRAINT pk_publications_contents PRIMARY KEY (title_id, publication_id)
 );
 
 /************************
