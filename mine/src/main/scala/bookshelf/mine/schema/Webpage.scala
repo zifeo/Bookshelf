@@ -28,9 +28,9 @@ object Webpage {
           id.toInt,
           intOrNone(author_id),
           intOrNone(publisher_id),
+          intOrNone(title_id),
           url,
           intOrNone(publication_series_id),
-          intOrNone(title_id),
           intOrNone(award_type_id),
           intOrNone(title_series_id),
           intOrNone(award_category_id)
