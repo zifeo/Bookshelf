@@ -18,12 +18,12 @@ object TitlesSeries {
 
   def parseCols(raw: List[String]): Try[TitlesSeries] = Try {
     raw match {
-      case List(id, title, parent, note_id) =>
+      case List(id, title, parent, noteId) =>
         TitlesSeries(
           id.toInt,
           title,
           intOrNone(parent),
-          intOrNone(note_id)
+          intOrNone(noteId)
         )
     }
   }

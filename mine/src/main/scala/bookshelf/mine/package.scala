@@ -100,11 +100,18 @@ package object mine {
     impl(number.toUpperCase().toList)
   }
 
-  def parseString(raw: String): Option[String] = {
+  def nullOrString(raw: String): Option[String] = {
     raw match {
       case "\\N" => None
       case x => Some(x)
     }
   }
+
+  def parseBool(str: String): Boolean = str.toLowerCase match {
+    case "true" | "1" => true
+    case "false" | "0" => false
+    case _ => throw new Exception(s"unable to parse $str to bool")
+  }
+
 
 }

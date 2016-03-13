@@ -25,17 +25,17 @@ object AwardsTypes {
 
   def parseCols(raw: List[String]): Try[AwardsTypes] = Try {
     raw match {
-      case List(id, code, name, note_id, awarded_by, awarded_for, short_name, poll, non_genre) =>
+      case List(id, code, name, noteId, awardedBy, awardedFor, shortName, poll, nonGenre) =>
         AwardsTypes(
           id.toInt,
           code,
           name,
-          intOrNone(note_id),
-          awarded_by,
-          awarded_for,
-          short_name,
+          intOrNone(noteId),
+          awardedBy,
+          awardedFor,
+          shortName,
           getBoolean(poll),
-          getBoolean(non_genre)
+          getBoolean(nonGenre)
         )
     }
   }

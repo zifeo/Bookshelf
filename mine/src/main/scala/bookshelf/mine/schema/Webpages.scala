@@ -23,17 +23,17 @@ object Webpages {
 
   def parseCols(raw: List[String]): Try[Webpages] = Try {
     raw match {
-      case List(id, author_id, publisher_id, url, publication_series_id, title_id, award_type_id, title_series_id, award_category_id) =>
+      case List(id, authorId, publisherId, url, publicationSeriesId, titleId, awardTypeId, titleSeriesId, awardCategoryId) =>
         Webpages(
           id.toInt,
-          intOrNone(author_id),
-          intOrNone(publisher_id),
-          intOrNone(title_id),
+          intOrNone(authorId),
+          intOrNone(publisherId),
+          intOrNone(titleId),
           url,
-          intOrNone(publication_series_id),
-          intOrNone(award_type_id),
-          intOrNone(title_series_id),
-          intOrNone(award_category_id)
+          intOrNone(publicationSeriesId),
+          intOrNone(awardTypeId),
+          intOrNone(titleSeriesId),
+          intOrNone(awardCategoryId)
         )
     }
   }
