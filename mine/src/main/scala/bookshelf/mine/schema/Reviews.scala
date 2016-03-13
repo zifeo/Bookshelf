@@ -1,7 +1,5 @@
 package bookshelf.mine.schema
 
-import bookshelf.mine._
-
 import scala.util.Try
 
 case class Reviews(
@@ -10,9 +8,6 @@ case class Reviews(
                   )
 
 object Reviews {
-
-  private[mine] lazy val raw = getDataset("reviews.csv")
-  private[mine] lazy val all = raw.map(parseCols)
 
   def parseCols(raw: List[String]): Try[Reviews] = Try {
     raw match {

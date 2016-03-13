@@ -2,19 +2,9 @@ package bookshelf
 
 import java.text.SimpleDateFormat
 
-import scala.io.{Codec, Source}
 import scala.util.Try
 
 package object mine {
-
-  /**
-    * Returns the given file as lists of lists.
-    *
-    * @param name file name
-    * @return rows of columns
-    */
-  private[mine] def getDataset(name: String): List[List[String]] =
-    Source.fromFile(s"./datasets/$name")(Codec.ISO8859).getLines().map(_.split('\t').toList).toList
 
   /**
     * Parse an integer as an option.
@@ -107,10 +97,10 @@ package object mine {
     }
   }
 
-  def parseBool(str: String): Boolean = str.toLowerCase match {
-    case "true" | "1" => true
-    case "false" | "0" => false
-    case _ => throw new Exception(s"unable to parse $str to bool")
+  def parseBoolean(str: String): Boolean = str.toLowerCase match {
+    case "true" | "1" | "yes" => true
+    case "false" | "0" | "false" => false
+    case _ => throw new Exception(s"unable to parse $str to boolean")
   }
 
 

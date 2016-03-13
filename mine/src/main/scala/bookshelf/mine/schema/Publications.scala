@@ -1,7 +1,7 @@
 package bookshelf.mine.schema
 
 import bookshelf.mine._
-import bookshelf.mine.schema.Publications.Publication_Type.Publication_Type
+import bookshelf.mine.schema.Publications.Type.Publication_Type
 
 import scala.util.Try
 
@@ -25,7 +25,7 @@ case class Publications(
 
 object Publications {
 
-  object Publication_Type extends Enumeration {
+  object Type extends Enumeration {
     type Publication_Type = Value
     val ANTHOLOGY = Value("ANTHOLOGY")
     val COLLECTION = Value("COLLECTION")
@@ -48,9 +48,6 @@ object Publications {
   val PATTERN_MONEY_1 = "([\\d|\\.]*)([\\D]|\\.]*)".r
   val PATTERN_MONEY_2 = "([\\D]|\\.]*)([\\d|\\.]*)".r
 
-  private[mine] lazy val raw = getDataset("publications.csv")
-  private[mine] lazy val all = raw.map(parseCols)
-
   def parseCurrency(money: String): (Option[Double], String) = money match {
     case PATTERN_MONEY_1(g1, g2) => (Try(g1.toDouble).toOption, g2)
     case PATTERN_MONEY_2(g1, g2) => (Try(g2.toDouble).toOption, g1)
@@ -70,7 +67,7 @@ object Publications {
           book_pages,
           pages_prefaces,
           packaging,
-          Publication_Type.values.find(_.equals(pubType)),
+          Type.values.find(_.equals(pubType)),
           longOrNone(isbn),
           image,
           money,
@@ -79,9 +76,8 @@ object Publications {
           intOrNone(pubSeriesId),
           intOrNone(pubSeriesNb)
         )
-      }
     }
-
+  }
 
 }
 

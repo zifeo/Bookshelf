@@ -18,9 +18,6 @@ case class Webpages(
 
 object Webpages {
 
-  private[mine] lazy val raw = getDataset("webpages.csv")
-  private[mine] lazy val all = raw.map(parseCols)
-
   def parseCols(raw: List[String]): Try[Webpages] = Try {
     raw match {
       case List(id, authorId, publisherId, url, publicationSeriesId, titleId, awardTypeId, titleSeriesId, awardCategoryId) =>
