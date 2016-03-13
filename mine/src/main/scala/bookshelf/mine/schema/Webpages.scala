@@ -4,7 +4,7 @@ import bookshelf.mine._
 
 import scala.util.Try
 
-case class Webpage(
+case class Webpages(
                     id: Int,
                     authorId: Option[Int],
                     publisherId: Option[Int],
@@ -16,15 +16,15 @@ case class Webpage(
                     awardCategoryId: Option[Int]
                   )
 
-object Webpage {
+object Webpages {
 
   private[mine] lazy val raw = getDataset("webpages.csv")
   private[mine] lazy val all = raw.map(parseCols)
 
-  def parseCols(raw: List[String]): Try[Webpage] = Try {
+  def parseCols(raw: List[String]): Try[Webpages] = Try {
     raw match {
       case List(id, author_id, publisher_id, url, publication_series_id, title_id, award_type_id, title_series_id, award_category_id) =>
-        Webpage(
+        Webpages(
           id.toInt,
           intOrNone(author_id),
           intOrNone(publisher_id),

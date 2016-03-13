@@ -4,20 +4,20 @@ import bookshelf.mine._
 
 import scala.util.Try
 
-case class Titles_tag(
+case class TitlesTags(
                        tagId: Int,
                        titleId: Int
                      )
 
-object Titles_tag {
+object TitlesTags {
 
   private[mine] lazy val raw = getDataset("titles_tag.csv")
   private[mine] lazy val all = raw.map(parseCols)
 
-  def parseCols(raw: List[String]): Try[Titles_tag] = Try {
+  def parseCols(raw: List[String]): Try[TitlesTags] = Try {
     raw match {
       case List(id, tag, title) =>
-        Titles_tag(
+        TitlesTags(
           tag.toInt,
           title.toInt
         )
