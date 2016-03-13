@@ -4,7 +4,7 @@ import scala.util.Try
 
 case class PublicationsContents(
                                  titleId: Int,
-                                 publicationId: Int,
+                                 publicationId: Int
                                )
 
 object PublicationsContents {
