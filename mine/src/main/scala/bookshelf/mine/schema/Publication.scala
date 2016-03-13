@@ -28,14 +28,13 @@ object Publication {
   object Publication_Type extends Enumeration {
     type Publication_Type = Value
     val ANTHOLOGY = Value("ANTHOLOGY")
-    val BACKCOVERART = Value("BACKCOVERART")
     val COLLECTION = Value("COLLECTION")
-    val COVERART = Value("COVERART")
-    val INTERIORART = Value("INTERIORART")
-    val EDITOR = Value("EDITOR")
-    val ESSAY = Value("ESSAY")
-    val INTERVIEW = Value("INTERVIEW")
+    val MAGAZINE = Value("MAGAZINE")
+    val NONFICTION = Value("NONFICTION")
     val NOVEL = Value("NOVEL")
+    val OMNIBUS = Value("OMNIBUS")
+    val FANZINE = Value("FANZINE")
+    val CHAPBOOK = Value("CHAPBOOK")
   }
 
   object Currency extends Enumeration {
