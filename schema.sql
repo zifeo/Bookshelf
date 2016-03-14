@@ -5,16 +5,15 @@
 CREATE TABLE authors
 (
   id          INT PRIMARY KEY NOT NULL,
-  name        VARCHAR(70)     NOT NULL,
-  legal_name  VARCHAR(70)     NOT NULL,
-  last_name   VARCHAR(70),
-  pseudonym   VARCHAR(70)     NOT NULL,
-  ------------------------ ?????????????
-  birth_place VARCHAR(200),
+  name        VARCHAR(256)    NOT NULL,
+  legal_name  VARCHAR(256)    NOT NULL,
+  last_name   VARCHAR(256),
+  pseudonym   INT, -- fk
+  birth_place VARCHAR(256),
   birth_date  DATE,
   death_date  DATE,
-  email       VARCHAR(150) UNIQUE,
-  image       VARCHAR(200),
+  email       VARCHAR(256) UNIQUE,
+  image       VARCHAR(256),
   language_id INT, -- fk
   note_id     INT -- fk
 );
@@ -22,17 +21,17 @@ CREATE TABLE authors
 CREATE TABLE publications
 (
   id             INT PRIMARY KEY NOT NULL,
-  title          VARCHAR(150)    NOT NULL,
+  title          VARCHAR(256)    NOT NULL,
   date_pub       DATE            NOT NULL,
   publisher_id   INT             NOT NULL, -- fk
   pages          INT,
 
-  packaging_type VARCHAR(50)     NOT NULL,
-  type           VARCHAR(30)     NOT NULL,
+  packaging_type VARCHAR(256)    NOT NULL,
+  type           VARCHAR(256)    NOT NULL,
   isbn           INT UNIQUE,
-  cover          VARCHAR(200),
+  cover          VARCHAR(256),
   price          FLOAT,
-  currency       VARCHAR(5),
+  currency       VARCHAR(256),
   pub_series_id  INT, -- fk
   pub_series_num INT,
   note_id        INT -- fk
@@ -41,14 +40,14 @@ CREATE TABLE publications
 CREATE TABLE titles
 (
   id           INT PRIMARY KEY NOT NULL,
-  title        VARCHAR(150)    NOT NULL,
-  translator   VARCHAR(100),
+  title        VARCHAR(256)    NOT NULL,
+  translator   VARCHAR(256),
   synopsis     INT, -- fk
   note_id      INT, -- fk
   series_id    INT, -- fk
   series_num   INT,
-  story_length VARCHAR(10),
-  type         VARCHAR(30),
+  story_length VARCHAR(256),
+  type         VARCHAR(256),
   parent       INT             NOT NULL DEFAULT 0, -- fk, 0 on not defined
   language_id  INT, -- fk
   graphic      BOOLEAN         NOT NULL
@@ -57,7 +56,7 @@ CREATE TABLE titles
 CREATE TABLE languages
 (
   id     INT PRIMARY KEY NOT NULL,
-  name   VARCHAR(50)     NOT NULL,
+  name   VARCHAR(256)    NOT NULL,
   code   CHAR(3)         NOT NULL UNIQUE,
   script BOOLEAN
 );
@@ -74,7 +73,7 @@ CREATE TABLE webpages
   author_id              INT, -- fk
   publisher_id           INT, -- fk
   title_id               INT, -- fk
-  url                    VARCHAR(300)    NOT NULL UNIQUE,
+  url                    VARCHAR(256)    NOT NULL UNIQUE,
   publications_series_id INT, -- fk
   award_type_id          INT, -- fk
   title_series_id        INT, -- fk
@@ -84,13 +83,13 @@ CREATE TABLE webpages
 CREATE TABLE tags
 (
   id   INT PRIMARY KEY NOT NULL,
-  name VARCHAR(50)     NOT NULL
+  name VARCHAR(256)    NOT NULL
 );
 
 CREATE TABLE title_series
 (
   id      INT PRIMARY KEY NOT NULL,
-  title   VARCHAR(150)    NOT NULL,
+  title   VARCHAR(256)    NOT NULL,
   parent  INT DEFAULT 0, -- fk
   note_id INT -- fk
 );
@@ -98,7 +97,7 @@ CREATE TABLE title_series
 CREATE TABLE awards
 (
   id          INT PRIMARY KEY NOT NULL,
-  title       VARCHAR(100)    NOT NULL,
+  title       VARCHAR(256)    NOT NULL,
   date_award  DATE            NOT NULL,
   category_id INT             NOT NULL, -- fk
   note_id     INT -- fk
@@ -107,7 +106,7 @@ CREATE TABLE awards
 CREATE TABLE awards_categories
 (
   id      INT PRIMARY KEY NOT NULL,
-  name    VARCHAR(200)    NOT NULL,
+  name    VARCHAR(256)    NOT NULL,
   type_id INT             NOT NULL, -- fk
   "order" INT,
   note_id INT -- fk
@@ -117,11 +116,11 @@ CREATE TABLE awards_types
 (
   id          INT PRIMARY KEY NOT NULL,
   code        CHAR(2) UNIQUE,
-  name        VARCHAR(100)    NOT NULL,
+  name        VARCHAR(256)    NOT NULL,
   note_id     INT, -- fk
-  awarded_by  VARCHAR(250)    NOT NULL,
+  awarded_by  VARCHAR(256)    NOT NULL,
   awarded_for INT             NOT NULL, --- REFERENCES ?
-  short_name  VARCHAR(100)    NOT NULL UNIQUE,
+  short_name  VARCHAR(256)    NOT NULL UNIQUE,
   poll        BOOLEAN         NOT NULL,
   non_genre   BOOLEAN         NOT NULL -- type ?
 );
@@ -129,14 +128,14 @@ CREATE TABLE awards_types
 CREATE TABLE publishers
 (
   id      INT PRIMARY KEY NOT NULL,
-  name    VARCHAR(100)    NOT NULL,
+  name    VARCHAR(256)    NOT NULL,
   note_id INT -- fk
 );
 
 CREATE TABLE publications_series
 (
   id      INT PRIMARY KEY NOT NULL,
-  name    VARCHAR(100)    NOT NULL,
+  name    VARCHAR(256)    NOT NULL,
   note_id INT -- fk
 );
 
@@ -190,6 +189,11 @@ REFERENCES languages (id)
 ON DELETE SET NULL;
 
 ALTER TABLE authors
+ADD FOREIGN KEY (pseudonym)
+REFERENCES authors (id)
+ON DELETE CASCADE;
+
+ALTER TABLE authors
 ADD FOREIGN KEY (note_id)
 REFERENCES notes (id)
 ON DELETE SET NULL;
@@ -212,7 +216,7 @@ REFERENCES publishers (id)
 ON DELETE SET NULL;
 
 ALTER TABLE publications
-ADD FOREIGN KEY (publications_series_id)
+ADD FOREIGN KEY (pub_series_id)
 REFERENCES publications_series (id)
 ON DELETE SET NULL;
 
