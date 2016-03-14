@@ -26,14 +26,24 @@ package object mine {
 
   private val FORMAT_DATE_1 = new SimpleDateFormat("yyyy-MM-dd")
   private val FORMAT_DATE_2 = new SimpleDateFormat("dd/MM/yy")
+  private val firstACDate = new java.util.Date()
 
   def stringToDate(raw: String): java.util.Date = {
+
+    // sql format cannot handle BC
+    def requireAC(date: java.util.Date): java.util.Date = {
+      if (date.compareTo(firstACDate) < 0) {
+        throw new Exception("date cannot be BC")
+      }
+      date
+    }
+
     if (raw.contains("-")) {
       FORMAT_DATE_1.parse(raw)
     } else if (raw.contains("/")) {
       FORMAT_DATE_2.parse(raw)
     } else {
-      new java.util.Date()
+      throw new Exception(s"cannot parse $raw to date")
     }
   }
 
@@ -100,7 +110,7 @@ package object mine {
   def parseBoolean(str: String): Boolean = str.toLowerCase match {
     case "true" | "1" | "yes" => true
     case "false" | "0" | "false" => false
-    case _ => throw new Exception(s"unable to parse $str to boolean")
+    case _ => throw new Exception(s"cannot parse $str to boolean")
   }
 
 
