@@ -1,6 +1,7 @@
 package bookshelf
 
 import java.text.SimpleDateFormat
+import java.time.temporal.TemporalField
 
 import scala.util.Try
 
@@ -29,10 +30,11 @@ package object mine {
   private val firstACDate = new java.util.Date()
 
   def stringToDate(raw: String): java.util.Date = {
-
     // sql format cannot handle BC
     def requireAC(date: java.util.Date): java.util.Date = {
-      if (date.compareTo(firstACDate) < 0) {
+      val calendar = java.util.Calendar.getInstance()
+      calendar.setTime(date)
+      if (calendar.get(java.util.Calendar.YEAR) <= 0) {
         throw new Exception("date cannot be BC")
       }
       date
