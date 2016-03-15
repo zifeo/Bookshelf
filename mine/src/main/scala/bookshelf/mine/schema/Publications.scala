@@ -1,41 +1,41 @@
-package bookshelf.mine.publications
+package bookshelf.mine.schema
 
 import bookshelf.mine._
-import bookshelf.mine.publications.Publication.Publication_Type.Publication_Type
+import bookshelf.mine.schema.Publications.Type.Publication_Type
+import org.joda.time.DateTime
 
 import scala.util.Try
 
-case class Publication(
+case class Publications(
                          id: Int,
                          title: String,
-                         date: java.util.Date,
-                         publisher_id: Option[Int],
+                         datePub: DateTime,
+                         publisherId: Option[Int],
                          pages: Option[Int],
                          preface: Option[Int],
                          packaging: String,
-                         pub_type: Option[Publication_Type],
+                         `type`: Option[Publication_Type],
                          isbn: Option[Long],
                          image: String,
                          price: Option[Double],
                          currency: String,
-                         note_id: Option[Int],
-                         pub_series_id: Option[Int],
-                         pub_series_nb: Option[Int]
+                         noteId: Option[Int],
+                         pubSeriesId: Option[Int],
+                         pubSeriesNb: Option[Int]
                        )
 
-object Publication {
+object Publications {
 
-  object Publication_Type extends Enumeration {
+  object Type extends Enumeration {
     type Publication_Type = Value
     val ANTHOLOGY = Value("ANTHOLOGY")
-    val BACKCOVERART = Value("BACKCOVERART")
     val COLLECTION = Value("COLLECTION")
-    val COVERART = Value("COVERART")
-    val INTERIORART = Value("INTERIORART")
-    val EDITOR = Value("EDITOR")
-    val ESSAY = Value("ESSAY")
-    val INTERVIEW = Value("INTERVIEW")
+    val MAGAZINE = Value("MAGAZINE")
+    val NONFICTION = Value("NONFICTION")
     val NOVEL = Value("NOVEL")
+    val OMNIBUS = Value("OMNIBUS")
+    val FANZINE = Value("FANZINE")
+    val CHAPBOOK = Value("CHAPBOOK")
   }
 
   object Currency extends Enumeration {
@@ -49,38 +49,34 @@ object Publication {
   val PATTERN_MONEY_1 = "([\\d|\\.]*)([\\D]|\\.]*)".r
   val PATTERN_MONEY_2 = "([\\D]|\\.]*)([\\d|\\.]*)".r
 
-  private[mine] lazy val raw = getDataset("publications.csv")
-  private[mine] lazy val all = raw.map(parseCols)
-
-  def getCurrency(money: String): (Option[Double], String) = money match {
+  def parseCurrency(money: String): (Option[Double], String) = money match {
     case PATTERN_MONEY_1(g1, g2) => (Try(g1.toDouble).toOption, g2)
     case PATTERN_MONEY_2(g1, g2) => (Try(g2.toDouble).toOption, g1)
     case _ => (Try(money.toDouble).toOption, "")
   }
 
-  def parseCols(raw: List[String]): Try[Publication] = Try {
+  def parseCols(raw: List[String]): Try[Publications] = Try {
     raw match {
-      case List(id, title, date, publisher_id, pages, packaging, pub_type, isbn, image, price, note_id, pub_series_id, pub_series_nb) => {
+      case List(id, title, date, publisherId, pages, packaging, pubType, isbn, image, price, noteId, pubSeriesId, pubSeriesNb) =>
         val (book_pages, pages_prefaces) = getPages(pages)
-        val (money, currency) = getCurrency(price)
-        Publication(
+        val (money, currency) = parseCurrency(price)
+        Publications(
           id.toInt,
           title,
           stringToDate(date), // need to manage the litteral without -
-          intOrNone(publisher_id),
+          intOrNone(publisherId),
           book_pages,
           pages_prefaces,
           packaging,
-          Publication_Type.values.find(_.equals(pub_type)),
+          Type.values.find(_.equals(pubType)),
           longOrNone(isbn),
           image,
           money,
           currency,
-          intOrNone(note_id),
-          intOrNone(pub_series_id),
-          intOrNone(pub_series_nb)
+          intOrNone(noteId),
+          intOrNone(pubSeriesId),
+          intOrNone(pubSeriesNb)
         )
-      }
     }
   }
 
