@@ -14,17 +14,16 @@ private[mine] object Imports extends App {
 
   import CSVSources._
 
-  private implicit val db = source(new PostgresAsyncSourceConfig[SnakeCase]("db"))
+  implicit val db = source(new PostgresAsyncSourceConfig[SnakeCase]("db"))
 
-  truncate("authors")
+  //truncate("authors")
 
-  val res = Future.sequence(List(
+  val res = List(
+    //db.run(quote(query[Authors].insert))(authors.flatMap(_.toOption)),
 
-    db.run(quote(query[Authors].insert))(authors.flatMap(_.toOption))
 
+  )
 
-  ))
-
-  Await.result(res, Duration.Inf) foreach println
+  Await.result(Future.sequence(res), Duration.Inf) foreach println
 
 }
