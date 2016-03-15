@@ -12,7 +12,7 @@ CREATE TABLE authors
   birth_place VARCHAR(256),
   birth_date  DATE,
   death_date  DATE,
-  email       VARCHAR(256) UNIQUE,
+  email       VARCHAR(256),
   image       VARCHAR(256),
   language_id INT, -- fk
   note_id     INT -- fk
