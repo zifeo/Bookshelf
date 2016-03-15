@@ -1,12 +1,13 @@
 package bookshelf.mine.schema
 
 import scala.util.Try
+import bookshelf.mine._
 
 case class Languages(
                       id: Int,
                       name: String,
                       code: String,
-                      script: String
+                      script: Option[Boolean]
                     )
 
 object Languages {
@@ -18,7 +19,7 @@ object Languages {
           id.toInt,
           name,
           code,
-          script
+          booleanOrNone(script)
         )
     }
   }

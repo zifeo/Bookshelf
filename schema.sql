@@ -98,7 +98,7 @@ CREATE TABLE awards
 (
   id          INT PRIMARY KEY NOT NULL,
   title       VARCHAR(256)    NOT NULL,
-  date_award  DATE            NOT NULL,
+  date        DATE            NOT NULL,
   category_id INT             NOT NULL, -- fk
   note_id     INT -- fk
 );
@@ -108,7 +108,7 @@ CREATE TABLE awards_categories
   id      INT PRIMARY KEY NOT NULL,
   name    VARCHAR(256)    NOT NULL,
   type_id INT             NOT NULL, -- fk
-  "order" INT,
+  ordr    INT,
   note_id INT -- fk
 );
 
@@ -119,7 +119,7 @@ CREATE TABLE awards_types
   name        VARCHAR(256)    NOT NULL,
   note_id     INT, -- fk
   awarded_by  VARCHAR(256)    NOT NULL,
-  awarded_for INT             NOT NULL, --- REFERENCES ?
+  awarded_for VARCHAR(256)    NOT NULL,
   short_name  VARCHAR(256)    NOT NULL UNIQUE,
   poll        BOOLEAN         NOT NULL,
   non_genre   BOOLEAN         NOT NULL -- type ?
