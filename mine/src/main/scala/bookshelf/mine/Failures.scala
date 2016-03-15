@@ -1,13 +1,13 @@
 package bookshelf.mine
 
-private[mine] object Main extends App {
+private[mine] object Failures extends App {
 
-  def prettyPrint[T](data: List[T]): Unit =
+  def prettyPrint[T](data: Iterable[T]): Unit =
     println(data.mkString("\n"))
 
   /*
   println("\n\n===== Authors =====")
-  prettyPrint(Author.all.filter(_.isFailure))
+  prettyPrint(CSVSources.authors.filter(_.isFailure))
 
   println("\n\n===== Publication =====")
   prettyPrint(Publication.all.filter(_.isFailure))
@@ -30,9 +30,10 @@ private[mine] object Main extends App {
   println("\n\n===== Awards categories =====")
   prettyPrint(Award_category.all.filter(_.isFailure))
 
+  */
   println("\n\n===== Awards types =====")
-  prettyPrint(Award_type.all.filter(_.isFailure))
-
+  prettyPrint(CSVSources.awardsTypes.filter(_.isFailure))
+  /*
   println("\n\n===== Tags =====")
   prettyPrint(Tag.all.filter(_.isFailure))
 
