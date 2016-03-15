@@ -2,12 +2,11 @@ package bookshelf.mine
 
 private[mine] object Failures extends App {
 
-  def prettyPrint[T](data: List[T]): Unit =
+  def prettyPrint[T](data: Iterable[T]): Unit =
     println(data.mkString("\n"))
 
   println("\n\n===== Authors =====")
   prettyPrint(CSVSources.authors.filter(_.isFailure))
-
 
   /*
 println("\n\n===== Publication =====")

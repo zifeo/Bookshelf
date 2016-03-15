@@ -2,13 +2,14 @@ package bookshelf.mine.schema
 
 import bookshelf.mine._
 import bookshelf.mine.schema.Publications.Type.Publication_Type
+import org.joda.time.DateTime
 
 import scala.util.Try
 
 case class Publications(
                          id: Int,
                          title: String,
-                         datePub: java.util.Date,
+                         datePub: DateTime,
                          publisherId: Option[Int],
                          pages: Option[Int],
                          preface: Option[Int],

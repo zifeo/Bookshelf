@@ -1,6 +1,7 @@
 package bookshelf.mine.schema
 
 import bookshelf.mine._
+import org.joda.time.DateTime
 
 import scala.util.Try
 
@@ -11,8 +12,8 @@ case class Authors(
                     lastName: Option[String],
                     pseudonym: Option[Int],
                     birthPlace: Option[String],
-                    birthDate: Option[java.util.Date],
-                    deathDate: Option[java.util.Date],
+                    birthDate: Option[DateTime],
+                    deathDate: Option[DateTime],
                     email: Option[String],
                     image: Option[String],
                     languageId: Option[Int],
