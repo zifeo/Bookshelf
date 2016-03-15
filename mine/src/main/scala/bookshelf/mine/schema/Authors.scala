@@ -8,7 +8,7 @@ import scala.util.Try
 case class Authors(
                     id: Int,
                     name: String,
-                    legalName: String,
+                    legalName: Option[String],
                     lastName: Option[String],
                     pseudonym: Option[Int],
                     birthPlace: Option[String],
@@ -28,7 +28,7 @@ object Authors {
         Authors(
           id.toInt,
           name,
-          legalName,
+          stringOrNone(legalName),
           stringOrNone(lastName),
           intOrNone(pseudonym),
           stringOrNone(birthPlace),
