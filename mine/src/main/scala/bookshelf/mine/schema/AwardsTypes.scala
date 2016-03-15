@@ -6,7 +6,7 @@ import scala.util.Try
 
 case class AwardsTypes(
                         id: Int,
-                        code: String,
+                        code: Option[String],
                         name: String,
                         noteId: Option[Int],
                         awardedBy: String,
@@ -23,7 +23,7 @@ object AwardsTypes {
       case List(id, code, name, noteId, awardedBy, awardedFor, shortName, poll, nonGenre) =>
         AwardsTypes(
           id.toInt,
-          code,
+          stringOrNone(code),
           name,
           intOrNone(noteId),
           awardedBy,

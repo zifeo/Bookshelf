@@ -98,8 +98,15 @@ package object mine {
 
   def parseBoolean(str: String): Boolean = str.toLowerCase match {
     case "true" | "1" | "yes" => true
-    case "false" | "0" | "false" => false
+    case "false" | "0" | "no" => false
     case _ => throw new Exception(s"cannot parse $str to boolean")
+  }
+
+  def booleanOrNone(raw: String): Option[Boolean] = {
+    raw match {
+      case "\\N" | "" => None
+      case x => Some(parseBoolean(x))
+    }
   }
 
 

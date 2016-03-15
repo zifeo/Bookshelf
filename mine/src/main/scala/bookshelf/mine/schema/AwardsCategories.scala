@@ -8,7 +8,7 @@ case class AwardsCategories(
                              id: Int,
                              name: String,
                              typeId: Int,
-                             order: String,
+                             ordr: Option[String],
                              noteId: Option[Int]
                            )
 
@@ -21,7 +21,7 @@ object AwardsCategories {
           id.toInt,
           name,
           typeId.toInt,
-          categoryOrder,
+          stringOrNone(categoryOrder),
           intOrNone(noteId)
         )
     }

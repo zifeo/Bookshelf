@@ -20,6 +20,11 @@ private[mine] object Imports extends App {
 
   val res = List(
     //db.run(quote(query[Authors].insert))(authors.flatMap(_.toOption)),
+    //db.run(quote(query[Awards].insert))(awards.flatMap(_.toOption)),
+    //db.run(quote(query[AwardsCategories].insert))(awardsCategories.flatMap(_.toOption)),
+    //db.run(quote(query[AwardsTypes].insert))(awardsTypes.flatMap(_.toOption)),
+    //db.run(quote(query[Languages].insert))(languages.flatMap(_.toOption)),
+    //db.run(quote(query[Notes].insert))(notes.flatMap(_.toOption))
 
 
   )
