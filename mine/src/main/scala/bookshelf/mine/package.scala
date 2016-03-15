@@ -1,7 +1,6 @@
 package bookshelf
 
-import java.text.SimpleDateFormat
-import java.time.temporal.TemporalField
+import com.github.nscala_time.time.Imports._
 
 import scala.util.Try
 
@@ -25,25 +24,13 @@ package object mine {
   def longOrNone(raw: String): Option[Long] =
     Try(raw.toLong).toOption
 
-  private val FORMAT_DATE_1 = new SimpleDateFormat("yyyy-MM-dd")
-  private val FORMAT_DATE_2 = new SimpleDateFormat("dd/MM/yy")
-  private val firstACDate = new java.util.Date()
-
-  def stringToDate(raw: String): java.util.Date = {
-    // sql format cannot handle BC
-    def requireAC(date: java.util.Date): java.util.Date = {
-      val calendar = java.util.Calendar.getInstance()
-      calendar.setTime(date)
-      if (calendar.get(java.util.Calendar.YEAR) <= 0) {
-        throw new Exception("date cannot be BC")
-      }
-      date
-    }
-
-    if (raw.contains("-")) {
-      FORMAT_DATE_1.parse(raw)
+  def stringToDate(raw: String): DateTime = {
+    if (raw.contains("0000")) {
+      throw new Exception(s"0000 year is invalid: $raw")
+    } else if (raw.contains("-")) {
+      raw.replace("-00", "-01").dateTimeFormat("yyyy-MM-dd")
     } else if (raw.contains("/")) {
-      FORMAT_DATE_2.parse(raw)
+      raw.dateTimeFormat("dd/MM/yy")
     } else {
       throw new Exception(s"cannot parse $raw to date")
     }

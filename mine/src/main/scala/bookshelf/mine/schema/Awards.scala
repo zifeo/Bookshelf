@@ -1,13 +1,14 @@
 package bookshelf.mine.schema
 
 import bookshelf.mine._
+import org.joda.time.DateTime
 
 import scala.util.Try
 
 case class Awards(
                    id: Int,
                    title: String,
-                   date: java.util.Date,
+                   date: DateTime,
                    categoryId: Int,
                    noteId: Option[Int]
                  )
