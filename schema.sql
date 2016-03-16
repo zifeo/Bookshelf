@@ -128,14 +128,14 @@ CREATE TABLE awards_types
 CREATE TABLE publishers
 (
   id      INT PRIMARY KEY NOT NULL,
-  name    VARCHAR(256)    NOT NULL,
+  name    VARCHAR(512)    NOT NULL,
   note_id INT -- fk
 );
 
 CREATE TABLE publications_series
 (
   id      INT PRIMARY KEY NOT NULL,
-  name    VARCHAR(256)    NOT NULL,
+  name    VARCHAR(512)    NOT NULL,
   note_id INT -- fk
 );
 
@@ -256,7 +256,7 @@ ON DELETE SET NULL;
 
 ALTER TABLE titles
 ADD FOREIGN KEY (series_id)
-REFERENCES title_series (id)
+REFERENCES titles_series (id)
 ON DELETE SET NULL;
 
 ALTER TABLE titles
