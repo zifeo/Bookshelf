@@ -256,7 +256,7 @@ ON DELETE SET NULL;
 
 ALTER TABLE titles
 ADD FOREIGN KEY (series_id)
-REFERENCES title_series (id)
+REFERENCES titles_series (id)
 ON DELETE SET NULL;
 
 ALTER TABLE titles
