@@ -1,8 +1,7 @@
 package bookshelf.mine.schema
 
 import bookshelf.mine._
-import bookshelf.mine.schema.Titles.Length.Length
-import bookshelf.mine.schema.Titles.Type.Type
+import io.getquill._
 
 import scala.util.Try
 
@@ -14,8 +13,8 @@ case class Titles(
                    noteId: Option[Int],
                    seriesId: Option[Int],
                    seriesNum: Option[Int],
-                   storyLength: Option[Length],
-                   `type`: Option[Type],
+                   storyLength: Option[String],
+                   `type`: Option[String],
                    parent: Option[Int],
                    languageId: Option[Int],
                    graphic: Boolean
@@ -72,28 +71,28 @@ object Titles {
     }
   }
 
-  def parseLength(raw: String): Option[Length] = {
+  def parseLength(raw: String): Option[String] = {
     raw match {
-      case "nv" => Some(Length.nv)
-      case "ss" => Some(Length.ss)
-      case "jvn" => Some(Length.jvn)
-      case "nvz" => Some(Length.nvz)
-      case "sf" => Some(Length.sf)
+      case "nv" => Some(Length.nv.toString)
+      case "ss" => Some(Length.ss.toString)
+      case "jvn" => Some(Length.jvn.toString)
+      case "nvz" => Some(Length.nvz.toString)
+      case "sf" => Some(Length.sf.toString)
       case _ => None
     }
   }
 
-  def parseType(raw: String): Option[Type] = {
+  def parseType(raw: String): Option[String] = {
     raw match {
-      case "ANTHOLOGY" => Some(Type.ANTHOLOGY)
-      case "BACKCOVERART" => Some(Type.BACKCOVERART)
-      case "COLLECTION" => Some(Type.COLLECTION)
-      case "COVERART" => Some(Type.COVERART)
-      case "INTERIORART" => Some(Type.INTERIORART)
-      case "EDITOR" => Some(Type.EDITOR)
-      case "ESSAY" => Some(Type.ESSAY)
-      case "INTERVIEW" => Some(Type.INTERVIEW)
-      case "NOVEL" => Some(Type.NOVEL)
+      case "ANTHOLOGY" => Some(Type.ANTHOLOGY.toString)
+      case "BACKCOVERART" => Some(Type.BACKCOVERART.toString)
+      case "COLLECTION" => Some(Type.COLLECTION.toString)
+      case "COVERART" => Some(Type.COVERART.toString)
+      case "INTERIORART" => Some(Type.INTERIORART.toString)
+      case "EDITOR" => Some(Type.EDITOR.toString)
+      case "ESSAY" => Some(Type.ESSAY.toString)
+      case "INTERVIEW" => Some(Type.INTERVIEW.toString)
+      case "NOVEL" => Some(Type.NOVEL.toString)
       case _ => None
     }
   }
