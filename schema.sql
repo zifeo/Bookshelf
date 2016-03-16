@@ -6,7 +6,7 @@ CREATE TABLE authors
 (
   id          INT PRIMARY KEY NOT NULL,
   name        VARCHAR(256)    NOT NULL,
-  legal_name  VARCHAR(256)    NOT NULL,
+  legal_name  VARCHAR(256),
   last_name   VARCHAR(256),
   pseudonym   INT, -- fk
   birth_place VARCHAR(256),
@@ -86,7 +86,7 @@ CREATE TABLE tags
   name VARCHAR(256)    NOT NULL
 );
 
-CREATE TABLE title_series
+CREATE TABLE titles_series
 (
   id      INT PRIMARY KEY NOT NULL,
   title   VARCHAR(256)    NOT NULL,
@@ -256,7 +256,7 @@ ON DELETE SET NULL;
 
 ALTER TABLE titles
 ADD FOREIGN KEY (series_id)
-REFERENCES title_series (id)
+REFERENCES titles_series (id)
 ON DELETE SET NULL;
 
 ALTER TABLE titles

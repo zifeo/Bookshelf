@@ -25,17 +25,8 @@ case class Publications(
 
 object Publications {
 
-  object Type extends Enumeration {
-    type PublicationType = Value
-    val ANTHOLOGY = Value("ANTHOLOGY")
-    val COLLECTION = Value("COLLECTION")
-    val MAGAZINE = Value("MAGAZINE")
-    val NONFICTION = Value("NONFICTION")
-    val NOVEL = Value("NOVEL")
-    val OMNIBUS = Value("OMNIBUS")
-    val FANZINE = Value("FANZINE")
-    val CHAPBOOK = Value("CHAPBOOK")
-  }
+  val types = List("ANTHOLOGY", "COLLECTION", "MAGAZINE", "NONFICTION", "NOVEL", "OMNIBUS", "FANZINE", "CHAPBOOK")
+    .map(_.toLowerCase)
 
   val PATTERN_MONEY_1 = "([\\d|\\.]*)([\\D]|\\.]*)".r
   val PATTERN_MONEY_2 = "([\\D]|\\.]*)([\\d|\\.]*)".r
@@ -59,7 +50,7 @@ object Publications {
           book_pages,
           pages_prefaces,
           packaging,
-          stringOrNone(Type.withName(pubType).toString),
+          requireIn(pubType, types),
           longOrNone(isbn),
           image,
           money,
