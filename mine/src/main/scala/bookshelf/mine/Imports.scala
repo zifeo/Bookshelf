@@ -26,7 +26,12 @@ private[mine] object Imports extends App {
     //db.run(quote(query[Languages].insert))(languages.flatMap(_.toOption)),
     //db.run(quote(query[Notes].insert))(notes.flatMap(_.toOption))
 
-
+    //db.run(quote(query[PublicationsAuthors].insert))(publicationsAuthors.flatMap(_.toOption)),
+    //db.run(quote(query[PublicationsContents].insert))(publicationsContents.flatMap(_.toOption)),
+    //db.run(quote(query[PublicationsSeries].insert))(publicationsSeries.flatMap(_.toOption)),
+    //db.run(quote(query[Publications].insert))(publications.flatMap(_.toOption)),
+    //db.run(quote(query[Publishers].insert))(publishers.flatMap(_.toOption)),
+    db.run(quote(query[Reviews].insert))(reviews.flatMap(_.toOption))
   )
 
   Await.result(Future.sequence(res), Duration.Inf) foreach println
