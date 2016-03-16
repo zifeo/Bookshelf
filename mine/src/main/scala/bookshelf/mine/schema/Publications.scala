@@ -1,7 +1,6 @@
 package bookshelf.mine.schema
 
 import bookshelf.mine._
-import bookshelf.mine.schema.Publications.Type.Publication_Type
 import org.joda.time.DateTime
 
 import scala.util.Try
@@ -14,7 +13,7 @@ case class Publications(
                          pages: Option[Int],
                          preface: Option[Int],
                          packaging: String,
-                         `type`: Option[Publication_Type],
+                         `type`: Option[String],
                          isbn: Option[Long],
                          image: String,
                          price: Option[Double],
@@ -27,7 +26,7 @@ case class Publications(
 object Publications {
 
   object Type extends Enumeration {
-    type Publication_Type = Value
+    type PublicationType = Value
     val ANTHOLOGY = Value("ANTHOLOGY")
     val COLLECTION = Value("COLLECTION")
     val MAGAZINE = Value("MAGAZINE")
@@ -36,14 +35,6 @@ object Publications {
     val OMNIBUS = Value("OMNIBUS")
     val FANZINE = Value("FANZINE")
     val CHAPBOOK = Value("CHAPBOOK")
-  }
-
-  object Currency extends Enumeration {
-    type Currency = Value
-    val EURO = Value("€")
-    val DOLLAR = Value("$")
-    val POUND = Value("£")
-    val FR_CH = Value("CH")
   }
 
   val PATTERN_MONEY_1 = "([\\d|\\.]*)([\\D]|\\.]*)".r
@@ -68,7 +59,7 @@ object Publications {
           book_pages,
           pages_prefaces,
           packaging,
-          Type.values.find(_.equals(pubType)),
+          stringOrNone(Type.withName(pubType).toString),
           longOrNone(isbn),
           image,
           money,
