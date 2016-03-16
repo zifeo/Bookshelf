@@ -86,7 +86,7 @@ CREATE TABLE tags
   name VARCHAR(256)    NOT NULL
 );
 
-CREATE TABLE title_series
+CREATE TABLE titles_series
 (
   id      INT PRIMARY KEY NOT NULL,
   title   VARCHAR(256)    NOT NULL,
