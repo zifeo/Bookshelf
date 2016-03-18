@@ -16,7 +16,7 @@ private[mine] object Imports extends App {
 
   implicit val db = source(new PostgresAsyncSourceConfig[SnakeCase]("db"))
 
-  //truncate("titles")
+  truncate("publications")
 
   val res = List(
     //db.run(quote(query[Authors].insert))(authors.flatMap(_.toOption)),
@@ -29,13 +29,13 @@ private[mine] object Imports extends App {
     //db.run(quote(query[PublicationsAuthors].insert))(publicationsAuthors.flatMap(_.toOption)),
     //db.run(quote(query[PublicationsContents].insert))(publicationsContents.flatMap(_.toOption)),
     //db.run(quote(query[PublicationsSeries].insert))(publicationsSeries.flatMap(_.toOption)),
-    //db.run(quote(query[Publications].insert))(publications.flatMap(_.toOption)),
+    db.run(quote(query[Publications].insert))(publications.flatMap(_.toOption))
     //db.run(quote(query[Publishers].insert))(publishers.flatMap(_.toOption)),
-    db.run(quote(query[Reviews].insert))(reviews.flatMap(_.toOption))
+    //db.run(quote(query[Reviews].insert))(reviews.flatMap(_.toOption)),
 
     //db.run(quote(query[Tags].insert))(tags.flatMap(_.toOption)),
     //db.run(quote(query[TitlesSeries].insert))(titlesSeries.flatMap(_.toOption)),
-    //db.run(quote(query[Titles].insert))(titles.flatMap(_.toOption))
+    //db.run(quote(query[Titles].insert))(titles.flatMap(_.toOption)),
     //db.run(quote(query[TitlesAwards].insert))(titlesAwards.flatMap(_.toOption)),
     //db.run(quote(query[TitlesTags].insert))(titlesTags.flatMap(_.toOption)),,
     //db.run(quote(query[Webpages].insert))(webpages.flatMap(_.toOption))

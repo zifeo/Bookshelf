@@ -90,11 +90,20 @@ package object mine {
   }
 
   def stringOrNone(raw: String): Option[String] = {
+    def toCyrillic(raw: String): String = {
+      if (raw.contains("&#")) {
+        raw.replaceAll(" ", "&#32").split(";").map(s => s.substring(2).toInt.toChar).mkString
+      } else {
+        raw
+      }
+    }
+
     raw match {
       case "\\N" | "" => None
-      case x => Some(x)
+      case x => Some(toCyrillic(x))
     }
   }
+
 
   def parseBoolean(str: String): Boolean = str.toLowerCase match {
     case "true" | "1" | "yes" => true
