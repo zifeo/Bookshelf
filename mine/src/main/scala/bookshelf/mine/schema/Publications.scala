@@ -7,20 +7,20 @@ import scala.util.Try
 
 case class Publications(
                          id: Int,
-                         title: String,
+                         title: Option[String],
                          datePub: DateTime,
                          publisherId: Option[Int],
                          pages: Option[Int],
                          preface: Option[Int],
-                         packaging: String,
+                         packaging_type: Option[String],
                          `type`: Option[String],
                          isbn: Option[Long],
-                         image: String,
+                         cover: Option[String],
                          price: Option[Double],
-                         currency: String,
+                         currency: Option[String],
                          noteId: Option[Int],
-                         pubSeriesId: Option[Int],
-                         pubSeriesNb: Option[Int]
+                         pub_series_id: Option[Int],
+                         pub_series_num: Option[Int]
                        )
 
 object Publications {
@@ -44,17 +44,17 @@ object Publications {
         val (money, currency) = parseCurrency(price)
         Publications(
           id.toInt,
-          title,
+          stringOrNone(title),
           stringToDate(date), // need to manage the litteral without -
           intOrNone(publisherId),
           book_pages,
           pages_prefaces,
-          packaging,
+          stringOrNone(packaging),
           requireIn(pubType, types),
           longOrNone(isbn),
-          image,
+          stringOrNone(image),
           money,
-          currency,
+          stringOrNone(currency),
           intOrNone(noteId),
           intOrNone(pubSeriesId),
           intOrNone(pubSeriesNb)

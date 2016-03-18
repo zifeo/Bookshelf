@@ -25,7 +25,7 @@ CREATE TABLE publications
   date_pub       DATE            NOT NULL,
   publisher_id   INT             NOT NULL, -- fk
   pages          INT,
-
+  preface        INT,
   packaging_type VARCHAR(256)    NOT NULL,
   type           VARCHAR(256)    NOT NULL,
   isbn           INT UNIQUE,
