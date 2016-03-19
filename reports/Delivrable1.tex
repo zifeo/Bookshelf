@@ -4,7 +4,7 @@
 \usepackage[english]{babel}
 \usepackage{textcomp}
 \usepackage{graphicx}
-\usepackage[papersize={210mm,297mm},top=2.25cm, bottom=2.25cm, left=2cm , right=2cm]{geometry}
+\usepackage[papersize={210mm,297mm},top=2cm, bottom=2.25cm, left=1.8cm , right=1.8cm]{geometry}
 \lstset{upquote=true}
 \usepackage{amsmath}
 \usepackage{tikz}
@@ -61,10 +61,10 @@
     \href{mailto:jeremy.hottinger@epfl.ch}{\texttt{jeremy.hottinger@epfl.ch}}\vspace{20pt} \\
     Aurélien Soccard \\
     235746 \\
-    \href{mailto:aurelien.soccard@epfl.ch}\texttt{aurelien.soccard@epfl.ch}\vspace{20pt} \\
+    \href{mailto:aurelien.soccard@epfl.ch}{\texttt{aurelien.soccard@epfl.ch}}\vspace{20pt} \\
     Téo Stocco \\
     235744 \\
-    \href{mailto:teo.stocco@epfl.ch}\texttt{teo.stocco@epfl.ch}\vspace{20pt} \\
+    \href{mailto:teo.stocco@epfl.ch}{\texttt{teo.stocco@epfl.ch}}\vspace{20pt} \\
     }
 
 % The following code is borrowed from: http://tex.stackexchange.com/a/86310/10898
@@ -115,6 +115,7 @@
 \begin{document}
 \begin{titlepage}
 \thispagestyle{firstpage}
+\vspace*{3cm}
 \titlefont CS-323 : Deliverable 1\par
 \vspace*{0.5cm}
 \epigraph{This is our first deliverable for the \textit{Bookself} project of the introduction to database course (spring 2016 - Pr. Anastasia Ailamaki), which sums up our ER-model and schema. It also contains some justifications.}%
@@ -136,6 +137,7 @@
 \end{titlepage}
 
 \setcounter{tocdepth}{1}
+\vspace{-1cm}
 \tableofcontents
 
 ~\\
@@ -147,19 +149,29 @@ We started to take a look at the given data and tried to understand how tables w
 ~\\~\\
 First, for everything that is related to publications, we quickly figured out things were working. Therefore, we quickly decided to drop some of the unused id (such as its author or its content). As a primary key, we made the choice to inflate it using constraints. Furthermore, we also decided to separate the price into two fields, one for the amount and one for the currency, this solution being much more efficient while looking for some price range for instance. 
 ~\\~\\
-Some intensive parsing has also been performed to know exactly how many characters were required for instance for each field, since we encounter some difficulties with cyrillic. We quickly realise that we should definitely parsing these values before inserting them, we present the advantages of being less memory consuming (6 characters become 1) and also the process of conversion is only be one time.
+Another part of the work was to analyse how tables were connected to remove potential redundancy. For instance, an award has a category but also a type, and a category has a type. These two types being always the same, we needed to drop out some content, what we've done by removing the type entry in a award. We also realise that, for instance in the author table, among the 80'000 birth places, only 10\% were unique so we have start thinking about changing this entry into a placeID and create a places table. There were some advantages (no redundancy, less space consumed) but some drawbacks (2 queries instead of one for each author) that finally made us stay with the given configuration (however, if another would be using a place, we will have done that).
+~\\~\\
+Furthermore, to write properly the creation of the table, we needed to know exactly what entry may be null, and which ones could not. This was done by inspecting carefully the data and reading correctly the instructions. Then, the dilemma was for notes and web pages tables. Indeed, for note, we only have two entries : the ID and the raw note, whereas for a website, there are an ID, an URL but also some other IDs to relate it to other entities : among these 7 IDs, only one   The type of each entry is explained in the following paragraph. Our final has been not the change the structure of these two tables since there is no WebpageID entry in tables as there is for note, but whether a web page is directly connected to the ID of its corresponding entity. Therefore, it implies to add an entry into these 7 tables, and we decided not to do this for practical reasons. Besides, we also thought about simply adding a simply URL entry into the note table, but this solution was also not satisfactory since before insert we would need to do a map from web page to note (not that hard) but since primary keys are only unique in one table, an author and a publication may have the same ID and this would imply much more work to know which website belongs to who.
+~\\~\\
+Last but not least, some intensive parsing has also been performed to know exactly how many characters were required for instance for each field, since we encounter some difficulties with Cyrillic. We quickly realise that we should definitely parsing these values before inserting them, we present the advantages of being less memory consuming (6 characters become 1) and also the process of conversion is only be one time.
 \addtocounter{page}{1}
-\newpage
+
 \section{ER model}
 
 This entity-relation model only contains fields which are either directly use for relation or as primary key (underline then). For a more complete view of the table, refers to the next section. Fields are coloured in blue, direct relationships in yellow, relationships through a table in red.
+~\\
 \textbf{Note :} If you find this diagram too small, a larger version is available online at the following address : 
 $$
 \text{\href{https://documents.epfl.ch/users/s/so/soccard/private/DBMS}{\texttt{https://documents.epfl.ch/users/s/so/soccard/private/DBMS}}}
 $$
+\begin{flushright}
 (access restricted to the db16 group as defined in the EPFL AD directory).
+\end{flushright}
+
+\newpage
+
 \begin{center}
-    \includegraphics[scale = 0.83]{DBMS_ER}
+    \includegraphics[scale = 0.5]{DBMS_ER}
 \end{center}
 
 \section{SQL schema}
@@ -225,6 +237,8 @@ CREATE TABLE titles
   graphic      BOOLEAN         NOT NULL
 )
 \end{lstlisting}
+
+\newpage
 
 \begin{lstlisting}[language=SQL,showspaces=false,basicstyle=\ttfamily,numberstyle=\tiny,commentstyle=\color{gray}
         ]
@@ -522,6 +536,8 @@ ADD FOREIGN KEY (note_id)
 REFERENCES notes (id)
 ON DELETE SET NULL;
 \end{lstlisting}
+
+\newpage
 
 \subsubsection{Publication series}
 \begin{lstlisting}[language=SQL,showspaces=false,basicstyle=\ttfamily,numberstyle=\tiny,commentstyle=\color{gray}
