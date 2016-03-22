@@ -56,7 +56,7 @@
 \makeatother
 \author{%
 	~\\	~\\
-    Jérémy Hottinger \\
+    Jeremy Hottinger \\
     259573 \\
     \href{mailto:jeremy.hottinger@epfl.ch}{\texttt{jeremy.hottinger@epfl.ch}}\vspace{20pt} \\
     Aurélien Soccard \\
@@ -118,7 +118,7 @@
 \vspace*{3cm}
 \titlefont CS-323 : Deliverable 1\par
 \vspace*{0.5cm}
-\epigraph{This is our first deliverable for the \textit{Bookself} project of the introduction to database course (spring 2016 - Pr. Anastasia Ailamaki), which sums up our ER-model and schema. It also contains some justifications.}%
+\epigraph{This is our first deliverable for the \textit{Bookshelf} project of the introduction to database course (spring 2016 - Pr. Anastasia Ailamaki), which sums up our ER-model and schema. It also contains some justifications.}%
 {\textit{March 2016} - \textsc{Team n°3}}
 \null\vfill
 \vspace*{5cm}
@@ -147,13 +147,13 @@
 
 We started to take a look at the given data and tried to understand how tables where connected at a first glance by drawing a really simplified diagram. Once this was done, we started to look at more deeply to the data : how are they stored? May they be empty? Are they all relevant? Our major decision was not to drop any table, but only add and remove some fields to entities.
 ~\\~\\
-First, for everything that is related to publications, we quickly figured out things were working. Therefore, we quickly decided to drop some of the unused id (such as its author or its content). As a primary key, we made the choice to inflate it using constraints. Furthermore, we also decided to separate the price into two fields, one for the amount and one for the currency, this solution being much more efficient while looking for some price range for instance. 
+First, for everything that is related to publications, we quickly figured out how things were working. Therefore, we quickly decided to drop some of the unused id (such as its author or its content). As a primary key, we made the choice to inflate it using constraints. Furthermore, we also decided to separate the price into two fields, one for the amount and one for the currency, this solution being much more efficient while looking for some price range for instance. 
 ~\\~\\
-Another part of the work was to analyse how tables were connected to remove potential redundancy. For instance, an award has a category but also a type, and a category has a type. These two types being always the same, we needed to drop out some content, what we've done by removing the type entry in a award. We also realise that, for instance in the author table, among the 80'000 birth places, only 10\% were unique so we have start thinking about changing this entry into a placeID and create a places table. There were some advantages (no redundancy, less space consumed) but some drawbacks (2 queries instead of one for each author) that finally made us stay with the given configuration (however, if another would be using a place, we will have done that).
+Another part of the work was to analyse how tables were connected to remove potential redundancy. For instance, an award has a category but also a type, and a category has a type. These two types being always the same, we needed to drop out some content, what we've done by removing the type entry in a award. We also realise that, for instance in the author table, among the 80'000 birth places, only 10\% were unique so we have started thinking about changing this attribute into a placeID and create a places table. There were some advantages (no redundancy, less space consumed) but some drawbacks (2 queries instead of one for each author) that finally made us stay with the given configuration (however, if another would be using a place, we will have done that).
 ~\\~\\
 Furthermore, to write properly the creation of the table, we needed to know exactly what entry may be null, and which ones could not. This was done by inspecting carefully the data and reading correctly the instructions. Then, the dilemma was for notes and web pages tables. Indeed, for note, we only have two entries : the ID and the raw note, whereas for a website, there are an ID, an URL but also some other IDs to relate it to other entities : among these 7 IDs, only one   The type of each entry is explained in the following paragraph. Our final has been not the change the structure of these two tables since there is no WebpageID entry in tables as there is for note, but whether a web page is directly connected to the ID of its corresponding entity. Therefore, it implies to add an entry into these 7 tables, and we decided not to do this for practical reasons. Besides, we also thought about simply adding a simply URL entry into the note table, but this solution was also not satisfactory since before insert we would need to do a map from web page to note (not that hard) but since primary keys are only unique in one table, an author and a publication may have the same ID and this would imply much more work to know which website belongs to who.
 ~\\~\\
-Last but not least, some intensive parsing has also been performed to know exactly how many characters were required for instance for each field, since we encounter some difficulties with Cyrillic. We quickly realise that we should definitely parsing these values before inserting them, we present the advantages of being less memory consuming (6 characters become 1) and also the process of conversion is only be one time.
+Last but not least, some intensive parsing has also been performed to know exactly how many characters were required for instance for each field, since we have encountered some difficulties with Cyrillic. We quickly realised that we should definitely parse these values before inserting them, it presents the advantages of being less memory consuming (6 characters become 1) and also the process of conversion is only done one time.
 \addtocounter{page}{1}
 
 \section{ER model}
@@ -165,7 +165,7 @@ $$
 \text{\href{https://documents.epfl.ch/users/s/so/soccard/private/DBMS}{\texttt{https://documents.epfl.ch/users/s/so/soccard/private/DBMS}}}
 $$
 \begin{flushright}
-(access restricted to the db16 group as defined in the EPFL AD directory).
+(access restricted to the db2016 group as defined in the EPFL AD directory).
 \end{flushright}
 
 \newpage
@@ -232,7 +232,7 @@ CREATE TABLE titles
   series_num   INT,
   story_length VARCHAR(256),
   type         VARCHAR(256),
-  parent       INT             NOT NULL DEFAULT 0, -- fk, 0 on not defined
+  parent       INT             NOT NULL DEFAULT 0, -- fk
   language_id  INT, -- fk
   graphic      BOOLEAN         NOT NULL
 )
@@ -256,7 +256,7 @@ CREATE TABLE languages
 CREATE TABLE notes
 (
   id   INT PRIMARY KEY NOT NULL,
-  note TEXT            NOT NULL -- None ?
+  note TEXT            NOT NULL
 )
 \end{lstlisting}
 

@@ -99,11 +99,13 @@ package object mine {
     }
 
     raw match {
-      case "\\N" | "" => None
+      case "\\N" | "" | "unknown" => None
       case x => Some(toCyrillic(x))
     }
   }
 
+  def intOrZero(str: String): Int =
+    Try(str.toInt).getOrElse(0)
 
   def parseBoolean(str: String): Boolean = str.toLowerCase match {
     case "true" | "1" | "yes" => true

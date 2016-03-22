@@ -7,9 +7,9 @@ import scala.util.Try
 
 case class Publications(
                          id: Int,
-                         title: Option[String],
+                         title: String,
                          datePub: DateTime,
-                         publisherId: Option[Int],
+                         publisherId: Int,
                          pages: Option[Int],
                          preface: Option[Int],
                          packaging_type: Option[String],
@@ -44,9 +44,9 @@ object Publications {
         val (money, currency) = parseCurrency(price)
         Publications(
           id.toInt,
-          stringOrNone(title),
-          stringToDate(date), // need to manage the litteral without -
-          intOrNone(publisherId),
+          title,
+          stringToDate(date),
+          publisherId.toInt,
           book_pages,
           pages_prefaces,
           stringOrNone(packaging),
