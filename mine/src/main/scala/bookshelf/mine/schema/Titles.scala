@@ -14,7 +14,7 @@ case class Titles(
                    seriesNum: Option[Int],
                    storyLength: Option[String],
                    `type`: Option[String],
-                   parent: Option[Int],
+                   parent: Int,
                    languageId: Option[Int],
                    graphic: Boolean
                  )
@@ -39,7 +39,7 @@ object Titles {
           intOrNone(serieNb),
           requireIn(length, lengths),
           requireIn(tpe, types),
-          intOrNone(parent),
+          intOrZero(parent),
           intOrNone(language),
           parseBoolean(graphic)
         )
