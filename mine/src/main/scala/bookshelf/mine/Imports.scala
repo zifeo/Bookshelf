@@ -16,7 +16,7 @@ private[mine] object Imports extends App {
 
   implicit val db = source(new PostgresAsyncSourceConfig[SnakeCase]("db"))
 
-  truncate("publications")
+  //truncate("publications")
 
   val res = List(
     //db.run(quote(query[Authors].insert))(authors.flatMap(_.toOption)),

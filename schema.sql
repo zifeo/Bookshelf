@@ -25,13 +25,13 @@ CREATE TABLE publications
   date_pub       DATE            NOT NULL,
   publisher_id   INT             NOT NULL, -- fk
   pages          INT,
-  preface        INT,
-  packaging_type VARCHAR(256)
+  preface_pages  INT,
+  packaging_type VARCHAR(16),
   type           VARCHAR(256)    NOT NULL,
-  isbn           INT UNIQUE,
+  isbn           BIGINT,
   cover          VARCHAR(256),
   price          FLOAT,
-  currency       VARCHAR(256),
+  currency       VARCHAR(8),
   pub_series_id  INT, -- fk
   pub_series_num INT,
   note_id        INT -- fk

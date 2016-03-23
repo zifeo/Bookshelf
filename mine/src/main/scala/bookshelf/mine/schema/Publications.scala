@@ -11,16 +11,16 @@ case class Publications(
                          datePub: DateTime,
                          publisherId: Int,
                          pages: Option[Int],
-                         preface: Option[Int],
-                         packaging_type: Option[String],
+                         prefacePages: Option[Int],
+                         packagingType: Option[String],
                          `type`: Option[String],
                          isbn: Option[Long],
                          cover: Option[String],
                          price: Option[Double],
                          currency: Option[String],
                          noteId: Option[Int],
-                         pub_series_id: Option[Int],
-                         pub_series_num: Option[Int]
+                         pubSeriesId: Option[Int],
+                         pubSeriesNum: Option[Int]
                        )
 
 object Publications {
