@@ -12,8 +12,8 @@ lazy val commonSettings = Seq(
   ),
   libraryDependencies ++= Seq(
     "org.postgresql" % "postgresql" % "9.4-1206-jdbc41",
-    "io.getquill" %% "quill-jdbc" % "0.4.1",
-    "io.getquill" %% "quill-async" % "0.4.1",
+    "io.getquill" %% "quill-jdbc" % "0.5.0",
+    "io.getquill" %% "quill-async" % "0.5.0",
     "ch.qos.logback" % "logback-classic" % "1.1.6",
     "com.github.nscala-time" %% "nscala-time" % "2.10.0"
   ),

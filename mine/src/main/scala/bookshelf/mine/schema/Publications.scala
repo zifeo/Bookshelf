@@ -9,18 +9,18 @@ case class Publications(
                          id: Int,
                          title: String,
                          datePub: DateTime,
-                         publisherId: Option[Int],
+                         publisherId: Int,
                          pages: Option[Int],
-                         preface: Option[Int],
-                         packaging: String,
+                         prefacePages: Option[Int],
+                         packagingType: Option[String],
                          `type`: Option[String],
                          isbn: Option[Long],
-                         image: String,
+                         cover: Option[String],
                          price: Option[Double],
-                         currency: String,
+                         currency: Option[String],
                          noteId: Option[Int],
                          pubSeriesId: Option[Int],
-                         pubSeriesNb: Option[Int]
+                         pubSeriesNum: Option[Int]
                        )
 
 object Publications {
@@ -45,16 +45,16 @@ object Publications {
         Publications(
           id.toInt,
           title,
-          stringToDate(date), // need to manage the litteral without -
-          intOrNone(publisherId),
+          stringToDate(date),
+          publisherId.toInt,
           book_pages,
           pages_prefaces,
-          packaging,
+          stringOrNone(packaging),
           requireIn(pubType, types),
           longOrNone(isbn),
-          image,
+          stringOrNone(image),
           money,
-          currency,
+          stringOrNone(currency),
           intOrNone(noteId),
           intOrNone(pubSeriesId),
           intOrNone(pubSeriesNb)
