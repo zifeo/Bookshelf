@@ -2,6 +2,12 @@
  * Entities
  ************************/
 
+CREATE TYPE PUBLICATION_TYPE AS ENUM ('ANTHOLOGY', 'COLLECTION', 'MAGAZINE', 'NONFICTION', 'NOVEL', 'OMNIBUS',
+  'FANZINE', 'CHAPBOOK');
+
+CREATE TYPE TITLE_TYPE AS ENUM ('ANTHOLOGY', 'BACKCOVERART', 'COLLECTION', 'COVERART', 'INTERIORART', 'EDITOR', 'ESSAY',
+  'INTERVIEW', 'NOVEL', 'NONFICTION', 'OMNIBUS', 'POEM', 'REVIEW', 'SERIAL', 'SHORTFICTION', 'CHAPBOOK');
+
 CREATE TABLE authors
 (
   id          INT PRIMARY KEY NOT NULL,
@@ -20,14 +26,14 @@ CREATE TABLE authors
 
 CREATE TABLE publications
 (
-  id             INT PRIMARY KEY NOT NULL,
-  title          VARCHAR(256)    NOT NULL,
-  date_pub       DATE            NOT NULL,
-  publisher_id   INT             NOT NULL, -- fk
+  id             INT PRIMARY KEY  NOT NULL,
+  title          VARCHAR(256)     NOT NULL,
+  date_pub       DATE             NOT NULL,
+  publisher_id   INT              NOT NULL, -- fk
   pages          INT,
 
-  packaging_type VARCHAR(256)    NOT NULL,
-  type           VARCHAR(256)    NOT NULL,
+  packaging_type VARCHAR(256)     NOT NULL,
+  type           PUBLICATION_TYPE NOT NULL,
   isbn           INT UNIQUE,
   cover          VARCHAR(256),
   price          FLOAT,
@@ -47,7 +53,7 @@ CREATE TABLE titles
   series_id    INT, -- fk
   series_num   INT,
   story_length VARCHAR(256),
-  type         VARCHAR(256),
+  type         TITLE_TYPE,
   parent       INT             NOT NULL DEFAULT 0, -- fk, 0 on not defined
   language_id  INT, -- fk
   graphic      BOOLEAN         NOT NULL
