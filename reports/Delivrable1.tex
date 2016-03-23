@@ -154,6 +154,8 @@ Another part of the work was to analyse how tables were connected to remove pote
 ~\\~\\
 Furthermore, to write properly the creation of the table, we needed to know exactly what entry may be null, and which ones could not. This was done by inspecting carefully the data and reading correctly the instructions. Then, the dilemma was for notes and web pages tables. Indeed, for note, we only have two entries : the ID and the raw note, whereas for a website, there are an ID, an URL but also some other IDs to relate it to other entities : among these 7 IDs, only one   The type of each entry is explained in the following paragraph. Our final has been not the change the structure of these two tables since there is no WebpageID entry in tables as there is for note, but whether a web page is directly connected to the ID of its corresponding entity. Therefore, it implies to add an entry into these 7 tables, and we decided not to do this for practical reasons. Besides, we also thought about simply adding a simply URL entry into the note table, but this solution was also not satisfactory since before insert we would need to do a map from web page to note (not that hard) but since primary keys are only unique in one table, an author and a publication may have the same ID and this would imply much more work to know which website belongs to who.
 ~\\~\\
+As publications and titles both have a type we used an enum as a compromise between having a raw string field and creating normalisation for it. This avoids the redundancy and increase data consistency. Note that it would not be an option if the dataset usage would include adding new types (normalising is better in this case).
+~\\~\\
 Last but not least, some intensive parsing has also been performed to know exactly how many characters were required for instance for each field, since we have encountered some difficulties with Cyrillic. We quickly realised that we should definitely parse these values before inserting them, it presents the advantages of being less memory consuming (6 characters become 1) and also the process of conversion is only done one time.
 \addtocounter{page}{1}
 \newpage
@@ -181,6 +183,20 @@ $$
 
 \begin{lstlisting}[language=SQL,showspaces=false,basicstyle=\ttfamily,numberstyle=\tiny,commentstyle=\color{gray}
         ]
+CREATE TYPE PUBLICATION_TYPE AS ENUM ('ANTHOLOGY', 'COLLECTION', 'MAGAZINE',
+	'NONFICTION', 'NOVEL', 'OMNIBUS', 'FANZINE', 'CHAPBOOK');
+\end{lstlisting}
+
+\begin{lstlisting}[language=SQL,showspaces=false,basicstyle=\ttfamily,numberstyle=\tiny,commentstyle=\color{gray}
+        ]
+CREATE TYPE TITLE_TYPE AS ENUM ('ANTHOLOGY', 'BACKCOVERART', 'COLLECTION',
+	'COVERART', 'INTERIORART', 'EDITOR', 'ESSAY', 'INTERVIEW', 'NOVEL',
+	'NONFICTION', 'OMNIBUS', 'POEM', 'REVIEW', 'SERIAL', 'SHORTFICTION',
+	'CHAPBOOK');
+\end{lstlisting}
+
+\begin{lstlisting}[language=SQL,showspaces=false,basicstyle=\ttfamily,numberstyle=\tiny,commentstyle=\color{gray}
+        ]
 CREATE TABLE authors
 (
   id          INT PRIMARY KEY NOT NULL,
@@ -202,14 +218,14 @@ CREATE TABLE authors
         ]
 CREATE TABLE publications
 (
-  id             INT PRIMARY KEY NOT NULL,
-  title          VARCHAR(256)    NOT NULL,
-  date_pub       DATE            NOT NULL,
-  publisher_id   INT             NOT NULL, -- fk
+  id             INT PRIMARY KEY 	NOT NULL,
+  title          VARCHAR(256)    	NOT NULL,
+  date_pub       DATE            	NOT NULL,
+  publisher_id   INT             	NOT NULL, -- fk
   pages          INT,
   preface        INT,
-  packaging_type VARCHAR(16)    NOT NULL,
-  type           VARCHAR(64)    NOT NULL,
+  packaging_type VARCHAR(16)   		NOT NULL,
+  type           PUBLICATON_TYPE    NOT NULL,
   isbn           BIGINT,
   cover          VARCHAR(256),
   price          FLOAT,
@@ -219,6 +235,8 @@ CREATE TABLE publications
   note_id        INT -- fk
 )
 \end{lstlisting}
+
+\newpage
 
 \begin{lstlisting}[language=SQL,showspaces=false,basicstyle=\ttfamily,numberstyle=\tiny,commentstyle=\color{gray}
         ]
@@ -232,14 +250,12 @@ CREATE TABLE titles
   series_id    INT, -- fk
   series_num   INT,
   story_length VARCHAR(256),
-  type         VARCHAR(256),
+  type         TITLE_TYPE,
   parent       INT             NOT NULL DEFAULT 0, -- fk
   language_id  INT, -- fk
   graphic      BOOLEAN         NOT NULL
 )
 \end{lstlisting}
-
-\newpage
 
 \begin{lstlisting}[language=SQL,showspaces=false,basicstyle=\ttfamily,numberstyle=\tiny,commentstyle=\color{gray}
         ]
@@ -297,6 +313,8 @@ CREATE TABLE titles_series
 )
 \end{lstlisting}
 
+\newpage
+
 \begin{lstlisting}[language=SQL,showspaces=false,basicstyle=\ttfamily,numberstyle=\tiny,commentstyle=\color{gray}
         ]
 CREATE TABLE awards
@@ -320,8 +338,6 @@ CREATE TABLE awards_categories
   note_id INT -- fk
 )
 \end{lstlisting}
-
-\newpage
 
 \begin{lstlisting}[language=SQL,showspaces=false,basicstyle=\ttfamily,numberstyle=\tiny,commentstyle=\color{gray}
         ]
@@ -400,8 +416,6 @@ CREATE TABLE reviews
   CONSTRAINT pk_reviews PRIMARY KEY (title_id, review_id)
 )
 \end{lstlisting}
-
-\newpage
 
 \begin{lstlisting}[language=SQL,showspaces=false,basicstyle=\ttfamily,numberstyle=\tiny,commentstyle=\color{gray}
         ]
@@ -536,9 +550,7 @@ ALTER TABLE publishers
 ADD FOREIGN KEY (note_id)
 REFERENCES notes (id)
 ON DELETE SET NULL;
-\end{lstlisting}
-
-\newpage
+\end{lstlisting}	
 
 \subsubsection{Publication series}
 \begin{lstlisting}[language=SQL,showspaces=false,basicstyle=\ttfamily,numberstyle=\tiny,commentstyle=\color{gray}
