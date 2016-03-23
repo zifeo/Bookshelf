@@ -5,11 +5,11 @@ import bookshelf.mine._
 import scala.util.Try
 
 case class TitlesSeries(
-                          id: Int,
-                          title: String,
-                          parent: Option[Int],
-                          noteId: Option[Int]
-                        )
+                         id: Int,
+                         title: String,
+                         parent: Int,
+                         noteId: Option[Int]
+                       )
 
 object TitlesSeries {
 
@@ -19,7 +19,7 @@ object TitlesSeries {
         TitlesSeries(
           id.toInt,
           title,
-          intOrNone(parent),
+          intOrZero(parent),
           intOrNone(noteId)
         )
     }
