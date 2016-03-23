@@ -54,7 +54,7 @@ CREATE TABLE titles
   series_num   INT,
   story_length VARCHAR(256),
   type         TITLE_TYPE,
-  parent       INT             NOT NULL DEFAULT 0, -- fk, 0 on not defined
+  parent       INT             NOT NULL DEFAULT 0, -- fk
   language_id  INT, -- fk
   graphic      BOOLEAN         NOT NULL
 );
@@ -128,7 +128,7 @@ CREATE TABLE awards_types
   awarded_for VARCHAR(256)    NOT NULL,
   short_name  VARCHAR(256)    NOT NULL UNIQUE,
   poll        BOOLEAN         NOT NULL,
-  non_genre   BOOLEAN         NOT NULL -- type ?
+  non_genre   BOOLEAN         NOT NULL
 );
 
 CREATE TABLE publishers
