@@ -14,10 +14,11 @@ private[mine] object Imports extends App {
 
   import CSVSources._
 
-  implicit val db = source(new PostgresAsyncSourceConfig[SnakeCase]("db"))
+  //implicit val db = source(new PostgresAsyncSourceConfig[SnakeCase]("db"))
 
+  //titleTranslators.foreach(println(_))
   //truncate("publications")
-
+/*
   val res = List(
     //db.run(quote(query[Authors].insert))(authors.flatMap(_.toOption)),
     //db.run(quote(query[Awards].insert))(awards.flatMap(_.toOption)),
@@ -43,5 +44,5 @@ private[mine] object Imports extends App {
   )
 
   Await.result(Future.sequence(res), Duration.Inf)
-
+*/
 }
