@@ -1,9 +1,13 @@
 package bookshelf.mine
 
+import bookshelf.mine.schema.Titles
+
 private[mine] object Failures extends App {
 
   def prettyPrint[T](data: Iterable[T]): Unit =
     println(data.mkString("\n"))
+
+  import CSVSources._
 
   /*
   println("\n\n===== Authors =====")
@@ -30,10 +34,9 @@ private[mine] object Failures extends App {
   println("\n\n===== Awards categories =====")
   prettyPrint(Award_category.all.filter(_.isFailure))
 
-  */
   println("\n\n===== Awards types =====")
   prettyPrint(CSVSources.awardsTypes.filter(_.isFailure))
-  /*
+
   println("\n\n===== Tags =====")
   prettyPrint(Tag.all.filter(_.isFailure))
 
@@ -45,10 +48,13 @@ private[mine] object Failures extends App {
 
   println("\n\n===== Notes =====")
   prettyPrint(Note.all.filter(_.isFailure))
+  */
 
   println("\n\n===== Titles =====")
-  prettyPrint(Title.all.filter(_.isFailure))
+  prettyPrint(titles.filter(_.isFailure))
+  println(Titles.v.mkString(" | "))
 
+  /*
   println("\n\n===== Titles award =====")
   prettyPrint(Titles_awards.all.filter(_.isFailure))
 

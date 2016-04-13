@@ -56,7 +56,7 @@ CREATE TABLE titles
   type         TITLE_TYPE,
   parent       INT             NOT NULL DEFAULT 0, -- fk
   language_id  INT, -- fk
-  graphic      BOOLEAN         NOT NULL
+  graphic      BOOLEAN
 );
 
 CREATE TABLE languages
@@ -106,16 +106,18 @@ CREATE TABLE awards
   title       VARCHAR(256)    NOT NULL,
   date        DATE            NOT NULL,
   category_id INT             NOT NULL, -- fk
+  type_id     INT             NOT NULL, -- fk
   note_id     INT -- fk
 );
 
-CREATE TABLE awards_categories
+CREATE TABLE awards_categories -- weak entity of award_type
 (
-  id      INT PRIMARY KEY NOT NULL,
+  id      INT             NOT NULL,
   name    VARCHAR(256)    NOT NULL,
   type_id INT             NOT NULL, -- fk
   ordr    INT,
-  note_id INT -- fk
+  note_id INT, -- fk
+  PRIMARY KEY (id, type_id)
 );
 
 CREATE TABLE awards_types
@@ -362,8 +364,8 @@ ON DELETE SET NULL;
 
 /* Awards */
 ALTER TABLE awards
-ADD FOREIGN KEY (category_id)
-REFERENCES awards_categories (id)
+ADD FOREIGN KEY (category_id, type_id)
+REFERENCES awards_categories (id, type_id)
 ON DELETE SET NULL;
 
 ALTER TABLE awards
@@ -375,7 +377,7 @@ ON DELETE SET NULL;
 ALTER TABLE awards_categories
 ADD FOREIGN KEY (type_id)
 REFERENCES awards_types (id)
-ON DELETE SET NULL;
+ON DELETE CASCADE;
 
 ALTER TABLE awards_categories
 ADD FOREIGN KEY (note_id)
