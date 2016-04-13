@@ -2,6 +2,7 @@ package bookshelf.mine.schema
 
 import bookshelf.mine._
 
+import scala.collection.mutable
 import scala.util.Try
 
 case class Titles(
@@ -16,7 +17,7 @@ case class Titles(
                    `type`: Option[String],
                    parent: Int,
                    languageId: Option[Int],
-                   graphic: Boolean
+                   graphic: Option[Boolean]
                  )
 
 object Titles {
@@ -26,9 +27,12 @@ object Titles {
 
   val lengths = List("NOVELLA", "SHORTSTORY", "JUVENILE_FICTION", "NOVELIZATION", "SHORT_FICTION").map(_.toLowerCase)
 
+  val v = mutable.Set.empty[String]
+
   def parseCols(raw: List[String]): Try[Titles] = Try {
     raw match {
       case List(id, title, translator, synopsis, noteId, serieId, serieNb, length, tpe, parent, language, graphic) =>
+        v += translator
         Titles(
           id.toInt,
           title,
@@ -41,7 +45,7 @@ object Titles {
           requireIn(tpe, types),
           intOrZero(parent),
           intOrNone(language),
-          parseBoolean(graphic)
+          booleanOrNone(graphic)
         )
     }
   }
