@@ -13,11 +13,13 @@ case class TitleTranslator(
 
 object TitleTranslators {
 
-  private var counter = 1
+  private var visited: List[String] = List()
 
-  def inc(): Int = {
-    counter += 1
-    counter
+  def inc(name: String): Int = {
+    if (!visited.contains(name)) {
+      visited = visited :+ name
+    }
+    visited.indexOf(name) + 1
   }
 
 
@@ -25,9 +27,9 @@ object TitleTranslators {
     raw match {
       case List(id, _, translator, _, _, _, _, _, _, _, _, _) =>
         translator.split(';').map(t => t.split(',').toList match {
-          case List(language, year, _) => TitleTranslator(
+          case List(language, year, name) => TitleTranslator(
             id.toInt,
-            inc,
+            inc(name),
             year.toInt,
             language
           )
