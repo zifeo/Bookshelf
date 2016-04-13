@@ -11,11 +11,13 @@ case class Translator(
 
 object Translators {
 
-  private var counter = 1
+  private var visited: List[String] = List()
 
-  def inc(): Int = {
-    counter += 1
-    counter
+  def inc(name: String): Int = {
+    if (!visited.contains(name)) {
+      visited = visited :+ name
+    }
+    visited.indexOf(name) + 1
   }
 
   def parseCols(raw: List[String]): Try[List[Translator]] = Try {
@@ -24,7 +26,7 @@ object Translators {
         translator.split(';').toList.map { t =>
           t.split(',').toList match {
             case List(_, _, name) => Translator(
-              inc,
+              inc(name),
               name
             )
           }
