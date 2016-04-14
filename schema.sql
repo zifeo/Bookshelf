@@ -47,7 +47,6 @@ CREATE TABLE titles
 (
   id           INT PRIMARY KEY NOT NULL,
   title        VARCHAR(256)    NOT NULL,
-  translator   VARCHAR(256),
   synopsis     INT, -- fk
   note_id      INT, -- fk
   series_id    INT, -- fk
@@ -57,6 +56,21 @@ CREATE TABLE titles
   parent       INT             NOT NULL DEFAULT 0, -- fk
   language_id  INT, -- fk
   graphic      BOOLEAN         NOT NULL
+);
+
+CREATE TABLE titles_translators
+(
+  title_id           INT NOT NULL,
+  translator_id      INT NOT NULL,
+  year               INT NOT NULL,
+  language           VARCHAR(64) NOT NULL,
+  CONSTRAINT pk_titles_translators PRIMARY KEY (title_id, translator_id, year, language)
+);
+
+CREATE TABLE translators
+(
+  id          INT PRIMARY KEY  NOT NULL,
+  translator  VARCHAR(128)      NOT NULL
 );
 
 CREATE TABLE languages
