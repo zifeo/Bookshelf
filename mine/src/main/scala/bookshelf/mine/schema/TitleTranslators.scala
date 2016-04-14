@@ -4,16 +4,16 @@ import bookshelf.mine._
 
 import scala.util.Try
 
-case class TitleTranslator(
-                            titleId: Int,
-                            translatorId: Int,
-                            year: Int,
-                            language: String
-                          )
+case class TitleTranslators(
+                             titleId: Int,
+                             translatorId: Int,
+                             year: Int,
+                             language: String
+                           )
 
 object TitleTranslators {
 
-  private var visited: List[String] = List()
+  private var visited = List.empty[String]
 
   def inc(name: String): Int = {
     if (!visited.contains(name)) {
@@ -23,17 +23,18 @@ object TitleTranslators {
   }
 
 
-  def parseCols(raw: List[String]): Try[List[TitleTranslator]] = Try {
+  def parseCols(raw: List[String]): Try[List[TitleTranslators]] = Try {
     raw match {
       case List(id, _, translator, _, _, _, _, _, _, _, _, _) =>
-        translator.split(';').map(t => t.split(',').toList match {
-          case List(language, year, name) => TitleTranslator(
+        translator.split(';').map { t => t.split(',').toList match {
+          case List(language, year, name) => TitleTranslators(
             id.toInt,
             inc(name),
             year.toInt,
             language
           )
-        }).toList
+        }
+        }.toList
     }
   }
 
