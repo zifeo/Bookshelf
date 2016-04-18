@@ -321,7 +321,7 @@ ON DELETE CASCADE;
 
 ALTER TABLE webpages
 ADD FOREIGN KEY (title_series_id)
-REFERENCES title_series (id)
+REFERENCES titles_series (id)
 ON DELETE CASCADE;
 
 ALTER TABLE webpages
@@ -352,12 +352,12 @@ REFERENCES tags (id)
 ON DELETE CASCADE;
 
 /* Titles series */
-ALTER TABLE title_series
+ALTER TABLE titles_series
 ADD FOREIGN KEY (parent)
-REFERENCES title_series (id)
+REFERENCES titles_series (id)
 ON DELETE SET DEFAULT;
 
-ALTER TABLE title_series
+ALTER TABLE titles_series
 ADD FOREIGN KEY (note_id)
 REFERENCES notes (id)
 ON DELETE SET NULL;

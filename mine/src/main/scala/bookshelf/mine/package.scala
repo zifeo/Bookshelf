@@ -1,10 +1,14 @@
 package bookshelf
 
+import java.util.logging.LogManager
+
 import com.github.nscala_time.time.Imports._
 
 import scala.util.Try
 
 package object mine {
+
+  LogManager.getLogManager.readConfiguration()
 
   /**
     * Parse an integer as an option.
