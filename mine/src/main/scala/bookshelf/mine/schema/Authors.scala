@@ -1,5 +1,7 @@
 package bookshelf.mine.schema
 
+import java.util.Date
+
 import bookshelf.mine._
 import org.joda.time.DateTime
 
@@ -12,8 +14,8 @@ case class Authors(
                     lastName: Option[String],
                     pseudonym: Option[Int],
                     birthPlace: Option[String],
-                    birthDate: Option[DateTime],
-                    deathDate: Option[DateTime],
+                    birthDate: Option[Date],
+                    deathDate: Option[Date],
                     email: Option[String],
                     image: Option[String],
                     languageId: Option[Int],
@@ -32,8 +34,8 @@ object Authors {
           stringOrNone(lastName),
           intOrNone(pseudonym),
           stringOrNone(birthPlace),
-          stringOrNone(birthDate).map(stringToDate),
-          stringOrNone(deathDate).map(stringToDate),
+          stringOrNone(birthDate).map(stringToDate).map(_.toDate),
+          stringOrNone(deathDate).map(stringToDate).map(_.toDate),
           stringOrNone(email),
           stringOrNone(image),
           intOrNone(languageId),

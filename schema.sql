@@ -14,15 +14,15 @@ DROP TABLE IF EXISTS authors CASCADE;
 CREATE TABLE authors
 (
   id          INT PRIMARY KEY NOT NULL,
-  name        VARCHAR(256)    NOT NULL,
-  legal_name  VARCHAR(256),
-  last_name   VARCHAR(256),
+  name        VARCHAR(512)    NOT NULL,
+  legal_name  VARCHAR(512),
+  last_name   VARCHAR(512),
   pseudonym   INT, -- fk
-  birth_place VARCHAR(256),
+  birth_place VARCHAR(512),
   birth_date  DATE,
   death_date  DATE,
-  email       VARCHAR(256),
-  image       VARCHAR(256),
+  email       VARCHAR(512),
+  image       VARCHAR(512),
   language_id INT, -- fk
   note_id     INT -- fk
 );
@@ -31,7 +31,7 @@ DROP TABLE IF EXISTS publications CASCADE;
 CREATE TABLE publications
 (
   id             INT PRIMARY KEY  NOT NULL,
-  title          VARCHAR(256)     NOT NULL,
+  title          VARCHAR(512)     NOT NULL,
   date_pub       DATE             NOT NULL,
   publisher_id   INT              NOT NULL, -- fk
   pages          INT,
@@ -39,7 +39,7 @@ CREATE TABLE publications
   packaging_type VARCHAR(16),
   type           PUBLICATION_TYPE NOT NULL,
   isbn           BIGINT,
-  cover          VARCHAR(256),
+  cover          VARCHAR(512),
   price          FLOAT,
   currency       VARCHAR(8),
   pub_series_id  INT, -- fk
@@ -51,13 +51,13 @@ DROP TABLE IF EXISTS titles CASCADE;
 CREATE TABLE titles
 (
   id           INT PRIMARY KEY NOT NULL,
-  title        VARCHAR(256)    NOT NULL,
-  translator   VARCHAR(256),
+  title        VARCHAR(512)    NOT NULL,
+  translator   VARCHAR(512),
   synopsis     INT, -- fk
   note_id      INT, -- fk
   series_id    INT, -- fk
   series_num   INT,
-  story_length VARCHAR(256),
+  story_length VARCHAR(512),
   type         TITLE_TYPE,
   parent       INT             NOT NULL DEFAULT 0, -- fk
   language_id  INT, -- fk
@@ -68,7 +68,7 @@ DROP TABLE IF EXISTS languages CASCADE;
 CREATE TABLE languages
 (
   id     INT PRIMARY KEY NOT NULL,
-  name   VARCHAR(256)    NOT NULL,
+  name   VARCHAR(512)    NOT NULL,
   code   CHAR(3)         NOT NULL UNIQUE,
   script BOOLEAN
 );
@@ -87,7 +87,7 @@ CREATE TABLE webpages
   author_id              INT, -- fk
   publisher_id           INT, -- fk
   title_id               INT, -- fk
-  url                    VARCHAR(256)    NOT NULL UNIQUE,
+  url                    VARCHAR(512)    NOT NULL,
   publications_series_id INT, -- fk
   award_type_id          INT, -- fk
   title_series_id        INT, -- fk
@@ -98,14 +98,14 @@ DROP TABLE IF EXISTS tags CASCADE;
 CREATE TABLE tags
 (
   id   INT PRIMARY KEY NOT NULL,
-  name VARCHAR(256)    NOT NULL
+  name VARCHAR(512)    NOT NULL
 );
 
 DROP TABLE IF EXISTS titles_series CASCADE;
 CREATE TABLE titles_series
 (
   id      INT PRIMARY KEY NOT NULL,
-  title   VARCHAR(256)    NOT NULL,
+  title   VARCHAR(512)    NOT NULL,
   parent  INT DEFAULT 0, -- fk
   note_id INT -- fk
 );
@@ -114,7 +114,7 @@ DROP TABLE IF EXISTS awards CASCADE;
 CREATE TABLE awards
 (
   id          INT PRIMARY KEY NOT NULL,
-  title       VARCHAR(256)    NOT NULL,
+  title       VARCHAR(512)    NOT NULL,
   date        DATE            NOT NULL,
   category_id INT             NOT NULL, -- fk
   type_id     INT             NOT NULL, -- fk
@@ -125,7 +125,7 @@ DROP TABLE IF EXISTS awards_categories CASCADE;
 CREATE TABLE awards_categories -- weak entity of award_type
 (
   id      INT             NOT NULL,
-  name    VARCHAR(256)    NOT NULL,
+  name    VARCHAR(512)    NOT NULL,
   type_id INT             NOT NULL, -- fk
   ordr    INT,
   note_id INT, -- fk
@@ -137,11 +137,11 @@ CREATE TABLE awards_types
 (
   id          INT PRIMARY KEY NOT NULL,
   code        CHAR(2) UNIQUE,
-  name        VARCHAR(256)    NOT NULL,
+  name        VARCHAR(512)    NOT NULL,
   note_id     INT, -- fk
-  awarded_by  VARCHAR(256)    NOT NULL,
-  awarded_for VARCHAR(256)    NOT NULL,
-  short_name  VARCHAR(256)    NOT NULL UNIQUE,
+  awarded_by  VARCHAR(512)    NOT NULL,
+  awarded_for VARCHAR(512)    NOT NULL,
+  short_name  VARCHAR(512)    NOT NULL UNIQUE,
   poll        BOOLEAN         NOT NULL,
   non_genre   BOOLEAN         NOT NULL
 );
@@ -150,7 +150,7 @@ DROP TABLE IF EXISTS publishers CASCADE;
 CREATE TABLE publishers
 (
   id      INT PRIMARY KEY NOT NULL,
-  name    VARCHAR(512)    NOT NULL,
+  name    VARCHAR(1024)    NOT NULL,
   note_id INT -- fk
 );
 
@@ -158,7 +158,7 @@ DROP TABLE IF EXISTS publications_series CASCADE;
 CREATE TABLE publications_series
 (
   id      INT PRIMARY KEY NOT NULL,
-  name    VARCHAR(512)    NOT NULL,
+  name    VARCHAR(1024)    NOT NULL,
   note_id INT -- fk
 );
 
