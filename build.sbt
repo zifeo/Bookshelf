@@ -1,4 +1,6 @@
 
+scalaVersion := "2.11.8"
+
 lazy val commonSettings = Seq(
   organization := "bookshelf",
   version := "1.0",
@@ -11,11 +13,10 @@ lazy val commonSettings = Seq(
     "-Xlint:_"
   ),
   libraryDependencies ++= Seq(
-    "org.postgresql" % "postgresql" % "9.4-1206-jdbc41",
-    "io.getquill" %% "quill-jdbc" % "0.5.0",
-    "io.getquill" %% "quill-async" % "0.5.0",
-    "ch.qos.logback" % "logback-classic" % "1.1.6",
-    "com.github.nscala-time" %% "nscala-time" % "2.10.0"
+    "com.typesafe" % "config" % "1.3.0",
+    "ch.qos.logback" % "logback-classic" % "1.1.7",
+    "com.github.nscala-time" %% "nscala-time" % "2.12.0",
+    "org.scalatest" %% "scalatest" % "2.2.6" % "test"
   ),
   unmanagedClasspath in Compile += baseDirectory.value / "src" / "main" / "resources",
   cancelable in Global := true,
@@ -27,10 +28,11 @@ lazy val mine = project
   .settings(commonSettings: _*)
   .settings(
     name := "Mine",
-    javaOptions += "-Xmx4G",
     libraryDependencies ++= Seq(
-      "org.scalatest" % "scalatest_2.11" % "2.2.6"
-    )
+      "org.postgresql" % "postgresql" % "9.4-1206-jdbc41",
+      "io.getquill" %% "quill-jdbc" % "0.5.0"
+    ),
+    javaOptions += "-Xmx4G"
   )
 
 lazy val saloon = project
@@ -40,9 +42,11 @@ lazy val saloon = project
   .settings(
     name := "Saloon",
     libraryDependencies ++= Seq(
-      "com.typesafe" % "config" % "1.3.0",
-      "com.typesafe.akka" %% "akka-http-experimental" % "2.4.2",
-      "com.typesafe.akka" %% "akka-http-spray-json-experimental" % "2.4.2"
+      "io.getquill" %% "quill-async" % "0.5.0",
+      "com.typesafe.akka" %% "akka-slf4j" % "2.4.4",
+      "com.typesafe.akka" %% "akka-http-experimental" % "2.4.4",
+      "com.typesafe.akka" %% "akka-http-spray-json-experimental" % "2.4.4",
+      "com.typesafe.akka" %% "akka-http-testkit-experimental" % "2.4.2-RC3" % "test"
     ),
     assemblyJarName in assembly := "bookshelf-saloon.jar",
     test in assembly := {},

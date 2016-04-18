@@ -10,6 +10,7 @@ case class Awards(
                    title: String,
                    date: DateTime,
                    categoryId: Int,
+                   typeId: Int,
                    noteId: Option[Int]
                  )
 
@@ -23,6 +24,7 @@ object Awards {
           title,
           stringToDate(date),
           categoryId.toInt,
+          typeId.toInt,
           intOrNone(noteId)
         )
     }
