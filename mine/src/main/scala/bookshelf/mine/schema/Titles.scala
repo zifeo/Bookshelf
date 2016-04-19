@@ -22,11 +22,6 @@ case class Titles(
 
 object Titles {
 
-  val types = List("ANTHOLOGY", "BACKCOVERART", "COLLECTION", "COVERART", "INTERIORART", "EDITOR", "ESSAY", "INTERVIEW",
-    "NOVEL", "NONFICTION", "OMNIBUS", "POEM", "REVIEW", "SERIAL", "SHORTFICTION", "CHAPBOOK").map(_.toLowerCase)
-
-  val lengths = List("NOVELLA", "SHORTSTORY", "JUVENILE_FICTION", "NOVELIZATION", "SHORT_FICTION").map(_.toLowerCase)
-
   val v = mutable.Set.empty[String]
 
   def parseCols(raw: List[String]): Try[Titles] = Try {
@@ -41,8 +36,8 @@ object Titles {
           intOrNone(noteId),
           intOrNone(serieId),
           intOrNone(serieNb),
-          requireIn(length, lengths),
-          requireIn(tpe, types),
+          requireIn(length, TitlesLengths.values),
+          requireIn(tpe, TitlesTypes.values),
           intOrZero(parent),
           intOrNone(language),
           booleanOrNone(graphic)

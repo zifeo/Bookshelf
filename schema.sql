@@ -2,14 +2,6 @@
  * Entities
  ************************/
 
-DROP TYPE IF EXISTS PUBLICATION_TYPE CASCADE;
-CREATE TYPE PUBLICATION_TYPE AS ENUM ('ANTHOLOGY', 'COLLECTION', 'MAGAZINE', 'NONFICTION', 'NOVEL', 'OMNIBUS',
-  'FANZINE', 'CHAPBOOK');
-
-DROP TYPE IF EXISTS TITLE_TYPE CASCADE;
-CREATE TYPE TITLE_TYPE AS ENUM ('ANTHOLOGY', 'BACKCOVERART', 'COLLECTION', 'COVERART', 'INTERIORART', 'EDITOR', 'ESSAY',
-  'INTERVIEW', 'NOVEL', 'NONFICTION', 'OMNIBUS', 'POEM', 'REVIEW', 'SERIAL', 'SHORTFICTION', 'CHAPBOOK');
-
 DROP TABLE IF EXISTS authors CASCADE;
 CREATE TABLE authors
 (
@@ -37,7 +29,7 @@ CREATE TABLE publications
   pages          INT,
   preface_pages  INT,
   packaging_type VARCHAR(16),
-  type           PUBLICATION_TYPE NOT NULL,
+  type           VARCHAR(256) NOT NULL,
   isbn           BIGINT,
   cover          VARCHAR(512),
   price          FLOAT,
@@ -58,7 +50,7 @@ CREATE TABLE titles
   series_id    INT, -- fk
   series_num   INT,
   story_length VARCHAR(512),
-  type         TITLE_TYPE,
+  type         VARCHAR(256),
   parent       INT             NOT NULL DEFAULT 0, -- fk
   language_id  INT, -- fk
   graphic      BOOLEAN
