@@ -25,9 +25,6 @@ case class Publications(
 
 object Publications {
 
-  val types = List("ANTHOLOGY", "COLLECTION", "MAGAZINE", "NONFICTION", "NOVEL", "OMNIBUS", "FANZINE", "CHAPBOOK")
-    .map(_.toLowerCase)
-
   val PATTERN_MONEY_1 = "([\\d|\\.]*)([\\D]|\\.]*)".r
   val PATTERN_MONEY_2 = "([\\D]|\\.]*)([\\d|\\.]*)".r
 
@@ -50,7 +47,7 @@ object Publications {
           book_pages,
           pages_prefaces,
           stringOrNone(packaging),
-          requireIn(pubType, types),
+          requireIn(pubType, PublicationsTypes.values),
           longOrNone(isbn),
           stringOrNone(image),
           money,

@@ -1,72 +1,68 @@
 package bookshelf.mine
 
-import bookshelf.mine.schema.Titles
-
 private[mine] object Failures extends App {
 
-  def prettyPrint[T](data: Iterable[T]): Unit =
-    println(data.mkString("\n"))
+  def prettyPrint[T](data: Iterable[T]): Unit = {
+    val elements = data.size
+    println(s"elements: $elements")
+    println(data.take(10).mkString("\n"))
+  }
 
   import CSVSources._
-
-  /*
+  
   println("\n\n===== Authors =====")
-  prettyPrint(CSVSources.authors.filter(_.isFailure))
+  prettyPrint(authors.filter(_.isFailure))
 
   println("\n\n===== Publication =====")
-  prettyPrint(Publication.all.filter(_.isFailure))
+  prettyPrint(publications.filter(_.isFailure))
 
   println("\n\n===== Publication authors =====")
-  prettyPrint(Publication_author.all.filter(_.isFailure))
+  prettyPrint(publicationsAuthors.filter(_.isFailure))
 
   println("\n\n===== Publication content =====")
-  prettyPrint(Publication_content.all.filter(_.isFailure))
+  prettyPrint(publicationsContents.filter(_.isFailure))
 
   println("\n\n===== Publication series =====")
-  prettyPrint(Publication_serie.all.filter(_.isFailure))
+  prettyPrint(publicationsSeries.filter(_.isFailure))
 
   println("\n\n===== Publishers =====")
-  prettyPrint(Publisher.all.filter(_.isFailure))
+  prettyPrint(publishers.filter(_.isFailure))
 
   println("\n\n===== Awards =====")
-  prettyPrint(Award.all.filter(_.isFailure))
+  prettyPrint(awards.filter(_.isFailure))
 
   println("\n\n===== Awards categories =====")
-  prettyPrint(Award_category.all.filter(_.isFailure))
+  prettyPrint(awardsCategories.filter(_.isFailure))
 
   println("\n\n===== Awards types =====")
-  prettyPrint(CSVSources.awardsTypes.filter(_.isFailure))
+  prettyPrint(awardsTypes.filter(_.isFailure))
 
   println("\n\n===== Tags =====")
-  prettyPrint(Tag.all.filter(_.isFailure))
+  prettyPrint(tags.filter(_.isFailure))
 
   println("\n\n===== Languages =====")
-  prettyPrint(Language.all.filter(_.isFailure))
+  prettyPrint(languages.filter(_.isFailure))
 
   println("\n\n===== Webpages =====")
-  prettyPrint(Webpage.all.filter(_.isFailure))
+  prettyPrint(webpages.filter(_.isFailure))
 
   println("\n\n===== Notes =====")
-  prettyPrint(Note.all.filter(_.isFailure))
-  */
+  prettyPrint(notes.filter(_.isFailure))
 
   println("\n\n===== Titles =====")
   prettyPrint(titles.filter(_.isFailure))
-  println(Titles.v.mkString(" | "))
-
-  /*
+  
   println("\n\n===== Titles award =====")
-  prettyPrint(Titles_awards.all.filter(_.isFailure))
+  prettyPrint(titlesAwards.filter(_.isFailure))
 
   println("\n\n===== Titles series =====")
-  prettyPrint(Titles_series.all.filter(_.isFailure))
+  prettyPrint(titlesSeries.filter(_.isFailure))
 
   println("\n\n===== Titles tag =====")
-  prettyPrint(Titles_tag.all.filter(_.isFailure))
+  prettyPrint(titlesTags.filter(_.isFailure))
 
   println("\n\n===== reviews =====")
-  prettyPrint(Reviews.all.filter(_.isFailure))
-  */
+  prettyPrint(reviews.filter(_.isFailure))
 
   println("\n==============\n===== DONE =====\n==============")
 
