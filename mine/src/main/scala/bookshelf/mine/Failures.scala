@@ -9,12 +9,12 @@ private[mine] object Failures extends App {
   }
 
   import CSVSources._
-  
+
   println("\n\n===== Authors =====")
   prettyPrint(authors.filter(_.isFailure))
 
-  println("\n\n===== Publication =====")
-  prettyPrint(publications.filter(_.isFailure))
+  //println("\n\n===== Publication =====")
+  //prettyPrint(publications.filter(_.isFailure))
 
   //println("\n\n===== Publication authors =====")
   //prettyPrint(publicationsAuthors.filter(_.isFailure))
@@ -31,8 +31,8 @@ private[mine] object Failures extends App {
   //println("\n\n===== Awards =====")
   //prettyPrint(awards.filter(_.isFailure))
 
-  println("\n\n===== Awards categories =====")
-  prettyPrint(awardsCategories.filter(_.isFailure))
+  //println("\n\n===== Awards categories =====")
+  //prettyPrint(awardsCategories.filter(_.isFailure))
 
   //println("\n\n===== Awards types =====")
   //prettyPrint(awardsTypes.filter(_.isFailure))
@@ -51,7 +51,7 @@ private[mine] object Failures extends App {
 
   //println("\n\n===== Titles =====")
   //prettyPrint(titles.filter(_.isFailure))
-  
+
   //println("\n\n===== Titles award =====")
   //prettyPrint(titlesAwards.filter(_.isFailure))
 

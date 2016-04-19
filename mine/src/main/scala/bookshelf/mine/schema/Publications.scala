@@ -1,5 +1,7 @@
 package bookshelf.mine.schema
 
+import java.util.Date
+
 import bookshelf.mine._
 import org.joda.time.DateTime
 
@@ -8,7 +10,7 @@ import scala.util.Try
 case class Publications(
                          id: Int,
                          title: String,
-                         datePub: DateTime,
+                         datePub: Date,
                          publisherId: Option[Int],
                          pages: Option[Int],
                          prefacePages: Option[Int],
@@ -42,7 +44,7 @@ object Publications {
         Publications(
           id.toInt,
           title,
-          stringToDate(date),
+          stringToDate(date).get,
           intOrNone(publisherId),
           book_pages,
           pages_prefaces,
