@@ -1,5 +1,10 @@
 package bookshelf.mine
 
+import bookshelf.mine._
+import bookshelf.mine.schema.{Publications, PublicationsTypes}
+
+import scala.util.Try
+
 private[mine] object Failures extends App {
 
   def prettyPrint[T](data: Iterable[T]): Unit = {
@@ -15,7 +20,6 @@ private[mine] object Failures extends App {
 //
   println("\n\n===== Publication =====")
   prettyPrint(publications.filter(_.isFailure))
-//
 //  println("\n\n===== Publication authors =====")
 //  prettyPrint(publicationsAuthors.filter(_.isFailure))
 //
