@@ -22,26 +22,30 @@ private[mine] object Imports extends App {
   val db = source(new JdbcSourceConfig[PostgresDialect, SnakeCase]("db"))
 
   val res = List(
+
     batchInserts(db.run(quote(query[Authors].insert)), authors),
     batchInserts(db.run(quote(query[Awards].insert)), awards),
     batchInserts(db.run(quote(query[AwardsCategories].insert)), awardsCategories),
     batchInserts(db.run(quote(query[AwardsTypes].insert)), awardsTypes),
     batchInserts(db.run(quote(query[Languages].insert)), languages),
     batchInserts(db.run(quote(query[Notes].insert)), notes),
-
     batchInserts(db.run(quote(query[PublicationsAuthors].insert)), publicationsAuthors),
+
     batchInserts(db.run(quote(query[PublicationsContents].insert)), publicationsContents),
     batchInserts(db.run(quote(query[PublicationsSeries].insert)), publicationsSeries),
     batchInserts(db.run(quote(query[Publications].insert)), publications),
     batchInserts(db.run(quote(query[Publishers].insert)), publishers),
     batchInserts(db.run(quote(query[Reviews].insert)), reviews),
-
     batchInserts(db.run(quote(query[Tags].insert)), tags),
+
     batchInserts(db.run(quote(query[TitlesSeries].insert)), titlesSeries),
     batchInserts(db.run(quote(query[Titles].insert)), titles),
     batchInserts(db.run(quote(query[TitlesAwards].insert)), titlesAwards),
     batchInserts(db.run(quote(query[TitlesTags].insert)), titlesTags),
-    batchInserts(db.run(quote(query[Webpages].insert)), webpages)
+    batchInserts(db.run(quote(query[Webpages].insert)), webpages),
+    batchInserts(db.run(quote(query[TitlesTranslators].insert)), titleTranslators),
+    batchInserts(db.run(quote(query[Translators].insert)), translators)
+
   )
 
   def batchInserts[T](query: List[T] => List[Long], data: List[Try[T]]): Future[List[Long]] = {
