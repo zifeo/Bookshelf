@@ -23,8 +23,11 @@
       });
       $('.table').tablesort();
       $('.ui.dropdown').dropdown();
-      $(document).on('click', '#demo', function() {
-        $('.ui.modal').modal('show');
+      $(document).on('click', '.details', function() {
+        $('#details').modal('show');
+      });
+      $(document).on('click', '#insert', function() {
+        $('#inserts').modal('show');
       });
       $('.table').visibility({
         onUpdate: function(calculations) {
@@ -71,7 +74,7 @@
         <div class="item">For every publisher, the average price of its published novels (the ones that have a dollar price)</div>
         <div class="item">The name of the author with the highest number of titles that are tagged as “science fiction”</div>
         <div class="item">The three most popular titles (i.e., the ones with the most awards and reviews)</div>
-        <div class="divider"></div>
+        <!--<div class="divider"></div>
         <div class="header">Deliverable 3</div>        
         <div class="item">The average price per currency of the publications of the most popular title (i.e, the title with most publications overall)</div>
         <div class="item">The names of the top ten title series with most awards</div>
@@ -87,9 +90,12 @@
         <div class="item">The author who has reviewed the most titles</div>
         <div class="item">For every language, the three authors with the most translated titles of “novel” type</div>
         <div class="item">The top ten authors whose publications have the largest pages per dollar ratio (considering all publications of an author that have a dollar price)</div>
-        <div class="item">For publications that have been awarded the Nebula award, the top 10 with the most extensive web presence<br> (i.e, the highest number of author websites, publication websites, publisher websites, publication series websites, and title series websites in total)</div>
+        <div class="item">For publications that have been awarded the Nebula award, the top 10 with the most extensive web presence<br> (i.e, the highest number of author websites, publication websites, publisher websites, publication series websites, and title series websites in total)</div>-->
       </div>
     </div>
+    <a class="ui link item" id="insert">
+    	<i class="plus icon"></i>
+    </a>
   </div>
 </div>
 <div class="ui container">
@@ -103,7 +109,7 @@
     </thead>
     <tbody>
     <tr>
-      <td><a href="#" id="demo">John</a></td>
+      <td><a href="#" class="details">John</a></td>
       <td>No Action</td>
       <td>None</td>
     </tr>
@@ -180,7 +186,54 @@
     </tbody>
   </table>
 </div>
-<div class="ui modal">
+<div class="ui modal" id="inserts">
+  <i class="close icon"></i>
+  <div class="header">
+	  Save a new award
+  </div>
+  <div class="content">
+	<div class="ui form">
+	  <div class="field">
+	    <label>Title</label>
+	    <input type="text">
+	  </div>
+	  <div class="field">
+	    <label>Date</label>
+	    <input type="date">
+	  </div>
+	  <div class="field">
+	    <label>Category</label>
+	    <select class="ui dropdown">
+	      <option value="">Select category</option>
+	      <option value="AF">Afghanistan</option>
+		  <option value="AX">Åland Islands</option>
+	      <option value="AL">Albania</option>
+	      <option value="DZ">Algeria</option>
+	      <option value="AS">American Samoa</option>
+	      <option value="AD">Andorra</option>
+	    </select>
+	  </div>
+	  <div class="field">
+	    <label>Type</label>
+	    <select class="ui dropdown">
+	      <option value="">Select type</option>
+	      <option value="AF">Afghanistan</option>
+		  <option value="AX">Åland Islands</option>
+	      <option value="AL">Albania</option>
+	      <option value="DZ">Algeria</option>
+	      <option value="AS">American Samoa</option>
+	      <option value="AD">Andorra</option>
+	    </select>
+	  </div>
+	  <div class="field">
+	    <label>Note</label>
+	    <textarea rows="2"></textarea>
+	  </div>
+	  <button class="ui button" type="submit">Submit</button>
+    </div>
+  </div>
+</div>
+<div class="ui modal" id="details">
   <i class="close icon"></i>
   <div class="content">
     <div class="ui list">

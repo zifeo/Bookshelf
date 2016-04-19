@@ -21,14 +21,7 @@ private[mine] object Imports extends App {
 
   val db = source(new JdbcSourceConfig[PostgresDialect, SnakeCase]("db"))
 
-  try {
-    db.run(quote(query[Publications].insert))(Publications(10000, "", DateTime.now, 0, None, None, None, None,
-      None, None, None, None, None, None, None))
-  } catch {
-    case failedBatch: BatchUpdateException => failedBatch.getNextException.printStackTrace()
-  }
-
-  /*val res = List(
+  val res = List(
     batchInserts(db.run(quote(query[Authors].insert)), authors),
     batchInserts(db.run(quote(query[Awards].insert)), awards),
     batchInserts(db.run(quote(query[AwardsCategories].insert)), awardsCategories),
@@ -53,7 +46,7 @@ private[mine] object Imports extends App {
 
   def batchInserts[T](query: List[T] => List[Long], data: List[Try[T]]): Future[List[Long]] = {
     val queries = Future {
-      data.flatMap(_.toOption).distinct.grouped(2000).flatMap(group => query(group)).toList
+      data.flatMap(_.toOption).distinct.grouped(1500).flatMap(group => query(group)).toList
     }
     queries onFailure {
       case failedBatch: BatchUpdateException => failedBatch.getNextException.printStackTrace()
@@ -63,6 +56,6 @@ private[mine] object Imports extends App {
     queries
   }
 
-  Await.result(Future.sequence(res), Duration.Inf)*/
+  Await.result(Future.sequence(res), Duration.Inf)
 
 }
