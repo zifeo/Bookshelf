@@ -5,6 +5,8 @@ import io.getquill._
 import io.getquill.sources.sql.ops._
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
+import bookshelf._
 
 object Search {
 

@@ -9,7 +9,7 @@ package object bookshelf {
   //implicit val encodeOptJoda = mappedEncoding[Option[DateTime], Option[java.util.Date]](_.map(_.toDate))
   //implicit val decodeOptJoda = mappedEncoding[Option[java.util.Date], Option[DateTime]](_.map(new DateTime(_)))
 
-  def truncate(table: String)(implicit db: JdbcSource[_, _]): Unit =
-    db.execute(s"TRUNCATE TABLE $table", None)
+  //def truncate(table: String)(implicit db: JdbcSource[_, _]): Unit =
+  //  db.execute(s"TRUNCATE TABLE $table", None)
 
 }
