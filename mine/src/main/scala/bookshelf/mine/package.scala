@@ -1,5 +1,6 @@
 package bookshelf
 
+import java.util.Date
 import java.util.logging.LogManager
 
 import com.github.nscala_time.time.Imports._
@@ -28,13 +29,19 @@ package object mine {
   def longOrNone(raw: String): Option[Long] =
     Try(raw.toLong).toOption
 
-  def stringToDate(raw: String): DateTime = {
-    if (raw.contains("-")) {
-      raw.replace("0000", "0001").replace("-00", "-01").dateTimeFormat("yyyy-MM-dd")
-    } else if (raw.contains("/")) {
-      raw.replace("0000", "0001").dateTimeFormat("dd/MM/yy")
-    } else {
-      throw new Exception(s"cannot parse $raw to date")
+  def stringToDate(raw: String): Option[Date] = {
+    def rec(raw:String):DateTime = {
+      if (raw.contains("-")) {
+        raw.replace("0000", "0001").replace("-00", "-01").dateTimeFormat("yyyy-MM-dd")
+      } else if (raw.contains("/")) {
+        raw.replace("0000", "0001").dateTimeFormat("dd/MM/yy")
+      } else {
+        throw new Exception(s"cannot parse $raw to date")
+      }
+    }
+    raw match {
+      case "\\N" | "" | "unknown" => None
+      case x => Some(rec(x).toDate)
     }
   }
 
@@ -91,18 +98,17 @@ package object mine {
     impl(number.toUpperCase().toList)
   }
 
+  private val regex = "(.*?)&#(\\d+?);(.*)".r
+
   def stringOrNone(raw: String): Option[String] = {
-    def toCyrillic(raw: String): String = {
-      if (raw.contains("&#")) {
-        raw.replaceAll(" ", "&#32").split(";").map(s => s.substring(2).toInt.toChar).mkString
-      } else {
-        raw
-      }
+    def rec(raw: String): String = raw match {
+      case regex(g1, g2, g3) => g1 + g2.toInt.toChar + rec(g3)
+      case _ => ""
     }
 
     raw match {
       case "\\N" | "" | "unknown" => None
-      case x => Some(toCyrillic(x))
+      case x => Some(rec(x))
     }
   }
 

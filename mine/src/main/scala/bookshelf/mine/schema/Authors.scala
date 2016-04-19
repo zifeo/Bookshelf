@@ -35,14 +35,16 @@ object Authors {
             stringOrNone(lastName),
             intOrNone(pseudonym),
             stringOrNone(birthPlace),
-            stringOrNone(birthDate).map(stringToDate).map(_.toDate),
-            stringOrNone(deathDate).map(stringToDate).map(_.toDate),
+            stringToDate(birthDate),
+            stringToDate(deathDate),
             stringOrNone(email),
             stringOrNone(image),
             intOrNone(languageId),
             intOrNone(noteId))
         } catch {
-          case e: Throwable => println(raw); throw e
+          case _: Exception =>
+            println(birthDate + "\t" + deathDate)
+            throw new Error()
         }
     }
   }
