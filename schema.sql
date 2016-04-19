@@ -55,16 +55,6 @@ CREATE TABLE titles
   graphic      BOOLEAN
 );
 
-DROP TABLE IF EXISTS titles_translators CASCADE;
-CREATE TABLE titles_translators
-(
-  title_id           INT NOT NULL, -- fk
-  translator_id      INT NOT NULL, -- fk
-  year               INT NOT NULL,
-  language           VARCHAR(64) NOT NULL,
-  CONSTRAINT pk_titles_translators PRIMARY KEY (title_id, translator_id, year, language)
-);
-
 DROP TABLE IF EXISTS translators CASCADE;
 CREATE TABLE translators
 (
@@ -190,6 +180,16 @@ CREATE TABLE titles_awards
   CONSTRAINT pk_titles_awards PRIMARY KEY (title_id, award_id)
 );
 
+DROP TABLE IF EXISTS titles_translators CASCADE;
+CREATE TABLE titles_translators
+(
+  title_id           INT NOT NULL, -- fk
+  translator_id      INT NOT NULL, -- fk
+  year               INT NOT NULL,
+  language           VARCHAR(64) NOT NULL,
+  CONSTRAINT pk_titles_translators PRIMARY KEY (title_id, translator_id, year, language)
+);
+
 DROP TABLE IF EXISTS titles_tags CASCADE;
 CREATE TABLE titles_tags
 (
@@ -308,6 +308,17 @@ ON DELETE SET NULL;
 ALTER TABLE titles
 ADD FOREIGN KEY (note_id)
 REFERENCES notes (id)
+ON DELETE SET NULL;
+
+/* Translators */
+ALTER TABLE titles_translators
+ADD FOREIGN KEY (title_id)
+REFERENCES titles (id)
+ON DELETE SET NULL;
+
+ALTER TABLE titles_translators
+ADD FOREIGN KEY (translator_id)
+REFERENCES translators (id)
 ON DELETE SET NULL;
 
 /* Reviews */

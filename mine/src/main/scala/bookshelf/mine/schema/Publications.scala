@@ -3,7 +3,6 @@ package bookshelf.mine.schema
 import java.util.Date
 
 import bookshelf.mine._
-import org.joda.time.DateTime
 
 import scala.util.Try
 
