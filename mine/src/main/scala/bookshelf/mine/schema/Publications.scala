@@ -58,6 +58,26 @@ object Publications {
           intOrNone(pubSeriesId),
           intOrNone(pubSeriesNb)
         )
+      case List(id, title, date, publisherId, pages, packaging, pubType, isbn, image, price, noteId, pubSeriesId) =>
+        val (book_pages, pages_prefaces) = getPages(pages)
+        val (money, currency) = parseCurrency(price)
+        Publications(
+          id.toInt,
+          title,
+          stringToDate(date).get,
+          intOrNone(publisherId),
+          book_pages,
+          pages_prefaces,
+          stringOrNone(packaging),
+          requireIn(pubType, PublicationsTypes.values),
+          longOrNone(isbn),
+          stringOrNone(image),
+          money,
+          stringOrNone(currency),
+          intOrNone(noteId),
+          intOrNone(pubSeriesId),
+          None
+        )
     }
   }
 
