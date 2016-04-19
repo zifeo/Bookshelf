@@ -27,25 +27,20 @@ object Authors {
   def parseCols(raw: List[String]): Try[Authors] = Try {
     raw match {
       case List(id, name, legalName, lastName, pseudonym, birthPlace, birthDate, deathDate, email, image, languageId, noteId) =>
-        try {
-          Authors(
-            id.toInt,
-            name,
-            stringOrNone(legalName),
-            stringOrNone(lastName),
-            intOrNone(pseudonym),
-            stringOrNone(birthPlace),
-            stringToDate(birthDate),
-            stringToDate(deathDate),
-            stringOrNone(email),
-            stringOrNone(image),
-            intOrNone(languageId),
-            intOrNone(noteId))
-        } catch {
-          case _: Exception =>
-            println(birthDate + "\t" + deathDate)
-            throw new Error()
-        }
+        Authors(
+          id.toInt,
+          name,
+          stringOrNone(legalName),
+          stringOrNone(lastName),
+          intOrNone(pseudonym),
+          stringOrNone(birthPlace),
+          stringToDate(birthDate),
+          stringToDate(deathDate),
+          stringOrNone(email),
+          stringOrNone(image),
+          intOrNone(languageId),
+          intOrNone(noteId)
+        )
     }
   }
 

@@ -14,7 +14,9 @@ private[mine] object CSVSources {
     * @return rows of columns
     */
   def getDataset(name: String): List[List[String]] =
-    Source.fromFile(s"./datasets/$name")(Codec.ISO8859).getLines().map(_.split('\t').toList).toList
+    Source.fromFile(s"./datasets/$name")(Codec.ISO8859).getLines().toList.map { line =>
+      line.replace("\\\t", "").split('\t').map(_.trim).toList
+    }
 
   lazy val authors = getDataset("authors.csv").map(Authors.parseCols)
   lazy val awards = getDataset("awards.csv").map(Awards.parseCols)
