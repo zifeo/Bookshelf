@@ -126,7 +126,7 @@ package object mine {
 
   def requireIn(raw: String, set: List[String]): Option[String] = raw.toLowerCase match {
     case value: String if set.contains(value) => Some(value)
-    case _ => None
+    case _ => println(raw); None
   }
 
 }

@@ -28,7 +28,10 @@ private[mine] object CSVSources {
   lazy val publishers = getDataset("publishers.csv").map(Publishers.parseCols)
   lazy val reviews = getDataset("reviews.csv").map(Reviews.parseCols)
   lazy val tags = getDataset("tags.csv").map(Tags.parseCols)
-  lazy val titles = getDataset("titles.csv").map(Titles.parseCols)
+  lazy val titlesData = getDataset("titles.csv")
+  lazy val titles = titlesData.map(Titles.parseCols)
+  lazy val translators = titlesData.flatMap(Translators.parseCols).distinct
+  lazy val titleTranslators = titlesData.flatMap(TitlesTranslators.parseCols).distinct
   lazy val titlesAwards = getDataset("titles_awards.csv").map(TitlesAwards.parseCols)
   lazy val titlesSeries = getDataset("titles_series.csv").map(TitlesSeries.parseCols)
   lazy val titlesTags = getDataset("titles_tag.csv").map(TitlesTags.parseCols)

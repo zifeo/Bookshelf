@@ -2,96 +2,114 @@
  * Entities
  ************************/
 
-CREATE TYPE PUBLICATION_TYPE AS ENUM ('ANTHOLOGY', 'COLLECTION', 'MAGAZINE', 'NONFICTION', 'NOVEL', 'OMNIBUS',
-  'FANZINE', 'CHAPBOOK');
-
-CREATE TYPE TITLE_TYPE AS ENUM ('ANTHOLOGY', 'BACKCOVERART', 'COLLECTION', 'COVERART', 'INTERIORART', 'EDITOR', 'ESSAY',
-  'INTERVIEW', 'NOVEL', 'NONFICTION', 'OMNIBUS', 'POEM', 'REVIEW', 'SERIAL', 'SHORTFICTION', 'CHAPBOOK');
-
+DROP TABLE IF EXISTS authors CASCADE;
 CREATE TABLE authors
 (
   id          INT PRIMARY KEY NOT NULL,
   name        VARCHAR(256)    NOT NULL,
-  legal_name  VARCHAR(256),
-  last_name   VARCHAR(256),
+  legal_name  VARCHAR(128),
+  last_name   VARCHAR(128),
   pseudonym   INT, -- fk
-  birth_place VARCHAR(256),
+  birth_place VARCHAR(128),
   birth_date  DATE,
   death_date  DATE,
-  email       VARCHAR(256),
+  email       VARCHAR(128),
   image       VARCHAR(256),
   language_id INT, -- fk
   note_id     INT -- fk
 );
 
+DROP TABLE IF EXISTS publications CASCADE;
 CREATE TABLE publications
 (
   id             INT PRIMARY KEY  NOT NULL,
-  title          VARCHAR(256)     NOT NULL,
+  title          VARCHAR(2048)     NOT NULL,
   date_pub       DATE             NOT NULL,
   publisher_id   INT              NOT NULL, -- fk
   pages          INT,
   preface_pages  INT,
-  packaging_type VARCHAR(16),
-  type           PUBLICATION_TYPE NOT NULL,
+  packaging_type VARCHAR(32),
+  type           VARCHAR(32),
   isbn           BIGINT,
   cover          VARCHAR(256),
   price          FLOAT,
-  currency       VARCHAR(8),
+  currency       VARCHAR(32),
   pub_series_id  INT, -- fk
   pub_series_num INT,
   note_id        INT -- fk
 );
 
+DROP TABLE IF EXISTS titles CASCADE;
 CREATE TABLE titles
 (
   id           INT PRIMARY KEY NOT NULL,
-  title        VARCHAR(256)    NOT NULL,
-  translator   VARCHAR(256),
+  title        VARCHAR(2048)    NOT NULL,
   synopsis     INT, -- fk
   note_id      INT, -- fk
   series_id    INT, -- fk
   series_num   INT,
-  story_length VARCHAR(256),
-  type         TITLE_TYPE,
+  story_length VARCHAR(2048), --<--
+  type         VARCHAR(32),
   parent       INT             NOT NULL DEFAULT 0, -- fk
   language_id  INT, -- fk
   graphic      BOOLEAN
 );
 
+DROP TABLE IF EXISTS titles_translators CASCADE;
+CREATE TABLE titles_translators
+(
+  title_id           INT NOT NULL, -- fk
+  translator_id      INT NOT NULL, -- fk
+  year               INT NOT NULL,
+  language           VARCHAR(64) NOT NULL,
+  CONSTRAINT pk_titles_translators PRIMARY KEY (title_id, translator_id, year, language)
+);
+
+DROP TABLE IF EXISTS translators CASCADE;
+CREATE TABLE translators
+(
+  id          INT PRIMARY KEY  NOT NULL,
+  translator  VARCHAR(128)      NOT NULL
+);
+
+DROP TABLE IF EXISTS languages CASCADE;
 CREATE TABLE languages
 (
   id     INT PRIMARY KEY NOT NULL,
-  name   VARCHAR(256)    NOT NULL,
+  name   VARCHAR(32)    NOT NULL,
   code   CHAR(3)         NOT NULL UNIQUE,
   script BOOLEAN
 );
 
+DROP TABLE IF EXISTS notes CASCADE;
 CREATE TABLE notes
 (
   id   INT PRIMARY KEY NOT NULL,
   note TEXT            NOT NULL -- None ?
 );
 
+DROP TABLE IF EXISTS webpages CASCADE;
 CREATE TABLE webpages
 (
   id                     INT PRIMARY KEY NOT NULL,
   author_id              INT, -- fk
   publisher_id           INT, -- fk
   title_id               INT, -- fk
-  url                    VARCHAR(256)    NOT NULL UNIQUE,
+  url                    VARCHAR(512)    NOT NULL,
   publications_series_id INT, -- fk
   award_type_id          INT, -- fk
   title_series_id        INT, -- fk
   award_category_id      INT -- fk
 );
 
+DROP TABLE IF EXISTS tags CASCADE;
 CREATE TABLE tags
 (
   id   INT PRIMARY KEY NOT NULL,
-  name VARCHAR(256)    NOT NULL
+  name VARCHAR(32)    NOT NULL
 );
 
+DROP TABLE IF EXISTS titles_series CASCADE;
 CREATE TABLE titles_series
 (
   id      INT PRIMARY KEY NOT NULL,
@@ -100,39 +118,43 @@ CREATE TABLE titles_series
   note_id INT -- fk
 );
 
+DROP TABLE IF EXISTS awards CASCADE;
 CREATE TABLE awards
 (
   id          INT PRIMARY KEY NOT NULL,
-  title       VARCHAR(256)    NOT NULL,
+  title       VARCHAR(512)    NOT NULL,
   date        DATE            NOT NULL,
   category_id INT             NOT NULL, -- fk
   type_id     INT             NOT NULL, -- fk
   note_id     INT -- fk
 );
 
+DROP TABLE IF EXISTS awards_categories CASCADE;
 CREATE TABLE awards_categories -- weak entity of award_type
 (
   id      INT             NOT NULL,
-  name    VARCHAR(256)    NOT NULL,
+  name    VARCHAR(128)    NOT NULL,
   type_id INT             NOT NULL, -- fk
   ordr    INT,
   note_id INT, -- fk
   PRIMARY KEY (id, type_id)
 );
 
+DROP TABLE IF EXISTS awards_types CASCADE;
 CREATE TABLE awards_types
 (
   id          INT PRIMARY KEY NOT NULL,
   code        CHAR(2) UNIQUE,
-  name        VARCHAR(256)    NOT NULL,
+  name        VARCHAR(128)    NOT NULL,
   note_id     INT, -- fk
   awarded_by  VARCHAR(256)    NOT NULL,
   awarded_for VARCHAR(256)    NOT NULL,
-  short_name  VARCHAR(256)    NOT NULL UNIQUE,
+  short_name  VARCHAR(32)    NOT NULL UNIQUE,
   poll        BOOLEAN         NOT NULL,
   non_genre   BOOLEAN         NOT NULL
 );
 
+DROP TABLE IF EXISTS publishers CASCADE;
 CREATE TABLE publishers
 (
   id      INT PRIMARY KEY NOT NULL,
@@ -140,10 +162,11 @@ CREATE TABLE publishers
   note_id INT -- fk
 );
 
+DROP TABLE IF EXISTS publications_series CASCADE;
 CREATE TABLE publications_series
 (
   id      INT PRIMARY KEY NOT NULL,
-  name    VARCHAR(512)    NOT NULL,
+  name    VARCHAR(1024)    NOT NULL,
   note_id INT -- fk
 );
 
@@ -151,6 +174,7 @@ CREATE TABLE publications_series
  * Relations
  ************************/
 
+DROP TABLE IF EXISTS publications_authors CASCADE;
 CREATE TABLE publications_authors
 (
   publication_id INT NOT NULL, -- fk
@@ -158,6 +182,7 @@ CREATE TABLE publications_authors
   CONSTRAINT pk_publications_authors PRIMARY KEY (publication_id, author_id)
 );
 
+DROP TABLE IF EXISTS titles_awards CASCADE;
 CREATE TABLE titles_awards
 (
   title_id INT NOT NULL, -- fk
@@ -165,6 +190,7 @@ CREATE TABLE titles_awards
   CONSTRAINT pk_titles_awards PRIMARY KEY (title_id, award_id)
 );
 
+DROP TABLE IF EXISTS titles_tags CASCADE;
 CREATE TABLE titles_tags
 (
   title_id INT NOT NULL, -- fk
@@ -172,6 +198,7 @@ CREATE TABLE titles_tags
   CONSTRAINT pk_titles_tags PRIMARY KEY (title_id, tag_id)
 );
 
+DROP TABLE IF EXISTS reviews CASCADE;
 CREATE TABLE reviews
 (
   title_id  INT NOT NULL, -- fk
@@ -179,6 +206,7 @@ CREATE TABLE reviews
   CONSTRAINT pk_reviews PRIMARY KEY (title_id, review_id)
 );
 
+DROP TABLE IF EXISTS publications_contents CASCADE;
 CREATE TABLE publications_contents
 (
   title_id       INT NOT NULL, -- fk
@@ -325,8 +353,8 @@ REFERENCES titles_series (id)
 ON DELETE CASCADE;
 
 ALTER TABLE webpages
-ADD FOREIGN KEY (award_category_id)
-REFERENCES awards_categories (id)
+ADD FOREIGN KEY (award_category_id, award_type_id)
+REFERENCES awards_categories (id, type_id)
 ON DELETE CASCADE;
 
 /* Titles awards */
