@@ -29,12 +29,10 @@ package object mine {
     Try(raw.toLong).toOption
 
   def stringToDate(raw: String): DateTime = {
-    if (raw.contains("0000")) {
-      throw new Exception(s"0000 year is invalid: $raw")
-    } else if (raw.contains("-")) {
-      raw.replace("-00", "-01").dateTimeFormat("yyyy-MM-dd")
+    if (raw.contains("-")) {
+      raw.replace("0000", "0001").replace("-00", "-01").dateTimeFormat("yyyy-MM-dd")
     } else if (raw.contains("/")) {
-      raw.dateTimeFormat("dd/MM/yy")
+      raw.replace("0000", "0001").dateTimeFormat("dd/MM/yy")
     } else {
       throw new Exception(s"cannot parse $raw to date")
     }
@@ -124,9 +122,12 @@ package object mine {
     }
   }
 
-  def requireIn(raw: String, set: List[String]): Option[String] = raw.toLowerCase match {
-    case value: String if set.contains(value) => Some(value)
-    case _ => println(raw); None
+  def requireIn(raw: String, values: List[String]): Option[String] = raw.toLowerCase match {
+    case value: String if values.contains(value) => Some(value)
+    case x => None
   }
+
+  def requireIn(raw: String, map: Map[String, String]): Option[String] =
+    map.get(raw.toLowerCase)
 
 }

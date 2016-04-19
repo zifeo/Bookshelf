@@ -25,7 +25,7 @@ CREATE TABLE publications
   id             INT PRIMARY KEY  NOT NULL,
   title          VARCHAR(2048)     NOT NULL,
   date_pub       DATE             NOT NULL,
-  publisher_id   INT              NOT NULL, -- fk
+  publisher_id   INT, -- fk
   pages          INT,
   preface_pages  INT,
   packaging_type VARCHAR(32),
