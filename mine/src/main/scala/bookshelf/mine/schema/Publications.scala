@@ -36,51 +36,47 @@ object Publications {
   }
 
   def parseCols(raw: List[String]): Try[Publications] = Try {
-    try {
-      raw match {
-        case List(id, title, date, publisherId, pages, packaging, pubType, isbn, image, price, noteId, pubSeriesId, pubSeriesNb) =>
-          val (book_pages, pages_prefaces) = getPages(pages)
-          val (money, currency) = parseCurrency(price)
-          Publications(
-            id.toInt,
-            title,
-            stringToDate(date).get,
-            intOrNone(publisherId),
-            book_pages,
-            pages_prefaces,
-            stringOrNone(packaging),
-            requireIn(pubType, PublicationsTypes.values),
-            longOrNone(isbn),
-            stringOrNone(image),
-            money,
-            stringOrNone(currency),
-            intOrNone(noteId),
-            intOrNone(pubSeriesId),
-            intOrNone(pubSeriesNb)
-          )
-        case List(id, title, date, publisherId, pages, packaging, pubType, isbn, image, price, noteId, pubSeriesId) =>
-          val (book_pages, pages_prefaces) = getPages(pages)
-          val (money, currency) = parseCurrency(price)
-          Publications(
-            id.toInt,
-            title,
-            stringToDate(date).get,
-            intOrNone(publisherId),
-            book_pages,
-            pages_prefaces,
-            stringOrNone(packaging),
-            requireIn(pubType, PublicationsTypes.values),
-            longOrNone(isbn),
-            stringOrNone(image),
-            money,
-            stringOrNone(currency),
-            intOrNone(noteId),
-            intOrNone(pubSeriesId),
-            None
-          )
-      }
-    } catch {
-      case e: Exception => println(raw); throw e
+    raw match {
+      case List(id, title, date, publisherId, pages, packaging, pubType, isbn, image, price, noteId, pubSeriesId, pubSeriesNb) =>
+        val (book_pages, pages_prefaces) = getPages(pages)
+        val (money, currency) = parseCurrency(price)
+        Publications(
+          id.toInt,
+          title,
+          stringToDate(date).get,
+          intOrNone(publisherId),
+          book_pages,
+          pages_prefaces,
+          stringOrNone(packaging),
+          requireIn(pubType, PublicationsTypes.values),
+          longOrNone(isbn),
+          stringOrNone(image),
+          money,
+          stringOrNone(currency),
+          intOrNone(noteId),
+          intOrNone(pubSeriesId),
+          intOrNone(pubSeriesNb)
+        )
+      case List(id, title, date, publisherId, pages, packaging, pubType, isbn, image, price, noteId, pubSeriesId) =>
+        val (book_pages, pages_prefaces) = getPages(pages)
+        val (money, currency) = parseCurrency(price)
+        Publications(
+          id.toInt,
+          title,
+          stringToDate(date).get,
+          intOrNone(publisherId),
+          book_pages,
+          pages_prefaces,
+          stringOrNone(packaging),
+          requireIn(pubType, PublicationsTypes.values),
+          longOrNone(isbn),
+          stringOrNone(image),
+          money,
+          stringOrNone(currency),
+          intOrNone(noteId),
+          intOrNone(pubSeriesId),
+          None
+        )
     }
   }
 

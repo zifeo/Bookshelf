@@ -48,9 +48,9 @@ CREATE TABLE titles
   note_id      INT, -- fk
   series_id    INT, -- fk
   series_num   INT,
-  story_length VARCHAR(2048), --<--
+  story_length VARCHAR(2048),
   type         VARCHAR(32),
-  parent       INT             NOT NULL DEFAULT 0, -- fk
+  parent       INT, -- fk
   language_id  INT, -- fk
   graphic      BOOLEAN
 );
@@ -59,7 +59,7 @@ DROP TABLE IF EXISTS translators CASCADE;
 CREATE TABLE translators
 (
   id          INT PRIMARY KEY  NOT NULL,
-  translator  VARCHAR(128)      NOT NULL
+  name        VARCHAR(128)     NOT NULL
 );
 
 DROP TABLE IF EXISTS languages CASCADE;
@@ -104,7 +104,7 @@ CREATE TABLE titles_series
 (
   id      INT PRIMARY KEY NOT NULL,
   title   VARCHAR(256)    NOT NULL,
-  parent  INT DEFAULT 0, -- fk
+  parent  INT, -- fk
   note_id INT -- fk
 );
 
@@ -134,7 +134,7 @@ DROP TABLE IF EXISTS awards_types CASCADE;
 CREATE TABLE awards_types
 (
   id          INT PRIMARY KEY NOT NULL,
-  code        CHAR(2) UNIQUE,
+  code        CHAR(2),
   name        VARCHAR(128)    NOT NULL,
   note_id     INT, -- fk
   awarded_by  VARCHAR(256)    NOT NULL,
@@ -213,6 +213,186 @@ CREATE TABLE publications_contents
   publication_id INT NOT NULL, -- fk
   CONSTRAINT pk_publications_contents PRIMARY KEY (title_id, publication_id)
 );
+
+/************************
+ * Dead foreign keys values
+ ************************/
+
+UPDATE authors SET pseudonym = NULL
+WHERE id IN (SELECT a1.id
+             FROM authors a1
+               LEFT JOIN authors a2
+                 ON a1.pseudonym = a2.id
+             WHERE a2.id IS NULL
+                   AND a1.pseudonym IS NOT NULL);
+
+UPDATE authors SET note_id = NULL
+WHERE id IN (SELECT a1.id
+             FROM authors a1
+               LEFT JOIN notes a2
+                 ON a1.note_id = a2.id
+             WHERE a2.id IS NULL
+                   AND a1.note_id IS NOT NULL);
+
+UPDATE publications SET note_id = NULL
+WHERE id IN (SELECT a1.id
+             FROM publications a1
+               LEFT JOIN notes a2
+                 ON a1.note_id = a2.id
+             WHERE a2.id IS NULL
+                   AND a1.note_id IS NOT NULL);
+
+DELETE FROM publications_authors
+WHERE author_id IN (SELECT a1.author_id
+                    FROM publications_authors a1
+                      LEFT JOIN authors a2
+                        ON a1.author_id = a2.id
+                    WHERE a2.id IS NULL
+                          AND a1.author_id IS NOT NULL);
+
+DELETE FROM publications_authors
+WHERE publication_id IN (SELECT a1.publication_id
+                         FROM publications_authors a1
+                           LEFT JOIN publications a2
+                             ON a1.publication_id = a2.id
+                         WHERE a2.id IS NULL
+                               AND a1.publication_id IS NOT NULL);
+
+DELETE FROM publications_contents
+WHERE title_id IN (SELECT a1.title_id
+                   FROM publications_contents a1
+                     LEFT JOIN titles a2
+                       ON a1.title_id = a2.id
+                   WHERE a2.id IS NULL
+                         AND a1.title_id IS NOT NULL);
+
+DELETE FROM publications_contents
+WHERE publication_id IN (SELECT a1.publication_id
+                         FROM publications_contents a1
+                           LEFT JOIN publications a2
+                             ON a1.publication_id = a2.id
+                         WHERE a2.id IS NULL
+                               AND a1.publication_id IS NOT NULL);
+
+UPDATE publishers SET note_id = NULL
+WHERE id IN (SELECT a1.id
+             FROM publishers a1
+               LEFT JOIN notes a2
+                 ON a1.note_id = a2.id
+             WHERE a2.id IS NULL
+                   AND a1.note_id IS NOT NULL);
+
+UPDATE titles SET note_id = NULL
+WHERE id IN (SELECT a1.id
+             FROM titles a1
+               LEFT JOIN notes a2
+                 ON a1.note_id = a2.id
+             WHERE a2.id IS NULL
+                   AND a1.note_id IS NOT NULL);
+
+UPDATE titles SET synopsis = NULL
+WHERE id IN (SELECT a1.synopsis
+             FROM titles a1
+               LEFT JOIN notes a2
+                 ON a1.synopsis = a2.id
+             WHERE a2.id IS NULL
+                   AND a1.synopsis IS NOT NULL);
+
+UPDATE titles SET synopsis = NULL
+WHERE id IN (SELECT a1.synopsis
+             FROM titles a1
+               LEFT JOIN notes a2
+                 ON a1.synopsis = a2.id
+             WHERE a2.id IS NULL
+                   AND a1.synopsis IS NOT NULL);
+
+UPDATE titles SET synopsis = NULL
+WHERE id IN (SELECT a1.id
+             FROM titles a1
+               LEFT JOIN notes a2
+                 ON a1.synopsis = a2.id
+             WHERE a2.id IS NULL
+                   AND a1.synopsis IS NOT NULL);
+
+UPDATE titles SET parent = 0
+WHERE id IN (SELECT a1.id
+             FROM titles a1
+               LEFT JOIN titles a2
+                 ON a1.parent = a2.id
+             WHERE a2.id IS NULL
+                   AND a1.parent IS NOT NULL);
+
+UPDATE titles SET parent = NULL
+WHERE id IN (SELECT a1.id
+             FROM titles a1
+               LEFT JOIN titles a2
+                 ON a1.parent = a2.id
+             WHERE a2.id IS NULL
+                   AND a1.parent IS NOT NULL);
+
+UPDATE titles SET language_id = NULL
+WHERE id IN (SELECT a1.id
+             FROM titles a1
+               LEFT JOIN languages a2
+                 ON a1.language_id = a2.id
+             WHERE a2.id IS NULL
+                   AND a1.language_id IS NOT NULL);
+
+DELETE FROM webpages
+WHERE id IN (SELECT a1.id
+             FROM webpages a1
+               LEFT JOIN publishers a2
+                 ON a1.publisher_id = a2.id
+             WHERE a2.id IS NULL
+                   AND a1.publisher_id IS NOT NULL);
+
+DELETE FROM webpages
+WHERE id IN (SELECT a1.id
+             FROM webpages a1
+               LEFT JOIN titles a2
+                 ON a1.title_id = a2.id
+             WHERE a2.id IS NULL
+                   AND a1.title_id IS NOT NULL);
+
+DELETE FROM webpages
+WHERE id IN (SELECT a1.id
+             FROM webpages a1
+               LEFT JOIN publications_series a2
+                 ON a1.publications_series_id = a2.id
+             WHERE a2.id IS NULL
+                   AND a1.publications_series_id IS NOT NULL);
+
+DELETE FROM titles_awards
+WHERE award_id IN (SELECT a1.award_id
+                   FROM titles_awards a1
+                     LEFT JOIN awards a2
+                       ON a1.award_id = a2.id
+                   WHERE a2.id IS NULL
+                         AND a1.award_id IS NOT NULL);
+
+DELETE FROM titles_tags
+WHERE tag_id IN (SELECT a1.tag_id
+                 FROM titles_tags a1
+                   LEFT JOIN tags a2
+                     ON a1.tag_id = a2.id
+                 WHERE a2.id IS NULL
+                       AND a1.tag_id IS NOT NULL);
+
+DELETE FROM titles_tags
+WHERE title_id IN (SELECT a1.title_id
+                   FROM titles_tags a1
+                     LEFT JOIN titles a2
+                       ON a1.title_id = a2.id
+                   WHERE a2.id IS NULL
+                         AND a1.title_id IS NOT NULL);
+
+UPDATE titles_series SET parent = NULL
+WHERE parent IN (SELECT a1.parent
+                 FROM titles_series a1
+                   LEFT JOIN titles a2
+                     ON a1.parent = a2.id
+                 WHERE a2.id IS NULL
+                       AND a1.parent IS NOT NULL);
 
 /************************
  * Foreign keys
@@ -428,7 +608,3 @@ ALTER TABLE awards_types
 ADD FOREIGN KEY (note_id)
 REFERENCES notes (id)
 ON DELETE SET NULL;
-
-/************************
- * Indexes
- ************************/
