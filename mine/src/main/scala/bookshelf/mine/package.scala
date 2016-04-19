@@ -30,7 +30,7 @@ package object mine {
     Try(raw.toLong).toOption
 
   def stringToDate(raw: String): Option[Date] = {
-    def rec(raw:String):DateTime = {
+    def rec(raw: String): DateTime = {
       if (raw.contains("-")) {
         raw.replace("0000", "0001").replace("-00", "-01").dateTimeFormat("yyyy-MM-dd")
       } else if (raw.contains("/")) {
@@ -52,15 +52,16 @@ package object mine {
 
   def getPages(raw: String): (Option[Int], Option[Int]) = {
     def impl(raw: String): (String, String) = raw match {
+      case "[]" => ("0", "0")
       case REGEX_PAGES_1(g1, g2, g3, g4, g5) => (g1 + g3 + g5, (toArabic(g2) + g4.toInt).toString)
       case REGEX_PAGES_2(g1, g2, g3, g4, g5) => (g1 + g3 + g5, (g2.toInt + toArabic(g4)).toString)
       case REGEX_PAGES_3(g1, g2, g3) => (g1 + g3, g2)
       case REGEX_PAGES_4(g1, g2, g3) => (g1 + g3, toArabic(g2).toString)
-      case x => (x, "")
+      case x => (x, "0")
     }
 
     def numberOrEmpty(num: String): Int =
-      if (num.isEmpty) 0
+      if (num.isEmpty || num == "[]") 0
       else num.toInt
 
     val (pagesLeft, pagesRight) = impl(raw)
