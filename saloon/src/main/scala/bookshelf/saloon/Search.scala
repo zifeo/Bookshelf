@@ -10,27 +10,36 @@ import bookshelf._
 
 object Search {
 
-  val queries = List(
-    db.run(quote((term: String) => query[Authors].filter(_.name like s"%$term%"))),
-    db.run(quote((term: String) => query[Publications].filter(_.title like s"%$term%"))),
-    db.run(quote((term: String) => query[PublicationsSeries].filter(_.name like s"%$term%"))),
-    db.run(quote((term: String) => query[Publishers].filter(_.name like s"%$term%"))),
-    db.run(quote((term: String) => query[Awards].filter(_.title like s"%$term%"))),
-    //db.run(quote((term: String) => query[AwardsCategories].filter(_.name like s"%$term%")),
-    //db.run(quote((term: String) => query[AwardsTypes].filter(_.name like s"%$term%")),
-    db.run(quote((term: String) => query[Notes].filter(_.note like s"%$term%"))),
-    db.run(quote((term: String) => query[Tags].filter(_.name like s"%$term%"))),
-    //db.run(quote((term: String) => query[Languages].filter(_.name like s"%$term%")),
-    db.run(quote((term: String) => query[Titles].filter(_.title like s"%$term%"))),
-    db.run(quote((term: String) => query[TitlesSeries].filter(_.title like s"%$term%")))
-  )
+  val authQuery = db.run(quote { term: String =>
+    query[Authors]
+      .filter(_.name like term)
+      .map(a => (a.id, a.name, a.birthPlace, a.image))
+      .take(4)
+  })
 
-  def apply(term: String): Future[Map[String, List[Any]]] = {
-    Future.sequence(queries.map(_(term))).map { results =>
-      results.map { res =>
-        "t" -> res
-      }.toMap
-    }
-  }
+  val pubQuery = db.run(quote { term: String =>
+    query[Publications]
+      .filter(_.title like term)
+      .map(a => (a.id, a.title, a.`type`, a.cover))
+      .take(4)
+  })
+
+  val titlQuery = db.run(quote { term: String =>
+    query[Titles]
+      .filter(_.title like term)
+      .map(a => (a.id, a.title, a.storyLength))
+      .take(4)
+  })
+
+  def authors(term: String): Future[List[(Int, String, Option[String], Option[String])]] =
+    authQuery(s"%$term%")
+
+  def publications(term: String): Future[List[(Int, String, Option[String], Option[String])]] =
+    pubQuery(s"%$term%")
+
+  def titles(term: String): Future[List[(Int, String, Option[String], Option[String])]] =
+    titlQuery(s"%$term%").map(_.map { case (a, b, c) =>
+      (a, b, c, None)
+    })
 
 }
