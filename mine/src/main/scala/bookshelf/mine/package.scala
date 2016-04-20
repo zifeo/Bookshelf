@@ -99,12 +99,12 @@ package object mine {
     impl(number.toUpperCase().toList)
   }
 
-  private val regex = "(.*?)&#(\\d+?);(.*)".r
+  private val cyrilicRegex = "(.*?)&#(\\d+?);(.*)".r
 
   def stringOrNone(raw: String): Option[String] = {
     def rec(raw: String): String = raw match {
-      case regex(g1, g2, g3) => g1 + g2.toInt.toChar + rec(g3)
-      case _ => ""
+      case cyrilicRegex(g1, g2, g3) => g1 + g2.toInt.toChar + rec(g3)
+      case normal => normal
     }
 
     raw match {
@@ -112,9 +112,6 @@ package object mine {
       case x => Some(rec(x))
     }
   }
-
-  def intOrZero(str: String): Int =
-    Try(str.toInt).getOrElse(0)
 
   def parseBoolean(str: String): Boolean = str.toLowerCase match {
     case "true" | "1" | "yes" => true

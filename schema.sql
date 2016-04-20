@@ -478,7 +478,7 @@ ON DELETE SET NULL;
 ALTER TABLE titles
 ADD FOREIGN KEY (parent)
 REFERENCES titles (id)
-ON DELETE SET DEFAULT;
+ON DELETE SET NULL;
 
 ALTER TABLE titles
 ADD FOREIGN KEY (language_id)
@@ -494,12 +494,12 @@ ON DELETE SET NULL;
 ALTER TABLE titles_translators
 ADD FOREIGN KEY (title_id)
 REFERENCES titles (id)
-ON DELETE SET NULL;
+ON DELETE CASCADE;
 
 ALTER TABLE titles_translators
 ADD FOREIGN KEY (translator_id)
 REFERENCES translators (id)
-ON DELETE SET NULL;
+ON DELETE CASCADE;
 
 /* Reviews */
 ALTER TABLE reviews
@@ -574,7 +574,7 @@ ON DELETE CASCADE;
 ALTER TABLE titles_series
 ADD FOREIGN KEY (parent)
 REFERENCES titles_series (id)
-ON DELETE SET DEFAULT;
+ON DELETE SET NULL;
 
 ALTER TABLE titles_series
 ADD FOREIGN KEY (note_id)
@@ -608,3 +608,20 @@ ALTER TABLE awards_types
 ADD FOREIGN KEY (note_id)
 REFERENCES notes (id)
 ON DELETE SET NULL;
+
+/************************
+ * Futher constraints
+ ************************/
+
+ALTER TABLE webpages
+ADD CONSTRAINT webpages_no_full_null CHECK (
+  author_id IS NOT NULL OR
+  publisher_id IS NOT NULL OR
+  title_id IS NOT NULL OR
+  publications_series_id IS NOT NULL OR
+  award_type_id IS NOT NULL OR
+  title_series_id IS NOT NULL OR
+  award_category_id IS NOT NULL
+)
+
+-- TODO : on update always cascade?
