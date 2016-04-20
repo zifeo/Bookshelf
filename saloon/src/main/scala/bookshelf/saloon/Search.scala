@@ -31,15 +31,19 @@ object Search {
       .take(4)
   })
 
-  def authors(term: String): Future[List[(Int, String, Option[String], Option[String])]] =
-    authQuery(s"%$term%")
+  def authors(term: String): Future[List[(String, String, Option[String], Option[String])]] =
+    authQuery(s"%$term%").map(_.map { case (a, b, c, d) =>
+      (s"authors/$a", b, c, d)
+    })
 
-  def publications(term: String): Future[List[(Int, String, Option[String], Option[String])]] =
-    pubQuery(s"%$term%")
+  def publications(term: String): Future[List[(String, String, Option[String], Option[String])]] =
+    pubQuery(s"%$term%").map(_.map { case (a, b, c, d) =>
+      (s"publications/$a", b, c, d)
+    })
 
-  def titles(term: String): Future[List[(Int, String, Option[String], Option[String])]] =
+  def titles(term: String): Future[List[(String, String, Option[String], Option[String])]] =
     titlQuery(s"%$term%").map(_.map { case (a, b, c) =>
-      (a, b, c, None)
+      (s"titles/$a", b, c, None)
     })
 
 }

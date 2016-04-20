@@ -3,6 +3,7 @@ package bookshelf.saloon
 import akka.actor.ActorSystem
 import akka.event.Logging
 import akka.http.scaladsl.Http
+import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import akka.http.scaladsl.model.{ContentType, HttpEntity, HttpResponse, MediaTypes}
 import akka.http.scaladsl.server.Directives._
 import akka.stream.ActorMaterializer
@@ -18,6 +19,7 @@ private[saloon] object Main extends App {
   implicit val ec = system.dispatcher
 
   import DefaultJsonProtocol._
+  import SprayJsonSupport._
 
   def format2SearchResults[A : JsonFormat, B : JsonFormat, C : JsonFormat, D : JsonFormat]
   (res: List[(A, B, C, D)]): JsValue =
@@ -85,11 +87,20 @@ private[saloon] object Main extends App {
         }
       }
     } ~
+      path("authors" / IntNumber) { id =>
+        complete {
+          for {
+            res <- Queries.authors(id)
+          } yield res match {
+            case Some(author) => author
+            case _ => throw new Exception
+          }
+        }
+      } ~
       pathSingleSlash {
         getFromFile("../static/index.html")
       } ~
       getFromDirectory("../static")
-
 
   val bind = Http().bindAndHandle(
     logRequestResult("Bookshelf", Logging.InfoLevel)(routes),
