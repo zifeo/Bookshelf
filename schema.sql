@@ -314,14 +314,6 @@ WHERE id IN (SELECT a1.id
              WHERE a2.id IS NULL
                    AND a1.synopsis IS NOT NULL);
 
-UPDATE titles SET parent = 0
-WHERE id IN (SELECT a1.id
-             FROM titles a1
-               LEFT JOIN titles a2
-                 ON a1.parent = a2.id
-             WHERE a2.id IS NULL
-                   AND a1.parent IS NOT NULL);
-
 UPDATE titles SET parent = NULL
 WHERE id IN (SELECT a1.id
              FROM titles a1
@@ -623,5 +615,3 @@ ADD CONSTRAINT webpages_no_full_null CHECK (
   title_series_id IS NOT NULL OR
   award_category_id IS NOT NULL
 )
-
--- TODO : on update always cascade?
