@@ -3,12 +3,12 @@ package bookshelf.saloon
 import akka.actor.ActorSystem
 import akka.event.Logging
 import akka.http.scaladsl.Http
-import akka.http.scaladsl.model.{ContentType, HttpEntity, MediaTypes, HttpResponse}
+import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
+import akka.http.scaladsl.model.{ContentType, HttpEntity, HttpResponse, MediaTypes}
 import akka.http.scaladsl.server.Directives._
 import akka.stream.ActorMaterializer
 import com.typesafe.config.ConfigFactory
-
-import scala.io.StdIn
+import spray.json._
 
 private[saloon] object Main extends App {
 
@@ -18,49 +18,89 @@ private[saloon] object Main extends App {
   implicit val materializer = ActorMaterializer()
   implicit val ec = system.dispatcher
 
+  import DefaultJsonProtocol._
+  import SprayJsonSupport._
+
+  def format2SearchResults[A : JsonFormat, B : JsonFormat, C : JsonFormat, D : JsonFormat]
+  (res: List[(A, B, C, D)]): JsValue =
+    res.map {
+      case (a, b, None, None) =>
+        Map(
+          "url" -> a.toJson,
+          "title" -> b.toJson
+        ).toJson
+      case (a, b, c, None) =>
+        Map(
+          "url" -> a.toJson,
+          "title" -> b.toJson,
+          "description" -> c.toJson
+        ).toJson
+      case (a, b, None, d) =>
+        Map(
+          "url" -> a.toJson,
+          "title" -> b.toJson,
+          "image" -> d.toJson
+        ).toJson
+      case (a, b, c, d) =>
+        Map(
+          "url" -> a.toJson,
+          "title" -> b.toJson,
+          "description" -> c.toJson,
+          "image" -> d.toJson
+        ).toJson
+    }.toJson
+
   val routes =
-    path("search" / Segment) { terms =>
+    path("search" / Segment) { term =>
       get {
         complete {
-          val json = s"""
-            |{
-            |	"results": {
-            |		"category1": {
-            |			"name": "Category 1",
-            |			"results": [{
-            |				"title": "Result Title",
-            |				"url": "/optional/url/on/click",
-            |				"description": "Optional Description"
-            |			}, {
-            |				"title": "Result Title",
-            |				"url": "/optional/url/on/click",
-            |				"description": "Just typing $terms"
-            |			}]
-            |		},
-            |		"category2": {
-            |			"name": "Category 2",
-            |			"results": [{
-            |				"title": "Result Title",
-            |				"url": "/optional/url/on/click",
-            |				"description": "Optional Description"
-            |			}]
-            |		}
-            |	},
-            |	"action": {
-            |		"url": "/path/to/results",
-            |		"text": "View all 202 results"
-            |	}
-            |}
-          """.stripMargin
-          HttpResponse(entity = HttpEntity(ContentType(MediaTypes.`application/json`), json))
+          for {
+            auth <- Search.authors(term)
+            pub <- Search.publications(term)
+            titl <- Search.titles(term)
+          } yield {
+            val authJson = format2SearchResults(auth)
+            val pubJson = format2SearchResults(pub)
+            val titlJson = format2SearchResults(titl)
+            val json =
+              if (auth.isEmpty && pub.isEmpty && titl.isEmpty)
+                Map("results" -> JsArray()).toJson
+              else
+                Map(
+                  "results" -> Map(
+                    "category1" -> Map(
+                      "name" -> "Authors".toJson,
+                      "results" -> format2SearchResults(auth)
+                    ).toJson,
+                    "category2" -> Map(
+                      "name" -> "Publications".toJson,
+                      "results" -> format2SearchResults(pub)
+                    ).toJson,
+                    "category3" -> Map(
+                      "name" -> "Titles".toJson,
+                      "results" -> format2SearchResults(titl)
+                    ).toJson
+                  ).toJson
+                ).toJson
+            HttpResponse(entity = HttpEntity(ContentType(MediaTypes.`application/json`), json.compactPrint))
+          }
         }
       }
     } ~
-      pathSingleSlash {
-        getFromFile("static/index.html")
+      path("authors" / IntNumber) { id =>
+        complete {
+          for {
+            res <- Queries.authors(id)
+          } yield res match {
+            case Some(author) => author
+            case _ => throw new Exception
+          }
+        }
       } ~
-      getFromDirectory("static")
-
+      pathSingleSlash {
+        getFromFile("../static/index.html")
+      } ~
+      getFromDirectory("../static")
 
   val bind = Http().bindAndHandle(
     logRequestResult("Bookshelf", Logging.InfoLevel)(routes),
