@@ -2,12 +2,10 @@ package bookshelf.mine
 
 import java.sql.BatchUpdateException
 
-import bookshelf._
 import bookshelf.mine.schema._
 import io.getquill._
 import io.getquill.naming.SnakeCase
 import io.getquill.sources.sql.idiom.PostgresDialect
-import org.joda.time.DateTime
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._

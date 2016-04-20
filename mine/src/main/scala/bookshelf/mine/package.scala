@@ -1,5 +1,6 @@
 package bookshelf
 
+import java.util.Date
 import java.util.logging.LogManager
 
 import com.github.nscala_time.time.Imports._
@@ -28,15 +29,19 @@ package object mine {
   def longOrNone(raw: String): Option[Long] =
     Try(raw.toLong).toOption
 
-  def stringToDate(raw: String): DateTime = {
-    if (raw.contains("0000")) {
-      throw new Exception(s"0000 year is invalid: $raw")
-    } else if (raw.contains("-")) {
-      raw.replace("-00", "-01").dateTimeFormat("yyyy-MM-dd")
-    } else if (raw.contains("/")) {
-      raw.dateTimeFormat("dd/MM/yy")
-    } else {
-      throw new Exception(s"cannot parse $raw to date")
+  def stringToDate(raw: String): Option[Date] = {
+    def rec(raw: String): DateTime = {
+      if (raw.contains("-")) {
+        raw.replace("0000", "0001").replace("-00", "-01").dateTimeFormat("yyyy-MM-dd")
+      } else if (raw.contains("/")) {
+        raw.replace("0000", "0001").dateTimeFormat("dd/MM/yy")
+      } else {
+        throw new Exception(s"cannot parse $raw to date")
+      }
+    }
+    raw match {
+      case "\\N" | "" | "unknown" => None
+      case x => Some(rec(x).toDate)
     }
   }
 
@@ -47,15 +52,16 @@ package object mine {
 
   def getPages(raw: String): (Option[Int], Option[Int]) = {
     def impl(raw: String): (String, String) = raw match {
+      case "[]" => ("0", "0")
       case REGEX_PAGES_1(g1, g2, g3, g4, g5) => (g1 + g3 + g5, (toArabic(g2) + g4.toInt).toString)
       case REGEX_PAGES_2(g1, g2, g3, g4, g5) => (g1 + g3 + g5, (g2.toInt + toArabic(g4)).toString)
       case REGEX_PAGES_3(g1, g2, g3) => (g1 + g3, g2)
       case REGEX_PAGES_4(g1, g2, g3) => (g1 + g3, toArabic(g2).toString)
-      case x => (x, "")
+      case x => (x, "0")
     }
 
     def numberOrEmpty(num: String): Int =
-      if (num.isEmpty) 0
+      if (num.isEmpty || num == "[]") 0
       else num.toInt
 
     val (pagesLeft, pagesRight) = impl(raw)
@@ -93,23 +99,19 @@ package object mine {
     impl(number.toUpperCase().toList)
   }
 
+  private val cyrilicRegex = "(.*?)&#(\\d+?);(.*)".r
+
   def stringOrNone(raw: String): Option[String] = {
-    def toCyrillic(raw: String): String = {
-      if (raw.contains("&#")) {
-        raw.replaceAll(" ", "&#32").split(";").map(s => s.substring(2).toInt.toChar).mkString
-      } else {
-        raw
-      }
+    def rec(raw: String): String = raw match {
+      case cyrilicRegex(g1, g2, g3) => g1 + g2.toInt.toChar + rec(g3)
+      case normal => normal
     }
 
     raw match {
       case "\\N" | "" | "unknown" => None
-      case x => Some(toCyrillic(x))
+      case x => Some(rec(x))
     }
   }
-
-  def intOrZero(str: String): Int =
-    Try(str.toInt).getOrElse(0)
 
   def parseBoolean(str: String): Boolean = str.toLowerCase match {
     case "true" | "1" | "yes" => true
@@ -124,9 +126,12 @@ package object mine {
     }
   }
 
-  def requireIn(raw: String, set: List[String]): Option[String] = raw.toLowerCase match {
-    case value: String if set.contains(value) => Some(value)
-    case _ => println(raw); None
+  def requireIn(raw: String, values: List[String]): Option[String] = raw.toLowerCase match {
+    case value: String if values.contains(value) => Some(value)
+    case x => None
   }
+
+  def requireIn(raw: String, map: Map[String, String]): Option[String] =
+    map.get(raw.toLowerCase)
 
 }

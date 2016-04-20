@@ -1,15 +1,20 @@
 package bookshelf.mine
 
+import bookshelf.mine._
+import bookshelf.mine.schema.{Publications, PublicationsTypes}
+
+import scala.util.Try
+
 private[mine] object Failures extends App {
 
   def prettyPrint[T](data: Iterable[T]): Unit = {
     val elements = data.size
     println(s"elements: $elements")
-    println(data.take(10).mkString("\n"))
+    println(data.take(2000).mkString("\n"))
   }
 
   import CSVSources._
-  
+
   println("\n\n===== Authors =====")
   prettyPrint(authors.filter(_.isFailure))
 
@@ -51,7 +56,7 @@ private[mine] object Failures extends App {
 
   println("\n\n===== Titles =====")
   prettyPrint(titles.filter(_.isFailure))
-  
+
   println("\n\n===== Titles award =====")
   prettyPrint(titlesAwards.filter(_.isFailure))
 

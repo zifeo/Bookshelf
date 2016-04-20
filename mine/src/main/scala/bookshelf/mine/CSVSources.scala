@@ -3,6 +3,7 @@ package bookshelf.mine
 import bookshelf.mine.schema._
 
 import scala.io.{Codec, Source}
+import scala.util.Try
 
 private[mine] object CSVSources {
 
@@ -13,7 +14,9 @@ private[mine] object CSVSources {
     * @return rows of columns
     */
   def getDataset(name: String): List[List[String]] =
-    Source.fromFile(s"./datasets/$name")(Codec.ISO8859).getLines().map(_.split('\t').toList).toList
+    Source.fromFile(s"./datasets/$name")(Codec.ISO8859).getLines().toList.map { line =>
+      line.replace("\\\t", "").split('\t').map(_.trim).toList
+    }
 
   lazy val authors = getDataset("authors.csv").map(Authors.parseCols)
   lazy val awards = getDataset("awards.csv").map(Awards.parseCols)
@@ -30,8 +33,8 @@ private[mine] object CSVSources {
   lazy val tags = getDataset("tags.csv").map(Tags.parseCols)
   lazy val titlesData = getDataset("titles.csv")
   lazy val titles = titlesData.map(Titles.parseCols)
-  lazy val translators = titlesData.flatMap(Translators.parseCols).distinct
-  lazy val titleTranslators = titlesData.flatMap(TitlesTranslators.parseCols).distinct
+  lazy val translators = titlesData.flatMap(Translators.parseCols(_).toOption).flatten.distinct.map(Try(_))
+  lazy val titleTranslators = titlesData.flatMap(TitlesTranslators.parseCols(_).toOption).flatten.distinct.map(Try(_))
   lazy val titlesAwards = getDataset("titles_awards.csv").map(TitlesAwards.parseCols)
   lazy val titlesSeries = getDataset("titles_series.csv").map(TitlesSeries.parseCols)
   lazy val titlesTags = getDataset("titles_tag.csv").map(TitlesTags.parseCols)

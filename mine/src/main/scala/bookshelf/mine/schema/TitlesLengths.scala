@@ -7,9 +7,15 @@ case class TitlesLengths(
 
 object TitlesLengths {
 
-  val values = List("NOVELLA", "SHORTSTORY", "JUVENILE_FICTION", "NOVELIZATION", "SHORT_FICTION").map(_.toLowerCase)
+  val values = Map(
+    "nv" -> "novella",
+    "ss" -> "shortstory",
+    "jvn" -> "juvenile_fiction",
+    "nvz" -> "novelization",
+    "sf" -> "short_fiction"
+  )
 
-  val all = values.zipWithIndex.map { case (name, id) =>
+  val all = values.values.zipWithIndex.map { case (name, id) =>
     TitlesLengths(id, name)
   }
 

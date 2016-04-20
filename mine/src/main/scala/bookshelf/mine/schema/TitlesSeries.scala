@@ -7,7 +7,7 @@ import scala.util.Try
 case class TitlesSeries(
                          id: Int,
                          title: String,
-                         parent: Int,
+                         parent: Option[Int],
                          noteId: Option[Int]
                        )
 
@@ -19,7 +19,7 @@ object TitlesSeries {
         TitlesSeries(
           id.toInt,
           title,
-          intOrZero(parent),
+          intOrNone(parent),
           intOrNone(noteId)
         )
     }

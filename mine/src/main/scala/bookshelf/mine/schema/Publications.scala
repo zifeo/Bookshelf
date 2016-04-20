@@ -1,15 +1,16 @@
 package bookshelf.mine.schema
 
+import java.util.Date
+
 import bookshelf.mine._
-import org.joda.time.DateTime
 
 import scala.util.Try
 
 case class Publications(
                          id: Int,
                          title: String,
-                         datePub: DateTime,
-                         publisherId: Int,
+                         datePub: Date,
+                         publisherId: Option[Int],
                          pages: Option[Int],
                          prefacePages: Option[Int],
                          packagingType: Option[String],
@@ -42,8 +43,8 @@ object Publications {
         Publications(
           id.toInt,
           title,
-          stringToDate(date),
-          publisherId.toInt,
+          stringToDate(date).get,
+          intOrNone(publisherId),
           book_pages,
           pages_prefaces,
           stringOrNone(packaging),
@@ -55,6 +56,26 @@ object Publications {
           intOrNone(noteId),
           intOrNone(pubSeriesId),
           intOrNone(pubSeriesNb)
+        )
+      case List(id, title, date, publisherId, pages, packaging, pubType, isbn, image, price, noteId, pubSeriesId) =>
+        val (book_pages, pages_prefaces) = getPages(pages)
+        val (money, currency) = parseCurrency(price)
+        Publications(
+          id.toInt,
+          title,
+          stringToDate(date).get,
+          intOrNone(publisherId),
+          book_pages,
+          pages_prefaces,
+          stringOrNone(packaging),
+          requireIn(pubType, PublicationsTypes.values),
+          longOrNone(isbn),
+          stringOrNone(image),
+          money,
+          stringOrNone(currency),
+          intOrNone(noteId),
+          intOrNone(pubSeriesId),
+          None
         )
     }
   }

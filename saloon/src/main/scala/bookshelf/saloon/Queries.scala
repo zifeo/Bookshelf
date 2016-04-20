@@ -6,6 +6,7 @@ import io.getquill._
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global._
 import bookshelf._
+import scala.concurrent.ExecutionContext.Implicits.global
 
 object Queries {
 
@@ -20,5 +21,13 @@ object Queries {
     val q = mapping(queryNum)
     db.run(q)
   }*/
+
+  val authorsId = quote { id: Int =>
+    query[Authors]
+      .filter(_.id == id)
+  }
+
+  def authors(id: Int): Future[Option[Authors]] =
+    db.run(authorsId)(id).map(_.headOption)
 
 }
