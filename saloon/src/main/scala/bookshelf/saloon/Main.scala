@@ -1,5 +1,7 @@
 package bookshelf.saloon
 
+import java.util.logging.LogManager
+
 import akka.actor.ActorSystem
 import akka.event.Logging
 import akka.http.scaladsl.Http
@@ -12,6 +14,7 @@ import spray.json._
 
 private[saloon] object Main extends App {
 
+  LogManager.getLogManager.readConfiguration()
   val config = ConfigFactory.load()
 
   implicit val system = ActorSystem("Bookshelf-system")
@@ -103,15 +106,9 @@ private[saloon] object Main extends App {
       getFromDirectory("../static")
 
   val bind = Http().bindAndHandle(
-    logRequestResult("Bookshelf", Logging.InfoLevel)(routes),
+    logRequestResult("Bookshelf", Logging.DebugLevel)(routes),
     config.getString("http.interface"),
     config.getInt("http.port")
   )
-
-  println("Press ENTER to stop.")
-  /*StdIn.readLine()
-  bind
-    .flatMap(_.unbind())
-    .onComplete(_ => system.terminate())*/
 
 }
