@@ -6,6 +6,7 @@ import akka.actor.ActorSystem
 import akka.event.Logging
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
+import akka.http.scaladsl.marshalling.ToResponseMarshallable
 import akka.http.scaladsl.model.{ContentType, HttpEntity, HttpResponse, MediaTypes}
 import akka.http.scaladsl.server.Directives._
 import akka.stream.ActorMaterializer
@@ -92,12 +93,17 @@ private[saloon] object Main extends App {
     } ~
       path("authors" / IntNumber) { id =>
         complete {
-          for {
-            res <- Queries.authors(id)
-          } yield res match {
-            case Some(author) => author
-            case _ => throw new Exception
-          }
+          Queries.authors(id)
+        }
+      } ~
+      path("publications" / IntNumber) { id =>
+        complete {
+          Queries.publications(id)
+        }
+      } ~
+      path("titles" / IntNumber) { id =>
+        complete {
+          Queries.titles(id)
         }
       } ~
       pathSingleSlash {
@@ -106,7 +112,7 @@ private[saloon] object Main extends App {
       getFromDirectory("../static")
 
   val bind = Http().bindAndHandle(
-    logRequestResult("Bookshelf", Logging.DebugLevel)(routes),
+    routes,
     config.getString("http.interface"),
     config.getInt("http.port")
   )

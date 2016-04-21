@@ -1,6 +1,6 @@
 package bookshelf.saloon
 
-import bookshelf.mine.schema.Authors
+import bookshelf.mine.schema.{Titles, Publications, Authors}
 import io.getquill._
 
 import scala.concurrent.Future
@@ -22,12 +22,31 @@ object Queries {
     db.run(q)
   }*/
 
-  val authorsId = quote { id: Int =>
-    query[Authors]
-      .filter(_.id == id)
+  private object Query {
+
+    val authById = quote { id: Int =>
+      query[Authors]
+        .filter(_.id == id)
+    }
+
+    val pubById = quote { id: Int =>
+      query[Publications]
+        .filter(_.id == id)
+    }
+
+    val titlById = quote { id: Int =>
+      query[Titles]
+        .filter(_.id == id)
+    }
   }
 
-  def authors(id: Int): Future[Option[Authors]] =
-    db.run(authorsId)(id).map(_.headOption)
+  def authors(id: Int): Future[Authors] =
+    db.run(Query.authById)(id).map(_.head)
+
+  def publications(id: Int): Future[Publications] =
+    db.run(Query.pubById)(id).map(_.head)
+
+  def titles(id: Int): Future[Titles] =
+    db.run(Query.titlById)(id).map(_.head)
 
 }

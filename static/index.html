@@ -19,7 +19,10 @@
           'title'
         ],
         minCharacters: 3,
-        cache: false
+        onSelect: function(result) {
+	        console.log(result.url);
+	        return false;
+        }
       });
       $('.table').tablesort();
       $('.ui.dropdown').dropdown();
