@@ -3,7 +3,7 @@ package bookshelf
 import java.time.Instant
 import java.util.Date
 
-import bookshelf.mine.schema.Authors
+import bookshelf.mine.schema.{Titles, Publications, Authors}
 import io.getquill._
 import io.getquill.naming.SnakeCase
 import spray.json._
@@ -26,6 +26,7 @@ package object saloon {
   }
 
   implicit val authorsJF = jsonFormat12(Authors.apply)
-
+  implicit val publicationsJF = jsonFormat15(Publications.apply)
+  implicit val titlesJF = jsonFormat11(Titles.apply)
 
 }
