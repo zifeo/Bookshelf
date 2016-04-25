@@ -34,7 +34,7 @@
     \fancyfoot[C]{ ~\\CS323 - Project delivrable \\ \textbf{Page \thepage/\pageref{LastPage}}}
     \fancyfoot[R]{ ~\\ \includegraphics[scale=0.35]{epfl_logo}}
     \renewcommand{\headrulewidth}{0mm}%
-} 
+}
 
 \renewcommand\epigraphflush{center}
 \renewcommand\epigraphsize{\normalsize}
@@ -43,16 +43,16 @@
 
 \renewcommand{\textflush}{flushright} \renewcommand{\sourceflush}{flushright}
 
-\let\originalepigraph\epigraph 
+\let\originalepigraph\epigraph
 \renewcommand\epigraph[2]{\originalepigraph{#1}{\textsc{#2}}}
 
 \definecolor{titlepagecolor}{cmyk}{0,.9,0.7,0}
 
 \DeclareFixedFont{\titlefont}{T1}{ppl}{b}{}{0.5in}
 
-\makeatletter                       
-\def\printauthor{%                  
-    {\large \@author}}              
+\makeatletter
+\def\printauthor{%
+    {\large \@author}}
 \makeatother
 \author{%
 	~\\	~\\
@@ -105,8 +105,8 @@
   (c) --
   ++(135:2.5) --
   ++(45:2.5) --
-  ++(-45:2.5) coordinate[pos=0.3] (d);   
-\draw 
+  ++(-45:2.5) coordinate[pos=0.3] (d);
+\draw
   (d) -- +(45:1);
 \end{scope}
 \end{tikzpicture}%
@@ -148,7 +148,7 @@
 
 We started to take a look at the given data and tried to understand how tables where connected at a first glance by drawing a really simplified diagram. Once this was done, we started to look at more deeply to the data : how are they stored? May they be empty? Are they all relevant? Our major decision was not to drop any table, but only add and remove some fields to entities.
 ~\\~\\
-First, for everything that is related to publications, we quickly figured out how things were working. Therefore, we quickly decided to drop some of the unused id (such as its publication author or its publication content). As a primary key, we made the choice to inflate it using constraints. Furthermore, we also decided to separate the price into two fields, one for the amount and one for the currency, this solution being much more efficient while looking for some price range for instance. 
+First, for everything that is related to publications, we quickly figured out how things were working. Therefore, we quickly decided to drop some of the unused id (such as its publication author or its publication content). As a primary key, we made the choice to inflate it using constraints. Furthermore, we also decided to separate the price into two fields, one for the amount and one for the currency, this solution being much more efficient while looking for some price range for instance.
 ~\\~\\
 Even though both publications and titles have each one a related type field we did not find it relevant to split them into different tables and/or explicit a IS-A relationship because of the way the datas are gathered.
 ~\\~\\
@@ -165,7 +165,7 @@ Last but not least, some intensive parsing has also been performed to know exact
 
 This entity-relation model only contains fields which are either directly use for relation or as primary key (underline then). For a more complete view of the table, refers to the next section. Fields are coloured in blue, direct relationships in yellow, relationships through a table in red.
 ~\\
-\textbf{Note :} If you find this diagram too small, a larger version is available online at the following address : 
+\textbf{Note :} If you find this diagram too small, a larger version is available online at the following address :
 $$
 \text{\href{https://documents.epfl.ch/users/s/so/soccard/private/DBMS}{\texttt{https://documents.epfl.ch/users/s/so/soccard/private/DBMS}}}
 $$
@@ -353,7 +353,7 @@ CREATE TABLE awards_types
   awarded_for VARCHAR(256)    NOT NULL,
   short_name  VARCHAR(256)    NOT NULL UNIQUE,
   poll        BOOLEAN         NOT NULL,
-  non_genre   BOOLEAN         NOT NULL 
+  non_genre   BOOLEAN         NOT NULL
 )
 \end{lstlisting}
 
@@ -552,7 +552,7 @@ ALTER TABLE publishers
 ADD FOREIGN KEY (note_id)
 REFERENCES notes (id)
 ON DELETE SET NULL;
-\end{lstlisting}	
+\end{lstlisting}
 
 \subsubsection{Publication series}
 \begin{lstlisting}[language=SQL,showspaces=false,basicstyle=\ttfamily,numberstyle=\tiny,commentstyle=\color{gray}
@@ -860,17 +860,19 @@ We are now considering \texttt{Award\char`_Category} as a weak entity of \texttt
 \begin{enumerate}
 \item For every year, output the year and the number of publications for said year.
 	\begin{enumerate}
-	\item Description of logic :\\
+	\item Description of logic :\We are using the DATE_PART function provided by
+     Postgresql to extract the year of the date stored for each publication. Then
+      we simply do a GROUP BY on the year and count the number of entries.\
 	\item SQL statement :
 		\begin{lstlisting}[language=SQL,showspaces=false,basicstyle=\ttfamily,numberstyle=\tiny,commentstyle=\color{gray}]
-SELECT DATE_PART('year', P.date_pub) AS year, COUNT(*) AS count
-FROM PUBLICATIONS P
-GROUP BY DATE_PART('year', P.date_pub)
+SELECT DATE_PART('year', p.date_pub) AS year, COUNT(*) AS count
+FROM publications p
+GROUP BY DATE_PART('year', p.date_pub)
 ORDER BY year ASC;
 		\end{lstlisting}
 
 	\item Results (partial):\\
-	
+
 	\begin{tabular}{|l|c|r|}
   \hline
   year & count \\
@@ -893,25 +895,27 @@ ORDER BY year ASC;
 \end{tabular}
 
 	\end{enumerate}\item Output the names of the ten authors with most publications.
-	
+
 		\begin{enumerate}
-	\item Description of logic :\\
+	\item Description of logic :\This query simply joins the authors and their
+    publications and then GROUP BY on the author’s name. We just have to count the
+    number of entries, ORDER BY that count and set a limit to 10.\
 	\item SQL statement :
 		\begin{lstlisting}[language=SQL,showspaces=false,basicstyle=\ttfamily,numberstyle=\tiny,commentstyle=\color{gray}]
-SELECT A.name, COUNT(*) AS count
-FROM PUBLICATIONS_AUTHORS P
-INNER JOIN AUTHORS A ON P.author_id = A.id
-GROUP BY A.name
+SELECT a.name, COUNT(*) AS count
+FROM publications_authors p
+INNER JOIN authors a ON p.author_id = a.id
+GROUP BY a.name
 ORDER BY count DESC
 LIMIT 10;
 		\end{lstlisting}
 
 	\item Results :\\
-	
+
 	\begin{tabular}{|l|c|r|}
   \hline
   name & count \\
-  \hline	
+  \hline
 uncredited & 2912\\
 Isaac Asimov & 2389\\
 Edgar Rice Burroughs & 2287\\
@@ -927,39 +931,41 @@ Terry Pratchett	& 1354\\
 
 	\end{enumerate}
 \newpage\item What are the names of the youngest and oldest authors to publish something in 2010?
-	
+
 			\begin{enumerate}
-	\item Description of logic :\\
+	\item Description of logic :\Slightly more complicated this query uses nested
+    subqueries to first select publications of 2010, then to select the maximum
+    and minimum  birth dates of author that have some publication of 2010.\
 	\item SQL statement :
 		\begin{lstlisting}[language=SQL,showspaces=false,basicstyle=\ttfamily,numberstyle=\tiny,commentstyle=\color{gray}]
-SELECT A.name
-FROM AUTHORS A
-WHERE A.birth_date = (
-SELECT MAX(A.birth_date) AS max
-FROM PUBLICATIONS_AUTHORS PA
-JOIN AUTHORS A ON PA.author_id = A.ID
-WHERE PA.publication_id IN (
-  SELECT PUB.id
-  FROM PUBLICATIONS PUB
-  WHERE DATE_PART('year', PUB.date_pub) = '2010'
+SELECT a.name
+FROM authors a
+WHERE a.birth_date = (
+SELECT MAX(a.birth_date) AS max
+FROM publications_authors pa
+JOIN authors a ON pa.author_id = a.id
+WHERE pa.publication_id IN (
+  SELECT pub.id
+  FROM publications pub
+  WHERE DATE_PART('year', pub.date_pub) = '2010'
 )) OR
-A.birth_date = (
-SELECT MIN(A.birth_date) AS max
-FROM PUBLICATIONS_AUTHORS PA
-JOIN AUTHORS A ON PA.author_id = A.ID
-WHERE PA.publication_id IN (
-  SELECT PUB.id
-  FROM PUBLICATIONS PUB
-  WHERE DATE_PART('year', PUB.date_pub) = '2010'
+a.birth_date = (
+SELECT MIN(a.birth_date) AS max
+FROM publications_authors pa
+JOIN authors A ON pa.author_id = a.id
+WHERE pa.publication_id IN (
+  SELECT pub.id
+  FROM publications pub
+  WHERE DATE_PART('year', pub.date_pub) = '2010'
 ));
 		\end{lstlisting}
 
 	\item Results :\\
-	
+
 	\begin{tabular}{|l|c|r|}
   \hline
   name \\
-  \hline	
+  \hline
 Robert Henryson\\
 Gavin Douglas\\
 Greg Kurzawa\\
@@ -978,10 +984,12 @@ Gottfried von Strassburg\\
 \end{tabular}
 
 	\end{enumerate}
-	\item How many comics (graphic titles) have publications with less than 50 pages, less than 100 pages, and more (or equal) than 100 pages?
-	
+\item How many comics (graphic titles) have publications with less than 50 pages, less than 100 pages, and more (or equal) than 100 pages?
+
 	\begin{enumerate}
-	\item Description of logic :\\
+	\item Description of logic :\After joining titles and publications, filtering
+    them using the “graphic” field of titles and setting the condition on the
+    number of pages, we just have to count the number of entries.\
 	\item SQL statement :
 		\begin{lstlisting}[language=SQL,showspaces=false,basicstyle=\ttfamily,numberstyle=\tiny,commentstyle=\color{gray}]
 SELECT COUNT(*)
@@ -1011,36 +1019,39 @@ AND p.Pages >= 100;
 		\end{lstlisting}
 
 	\item Results :\\
-	
+
 	\begin{tabular}{|l|c|r|}
 	  \hline
 		count \\
-	  \hline	
+	  \hline
 		153\\
 	  \hline
 	\end{tabular}
-	
+
 	\begin{tabular}{|l|c|r|}
 	  \hline
 		count \\
-	  \hline	
+	  \hline
 		202\\
 	  \hline
 	\end{tabular}
-	
+
 	\begin{tabular}{|l|c|r|}
 	  \hline
 		count \\
-	  \hline	
+	  \hline
 		194\\
 	  \hline
 	\end{tabular}
 
 \end{enumerate}
-	\item For every publisher, calculate the average price of its published novels (the ones that have a dollar price).
-	
+\item For every publisher, calculate the average price of its published novels (the ones that have a dollar price).
+
 	\begin{enumerate}
-	\item Description of logic :\\
+	\item Description of logic :\This query joins the publications and authors via
+    the publications_authors table. Then it filters the publications to keep only
+    the ones that have a price in dollar. Finally it groups everything on the author’s
+    name and do an average on the price.\
 	\item SQL statement :
 		\begin{lstlisting}[language=SQL,showspaces=false,basicstyle=\ttfamily,numberstyle=\tiny,commentstyle=\color{gray}]
 SELECT a.name, AVG(p.price)
@@ -1052,11 +1063,11 @@ GROUP BY a.name;
 		\end{lstlisting}
 
 	\item Results (partial, 10 first):\\
-	
+
 	\begin{tabular}{|l|c|r|}
 	  \hline
 		  name & avg \\
-	  \hline	
+	  \hline
 			A. A. Aguirre & 7.99\\
 			A. A. Attanasio	& 10.992027027027035\\
 			A. A. Bell	& 11.135000000000002\\
@@ -1069,12 +1080,17 @@ GROUP BY a.name;
 			A. A. Lanoie	& 12.95\\
 	  \hline
 \end{tabular}
-	
-\end{enumerate}	
-	\item What is the name of the author with the highest number of titles that are tagged as “science fiction”?
+
+\end{enumerate}
+\item What is the name of the author with the highest number of titles that are tagged as “science fiction”?
 
 	\begin{enumerate}
-	\item Description of logic :\\
+	\item Description of logic :\This query use a subquery. This subquery links
+    authors with their publications, the publications with their titles and finally
+    the titles with their tags. A simple filter on tags to keep only the ones that
+    have the keyword “sf” (meaning science fiction), then group by authors name, count
+    the entries for each authors and order by this counter. Then the main query is
+    there to keep the name without the counter.\
 	\item SQL statement :
 		\begin{lstlisting}[language=SQL,showspaces=false,basicstyle=\ttfamily,numberstyle=\tiny,commentstyle=\color{gray}]
 SELECT a.name
@@ -1082,12 +1098,12 @@ FROM authors a
 JOIN (
   SELECT a.name AS n, COUNT(*) AS count_sf
   FROM authors a
-  JOIN publications_authors pa   ON a.id = pa.author_id
-  JOIN publications p      ON pa.publication_id = p.id
-  JOIN publications_contents pc   ON pc.publication_id = p.id
-  JOIN titles t         ON pc.title_id = t.id
-  JOIN titles_tags tt      ON t.id = tt.title_id
-  JOIN tags           ON tt.tag_id = tags.id
+  JOIN publications_authors pa ON a.id = pa.author_id
+  JOIN publications p ON pa.publication_id = p.id
+  JOIN publications_contents pc ON pc.publication_id = p.id
+  JOIN titles t ON pc.title_id = t.id
+  JOIN titles_tags tt ON t.id = tt.title_id
+  JOIN tags ON tt.tag_id = tags.id
 
   WHERE tags.name LIKE '%sf%'
   GROUP BY a.name
@@ -1097,19 +1113,20 @@ c ON c.n = a.name;
 		\end{lstlisting}
 
 	\item Results :\\
-	
+
 	\begin{tabular}{|l|c|r|}
 	  \hline
 		name\\
-	  \hline	
+	  \hline
 		Robert A. Heinlein\\
 	  \hline
 	\end{tabular}
 \end{enumerate}
-	\item List the three most popular titles (i.e., the ones with the most awards and reviews).
+\item List the three most popular titles (i.e., the ones with the most awards and reviews).
 
 	\begin{enumerate}
-	\item Description of logic :\\
+	\item Description of logic :\Here we order the titles on their number of awards
+    and reviews and then simply sum them and order them on that total.\
 	\item SQL statement :
 		\begin{lstlisting}[language=SQL,showspaces=false,basicstyle=\ttfamily,numberstyle=\tiny,commentstyle=\color{gray}]
 SELECT t.title, count_awards + count_reviews as total
@@ -1127,11 +1144,11 @@ LIMIT 3;
 		\end{lstlisting}
 
 	\item Results :\\
-	
+
 	\begin{tabular}{|l|c|r|}
 	  \hline
 		title & total\\
-	  \hline	
+	  \hline
 		The Wonderful Wizard of Oz	& 100\\
 		The Dispossessed: An Ambiguous Utopia	& 43\\
 		Neuromancer	& 33\\
