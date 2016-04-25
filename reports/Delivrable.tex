@@ -863,12 +863,10 @@ We are now considering \texttt{Award\char`_Category} as a weak entity of \texttt
 	\item Description of logic :\\
 	\item SQL statement :
 		\begin{lstlisting}[language=SQL,showspaces=false,basicstyle=\ttfamily,numberstyle=\tiny,commentstyle=\color{gray}]
-SELECT A.name, COUNT(*) AS count
-FROM PUBLICATIONS_AUTHORS P
-INNER JOIN AUTHORS A ON P.author_id = A.id
-GROUP BY A.name
-ORDER BY count DESC
-LIMIT 10;
+SELECT DATE_PART('year', P.date_pub) AS year, COUNT(*) AS count
+FROM PUBLICATIONS P
+GROUP BY DATE_PART('year', P.date_pub)
+ORDER BY year ASC;
 		\end{lstlisting}
 
 	\item Results (partial):\\
@@ -900,10 +898,12 @@ LIMIT 10;
 	\item Description of logic :\\
 	\item SQL statement :
 		\begin{lstlisting}[language=SQL,showspaces=false,basicstyle=\ttfamily,numberstyle=\tiny,commentstyle=\color{gray}]
-SELECT DATE_PART('year', P.date_pub) AS year, COUNT(*) AS count
-FROM PUBLICATIONS P
-GROUP BY DATE_PART('year', P.date_pub)
-ORDER BY year ASC;
+SELECT A.name, COUNT(*) AS count
+FROM PUBLICATIONS_AUTHORS P
+INNER JOIN AUTHORS A ON P.author_id = A.id
+GROUP BY A.name
+ORDER BY count DESC
+LIMIT 10;
 		\end{lstlisting}
 
 	\item Results :\\
