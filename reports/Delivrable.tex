@@ -24,14 +24,14 @@
 
 \renewcommand\footrulewidth{0.66pt}
 \fancyfoot[L]{ ~\\ Group 3}
-\fancyfoot[C]{ ~\\CS323 - Deliverable 1 \\ \textbf{Page \thepage/\pageref{LastPage}}}
+\fancyfoot[C]{ ~\\CS323 - Project delivrable \\ \textbf{Page \thepage/\pageref{LastPage}}}
 \fancyfoot[R]{ ~\\ \includegraphics[scale=0.35]{epfl_logo}}
 
 \fancypagestyle{firstpage}{%
     \fancyhf{}%
     \renewcommand\footrulewidth{0.66pt}
     \fancyfoot[L]{ ~\\ Group 3}
-    \fancyfoot[C]{ ~\\CS323 - Deliverable 1 \\ \textbf{Page \thepage/\pageref{LastPage}}}
+    \fancyfoot[C]{ ~\\CS323 - Project delivrable \\ \textbf{Page \thepage/\pageref{LastPage}}}
     \fancyfoot[R]{ ~\\ \includegraphics[scale=0.35]{epfl_logo}}
     \renewcommand{\headrulewidth}{0mm}%
 } 
@@ -116,7 +116,7 @@
 \begin{titlepage}
 \thispagestyle{firstpage}
 \vspace*{3cm}
-\titlefont CS-323 : Deliverable 1\par
+\titlefont CS-323 : Project delivrable\par
 \vspace*{0.5cm}
 \epigraph{This is our first deliverable for the \textit{Bookshelf} project of the introduction to database course (spring 2016 - Pr. Anastasia Ailamaki), which sums up our ER-model and schema. It also contains some justifications.}%
 {\textit{March 2016} - \textsc{Team n°3}}
@@ -140,7 +140,9 @@
 \vspace{-1cm}
 \tableofcontents
 
-\vspace{1cm}
+\newpage
+
+\part{Delivrable 1}
 
 \section{Justifications}
 
@@ -158,7 +160,7 @@ As publications and titles both have a type we used an enum as a compromise betw
 ~\\~\\
 Last but not least, some intensive parsing has also been performed to know exactly how many characters were required for instance for each field, since we have encountered some difficulties with Cyrillic. We quickly realised that we should definitely parse these values before inserting them, it presents the advantages of being less memory consuming (6 characters become 1) and also the process of conversion is only done one time.
 \addtocounter{page}{1}
-\newpage
+
 \section{ER model}
 
 This entity-relation model only contains fields which are either directly use for relation or as primary key (underline then). For a more complete view of the table, refers to the next section. Fields are coloured in blue, direct relationships in yellow, relationships through a table in red.
@@ -843,5 +845,309 @@ ON DELETE SET NULL;
 \begin{center}
     \includegraphics[scale = 0.4]{DBMS}
 \end{center}
+
+\part{Delivrable 2}
+\section{Modifications of the previous milestone regarding remarks}
+
+\subsection{Justifications}
+We are now considering \texttt{Award\char`_Category} as a weak entity of \texttt{Award\char`_Type} since it doesn’t make sense for a category to exist without type. Therefore, the primary key of the category is now not only \texttt{cat\char`_ID} but also a tuple containing \texttt{cat\char`_ID} and \texttt{type\char`_ID}. This leads us to store again in our Award table the \texttt{type\char`_ID} attribute to make the connection between awards and their categories.After analyzing the data, the graphic attribute may be null, we lead us to remove the NOT NULL constraint on this attribute.
+
+
+\subsection{New ER Model}
+\newpage
+\section{Queries implementation}
+
+\begin{enumerate}
+\item For every year, output the year and the number of publications for said year.
+	\begin{enumerate}
+	\item Description of logic :\\
+	\item SQL statement :
+		\begin{lstlisting}[language=SQL,showspaces=false,basicstyle=\ttfamily,numberstyle=\tiny,commentstyle=\color{gray}]
+SELECT A.name, COUNT(*) AS count
+FROM PUBLICATIONS_AUTHORS P
+INNER JOIN AUTHORS A ON P.author_id = A.id
+GROUP BY A.name
+ORDER BY count DESC
+LIMIT 10;
+		\end{lstlisting}
+
+	\item Results (partial):\\
+	
+	\begin{tabular}{|l|c|r|}
+  \hline
+  year & count \\
+  \hline
+2005 & 	8667\\
+2006 & 	8166\\
+2007 & 	11970\\
+2008 & 	14204\\
+2009 & 	15526\\
+2010 & 	19150\\
+2011 & 	22470\\
+2012 & 	22317\\
+2013 & 	22923\\
+2014 & 	21219\\
+2015 & 	17206\\
+2016 & 	1590\\
+8888 & 	445\\
+9999 & 	4\\
+\hline
+\end{tabular}
+
+	\end{enumerate}\item Output the names of the ten authors with most publications.
+	
+		\begin{enumerate}
+	\item Description of logic :\\
+	\item SQL statement :
+		\begin{lstlisting}[language=SQL,showspaces=false,basicstyle=\ttfamily,numberstyle=\tiny,commentstyle=\color{gray}]
+SELECT DATE_PART('year', P.date_pub) AS year, COUNT(*) AS count
+FROM PUBLICATIONS P
+GROUP BY DATE_PART('year', P.date_pub)
+ORDER BY year ASC;
+		\end{lstlisting}
+
+	\item Results :\\
+	
+	\begin{tabular}{|l|c|r|}
+  \hline
+  name & count \\
+  \hline	
+uncredited & 2912\\
+Isaac Asimov & 2389\\
+Edgar Rice Burroughs & 2287\\
+Robert A. Heinlein	& 1878\\
+Arthur C. Clarke & 1512\\
+Andre Norton & 1505\\
+Stephen King & 1504\\
+Robert Silverberg & 1481\\
+Philip K. Dick & 1398\\
+Terry Pratchett	& 1354\\
+  \hline
+\end{tabular}
+
+	\end{enumerate}
+\newpage\item What are the names of the youngest and oldest authors to publish something in 2010?
+	
+			\begin{enumerate}
+	\item Description of logic :\\
+	\item SQL statement :
+		\begin{lstlisting}[language=SQL,showspaces=false,basicstyle=\ttfamily,numberstyle=\tiny,commentstyle=\color{gray}]
+SELECT A.name
+FROM AUTHORS A
+WHERE A.birth_date = (
+SELECT MAX(A.birth_date) AS max
+FROM PUBLICATIONS_AUTHORS PA
+JOIN AUTHORS A ON PA.author_id = A.ID
+WHERE PA.publication_id IN (
+  SELECT PUB.id
+  FROM PUBLICATIONS PUB
+  WHERE DATE_PART('year', PUB.date_pub) = '2010'
+)) OR
+A.birth_date = (
+SELECT MIN(A.birth_date) AS max
+FROM PUBLICATIONS_AUTHORS PA
+JOIN AUTHORS A ON PA.author_id = A.ID
+WHERE PA.publication_id IN (
+  SELECT PUB.id
+  FROM PUBLICATIONS PUB
+  WHERE DATE_PART('year', PUB.date_pub) = '2010'
+));
+		\end{lstlisting}
+
+	\item Results :\\
+	
+	\begin{tabular}{|l|c|r|}
+  \hline
+  name \\
+  \hline	
+Robert Henryson\\
+Gavin Douglas\\
+Greg Kurzawa\\
+Laramie Sasseville\\
+Brooke Vaughn\\
+Pancham Yadav\\
+Euripides\\
+Aubrey Smith\\
+Augustin Lardy\\
+Livy\\
+Michel Saint-Romain\\
+Gan Bao\\
+Timothy F. Mitchell\\
+Gottfried von Strassburg\\
+  \hline
+\end{tabular}
+
+	\end{enumerate}
+	\item How many comics (graphic titles) have publications with less than 50 pages, less than 100 pages, and more (or equal) than 100 pages?
+	
+	\begin{enumerate}
+	\item Description of logic :\\
+	\item SQL statement :
+		\begin{lstlisting}[language=SQL,showspaces=false,basicstyle=\ttfamily,numberstyle=\tiny,commentstyle=\color{gray}]
+SELECT COUNT(*)
+FROM titles t
+JOIN publications_contents AS pc ON t.id = pc.title_id
+JOIN publications AS p ON pc.publication_id = p.id
+WHERE t.graphic = 'YES'
+AND p.Pages < 50;
+
+------------------------------------------------
+
+SELECT COUNT(*)
+FROM titles t
+JOIN publications_contents AS pc ON t.id = pc.title_id
+JOIN publications AS p ON pc.publication_id = p.id
+WHERE t.graphic = 'YES'
+AND p.Pages < 100;
+
+------------------------------------------------
+
+SELECT COUNT(*)
+FROM titles t
+JOIN publications_contents AS pc ON t.id = pc.title_id
+JOIN publications AS p ON pc.publication_id = p.id
+WHERE t.graphic = 'YES'
+AND p.Pages >= 100;
+		\end{lstlisting}
+
+	\item Results :\\
+	
+	\begin{tabular}{|l|c|r|}
+	  \hline
+		count \\
+	  \hline	
+		153\\
+	  \hline
+	\end{tabular}
+	
+	\begin{tabular}{|l|c|r|}
+	  \hline
+		count \\
+	  \hline	
+		202\\
+	  \hline
+	\end{tabular}
+	
+	\begin{tabular}{|l|c|r|}
+	  \hline
+		count \\
+	  \hline	
+		194\\
+	  \hline
+	\end{tabular}
+
+\end{enumerate}
+	\item For every publisher, calculate the average price of its published novels (the ones that have a dollar price).
+	
+	\begin{enumerate}
+	\item Description of logic :\\
+	\item SQL statement :
+		\begin{lstlisting}[language=SQL,showspaces=false,basicstyle=\ttfamily,numberstyle=\tiny,commentstyle=\color{gray}]
+SELECT a.name, AVG(p.price)
+FROM publications p
+JOIN publications_authors AS pa ON p.id = pa.publication_id
+JOIN authors AS a ON pa.author_id = a.id
+WHERE p.currency = '$'
+GROUP BY a.name;
+		\end{lstlisting}
+
+	\item Results (partial, 10 first):\\
+	
+	\begin{tabular}{|l|c|r|}
+	  \hline
+		  name & avg \\
+	  \hline	
+			A. A. Aguirre & 7.99\\
+			A. A. Attanasio	& 10.992027027027035\\
+			A. A. Bell	& 11.135000000000002\\
+			A. A. Cheshire	& 17.49\\
+			A. Afanasyev	& 14.95\\
+			A. A. Gallardo	& 14.95\\
+			A. A. Garrison	& 15.95\\
+			A. A. Glynn	& 6.330000000000001\\
+			A. Ahad	& 19.95\\
+			A. A. Lanoie	& 12.95\\
+	  \hline
+\end{tabular}
+	
+\end{enumerate}	
+	\item What is the name of the author with the highest number of titles that are tagged as “science fiction”?
+
+	\begin{enumerate}
+	\item Description of logic :\\
+	\item SQL statement :
+		\begin{lstlisting}[language=SQL,showspaces=false,basicstyle=\ttfamily,numberstyle=\tiny,commentstyle=\color{gray}]
+SELECT a.name
+FROM authors a
+JOIN (
+  SELECT a.name AS n, COUNT(*) AS count_sf
+  FROM authors a
+  JOIN publications_authors pa   ON a.id = pa.author_id
+  JOIN publications p      ON pa.publication_id = p.id
+  JOIN publications_contents pc   ON pc.publication_id = p.id
+  JOIN titles t         ON pc.title_id = t.id
+  JOIN titles_tags tt      ON t.id = tt.title_id
+  JOIN tags           ON tt.tag_id = tags.id
+
+  WHERE tags.name LIKE '%sf%'
+  GROUP BY a.name
+  ORDER BY count_sf DESC
+  LIMIT 1)
+c ON c.n = a.name;
+		\end{lstlisting}
+
+	\item Results :\\
+	
+	\begin{tabular}{|l|c|r|}
+	  \hline
+		name\\
+	  \hline	
+		Robert A. Heinlein\\
+	  \hline
+	\end{tabular}
+\end{enumerate}
+	\item List the three most popular titles (i.e., the ones with the most awards and reviews).
+
+	\begin{enumerate}
+	\item Description of logic :\\
+	\item SQL statement :
+		\begin{lstlisting}[language=SQL,showspaces=false,basicstyle=\ttfamily,numberstyle=\tiny,commentstyle=\color{gray}]
+SELECT t.title, count_awards + count_reviews as total
+FROM titles t
+JOIN(
+  SELECT ta.title_id, COUNT(ta.award_id) AS count_awards
+  FROM titles_awards ta
+  GROUP BY ta.title_id) c ON c.title_id = t.id
+JOIN(
+  SELECT r.title_id, COUNT(r.review_id) AS count_reviews
+  FROM reviews r
+  GROUP BY r.title_id) d ON d.title_id = t.id
+ORDER BY count_awards + count_reviews DESC
+LIMIT 3;
+		\end{lstlisting}
+
+	\item Results :\\
+	
+	\begin{tabular}{|l|c|r|}
+	  \hline
+		title & total\\
+	  \hline	
+		The Wonderful Wizard of Oz	& 100\\
+		The Dispossessed: An Ambiguous Utopia	& 43\\
+		Neuromancer	& 33\\
+	  \hline
+	\end{tabular}
+\end{enumerate}
+
+\end{enumerate}
+
+\section{Interface}
+
+\subsection{Screenshots}
+
+\subsection{Implementation details}
+
+\newpage
+\part{Delivrable 3}
 
 \end{document}
