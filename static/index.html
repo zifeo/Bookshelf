@@ -37,6 +37,28 @@
                     console.log(calculations);
                 }
             });
+			const presets = $('#presets');
+            const headerId = $('#results thead tr');
+            const contentId = $('#results tbody');
+            $(document).on('click', '#presets .item[rel]', function() {
+                const queryNum = $(this).attr('rel');
+                presets.addClass('loading');
+                $.getJSON('presets/' + queryNum, function(res) {				  
+				  headerId.empty();
+				  contentId.empty();
+				  res.headers.forEach(function(e) {
+					  headerId.append("<th>" + e + "</th>")
+				  });
+				  res.rows.forEach(function(e) {
+					  var row = "<tr>";
+					  e.forEach(function(r) {
+						 row += "<td>" + r + "</td>"; 
+					  });
+					  contentId.append(row + "</tr>");
+				  });          
+				  presets.removeClass('loading');
+				});
+            });
         });
     </script>
     <style>
@@ -57,26 +79,26 @@
                 <i class="search link icon"></i>
             </div>
         </div>
-        <div class="ui pointing dropdown link item">
+        <div class="ui pointing dropdown link item" id="presets">
             <span class="text">Presets</span>
             <i class="dropdown icon"></i>
             <div class="menu">
                 <div class="header">Deliverable 2</div>
-                <div class="item">For every year, the year and the number of publications for said year</div>
-                <div class="item">The names of the ten authors with most publications</div>
-                <div class="item">The names of the youngest and oldest authors to publish something in 2010</div>
+                <div class="item" rel="1">For every year, the year and the number of publications for said year</div>
+                <div class="item" rel="2">The names of the ten authors with most publications</div>
+                <div class="item" rel="3">The names of the youngest and oldest authors to publish something in 2010</div>
                 <div class="item">
                     <i class="dropdown icon"></i>
                     <span class="text">The count of many comics (graphic titles) that have publications with</span>
                     <div class="menu">
-                        <div class="item">less than 50 pages</div>
-                        <div class="item">less than 100 pages</div>
-                        <div class="item">more (or equal) than 100 pages</div>
+                        <div class="item" rel="4">less than 50 pages</div>
+                        <div class="item" rel="5">less than 100 pages</div>
+                        <div class="item" rel="6">more (or equal) than 100 pages</div>
                     </div>
                 </div>
-                <div class="item">For every publisher, the average price of its published novels (the ones that have a dollar price)</div>
-                <div class="item">The name of the author with the highest number of titles that are tagged as “science fiction”</div>
-                <div class="item">The three most popular titles (i.e., the ones with the most awards and reviews)</div>
+                <div class="item" rel="7">For every publisher, the average price of its published novels (the ones that have a dollar price)</div>
+                <div class="item" rel="8">The name of the author with the highest number of titles that are tagged as “science fiction”</div>
+                <div class="item" rel="9">The three most popular titles (i.e., the ones with the most awards and reviews)</div>
                 <!--<div class="divider"></div>
                 <div class="header">Deliverable 3</div>
                 <div class="item">The average price per currency of the publications of the most popular title (i.e, the title with most publications overall)</div>
@@ -107,7 +129,7 @@
 </div>
 
 <div class="ui container">
-    <table class="ui selectable sortable celled table">
+    <table class="ui selectable sortable celled table" id="results">
         <thead>
         <tr>
             <th>Name</th>
