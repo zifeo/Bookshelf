@@ -72,26 +72,25 @@ WHERE t.graphic = 'YES'
 AND p.Pages >= 100;
 
 
-SELECT a.name, AVG(p.price)
+SELECT pr.name, AVG(p.price)
 FROM publications p
-JOIN publications_authors AS pa ON p.id = pa.publication_id
-JOIN authors AS a ON pa.author_id = a.id
+JOIN publishers pr ON p.publisher_id = pr.id
 WHERE p.currency = '$'
-GROUP BY a.name;
+GROUP BY pr.name;
 
 SELECT a.name
 FROM authors a
 JOIN (
 SELECT a.name AS n, COUNT(*) AS count_sf
 FROM authors a
-JOIN publications_authors pa   ON a.id = pa.author_id
-JOIN publications p      ON pa.publication_id = p.id
-JOIN publications_contents pc   ON pc.publication_id = p.id
-JOIN titles t         ON pc.title_id = t.id
-JOIN titles_tags tt      ON t.id = tt.title_id
-JOIN tags           ON tt.tag_id = tags.id
-
+JOIN publications_authors pa ON a.id = pa.author_id
+JOIN publications p ON pa.publication_id = p.id
+JOIN publications_contents pc ON pc.publication_id = p.id
+JOIN titles t ON pc.title_id = t.id
+JOIN titles_tags tt ON t.id = tt.title_id
+JOIN tags ON tt.tag_id = tags.id
 WHERE tags.name LIKE '%sf%'
+OR tags.name LIKE '%science-fiction%'
 GROUP BY a.name
 ORDER BY count_sf DESC
 LIMIT 1) c ON c.n = a.name;
