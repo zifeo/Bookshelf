@@ -10,18 +10,6 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 object Queries {
 
-  trait Result
-  case class Query1Result()
-
-  val mapping = Map(
-    0 -> quote(infix"Select * from Publications".as[Query[Query1Result]])
-  )
-
-  /*def apply(queryNum: Int): Future[Result] = {
-    val q = mapping(queryNum)
-    db.run(q)
-  }*/
-
   private object Query {
 
     val authById = quote { id: Int =>
@@ -38,6 +26,7 @@ object Queries {
       query[Titles]
         .filter(_.id == id)
     }
+
   }
 
   def authors(id: Int): Future[Authors] =
