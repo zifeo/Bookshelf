@@ -218,6 +218,8 @@ CREATE TABLE publications_contents
  * Dead foreign keys values
  ************************/
 
+-- titles parent if translated
+
 UPDATE authors SET pseudonym = NULL
 WHERE id IN (SELECT a1.id
              FROM authors a1
