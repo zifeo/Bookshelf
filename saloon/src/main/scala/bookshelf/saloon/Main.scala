@@ -6,9 +6,11 @@ import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import akka.http.scaladsl.model.{ContentType, HttpEntity, HttpResponse, MediaTypes}
 import akka.http.scaladsl.server.Directives._
 import akka.stream.ActorMaterializer
+import akka.util.Timeout
 import spray.json._
 
-import scala.language.implicitConversions
+import scala.concurrent.duration._
+import scala.language.{implicitConversions, postfixOps}
 
 private[saloon] object Main extends App {
 
@@ -18,6 +20,8 @@ private[saloon] object Main extends App {
 
   import DefaultJsonProtocol._
   import SprayJsonSupport._
+
+  implicit val timeout = Timeout(15 seconds)
 
   implicit def toJson[T: JsonWriter](obj: T): JsValue =
     obj.toJson
@@ -52,8 +56,8 @@ private[saloon] object Main extends App {
     }.toJson
 
   val routes =
-    path("search" / Segment) { term =>
-      get {
+    get {
+      path("search" / Segment) { term =>
         complete {
           for {
             auth <- Search.authors(term)
@@ -84,29 +88,42 @@ private[saloon] object Main extends App {
                   )
                 )
             HttpResponse(entity = HttpEntity(ContentType(MediaTypes.`application/json`), json.compactPrint))
+
           }
         }
-      }
-    } ~
-      path("authors" / IntNumber) { id =>
-        complete {
-          Queries.authors(id)
-        }
       } ~
-      path("publications" / IntNumber) { id =>
-        complete {
-          Queries.publications(id)
-        }
-      } ~
-      path("titles" / IntNumber) { id =>
-        complete {
-          Queries.titles(id)
-        }
-      } ~
-      pathSingleSlash {
-        getFromFile("../static/index.html")
-      } ~
-      getFromDirectory("../static")
+        path("authors" / IntNumber) { id =>
+          complete {
+            Queries.authors(id)
+          }
+        } ~
+        path("publications" / IntNumber) { id =>
+          complete {
+            Queries.publications(id)
+          }
+        } ~
+        path("titles" / IntNumber) { id =>
+          complete {
+            Queries.titles(id)
+          }
+        } ~
+        path("presets" / IntNumber) { numQuery =>
+          validate(Presets.exists(numQuery), "unknown query number") {
+            complete {
+              Presets(numQuery).map { case (headers, rows) =>
+                JsObject(
+                  "headers" -> headers,
+                  "rows" -> rows
+                )
+              }
+            }
+          }
+        } ~
+        pathSingleSlash {
+          getFromFile("../static/index.html")
+        } ~
+        getFromDirectory("../static")
+    }
 
   val bind = Http().bindAndHandle(
     routes,

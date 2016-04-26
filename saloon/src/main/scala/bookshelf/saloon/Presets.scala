@@ -1,17 +1,17 @@
 package bookshelf.saloon
 
-import com.github.mauricio.async.db.{RowData, QueryResult}
 import com.github.mauricio.async.db.postgresql.PostgreSQLConnection
 import com.github.mauricio.async.db.postgresql.util.URLParser
 
-import scala.concurrent.duration._
-import scala.concurrent.{Future, Await}
-import scala.language.postfixOps
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration._
+import scala.concurrent.{Await, Future}
+import scala.io.Source
+import scala.language.postfixOps
 
-object Presets extends App {
+object Presets {
 
-  private lazy val db = {
+  val db = {
     val host = config.getString("db.host")
     val port = config.getString("db.port")
     val user = config.getString("db.user")
@@ -22,33 +22,26 @@ object Presets extends App {
     Await.result(connection.connect, 5 seconds)
   }
 
-  val sql1 =
-    """
-      |SELECT A.name, COUNT(*) AS count
-      |FROM PUBLICATIONS_AUTHORS P
-      |INNER JOIN AUTHORS A ON P.author_id = A.id
-      |GROUP BY A.name
-      |ORDER BY count DESC
-      |LIMIT 10;
-      |
-    """.stripMargin
+  val queries = Source.fromFile("../queries.sql").mkString.split(';').map(_.trim)
 
-  def sql(query: String): Future[List[Map[String, String]]] =
+  def sql(query: String): Future[(List[String], List[List[String]])] =
     db.sendQuery(query).map { resQuery =>
       resQuery.rows match {
         case Some(res) =>
-          val cols = res.columnNames
-          res.toList.map {row =>
-            cols.zip(row.map(_.toString)).toMap
+          val cols = res.columnNames.toList
+          val rows = res.toList.map { row =>
+            row.map(_.toString).toList
           }
+          (cols, rows)
         case None =>
-          throw new Exception("no result")
+          (List(), List())
       }
     }
 
+  def exists(numQuery: Int): Boolean =
+    numQuery - 1 < queries.length && numQuery > 0
 
-  val result = Await.result(sql(sql1), 5 seconds )
-
-  println(result)
+  def apply(numQuery: Int): Future[(List[String], List[List[String]])] =
+    sql(queries(numQuery - 1))
 
 }
