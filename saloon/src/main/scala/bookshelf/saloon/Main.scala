@@ -1,22 +1,16 @@
 package bookshelf.saloon
 
-import java.util.logging.LogManager
-
 import akka.actor.ActorSystem
-import akka.event.Logging
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
-import akka.http.scaladsl.marshalling.ToResponseMarshallable
 import akka.http.scaladsl.model.{ContentType, HttpEntity, HttpResponse, MediaTypes}
 import akka.http.scaladsl.server.Directives._
 import akka.stream.ActorMaterializer
-import com.typesafe.config.ConfigFactory
 import spray.json._
 
-private[saloon] object Main extends App {
+import scala.language.implicitConversions
 
-  LogManager.getLogManager.readConfiguration()
-  val config = ConfigFactory.load()
+private[saloon] object Main extends App {
 
   implicit val system = ActorSystem("Bookshelf-system")
   implicit val materializer = ActorMaterializer()
@@ -25,33 +19,36 @@ private[saloon] object Main extends App {
   import DefaultJsonProtocol._
   import SprayJsonSupport._
 
+  implicit def toJson[T: JsonWriter](obj: T): JsValue =
+    obj.toJson
+
   def format2SearchResults[A : JsonFormat, B : JsonFormat, C : JsonFormat, D : JsonFormat]
   (res: List[(A, B, C, D)]): JsValue =
     res.map {
       case (a, b, None, None) =>
-        Map(
-          "url" -> a.toJson,
-          "title" -> b.toJson
-        ).toJson
+        JsObject(
+          "url" -> a,
+          "title" -> b
+        )
       case (a, b, c, None) =>
-        Map(
-          "url" -> a.toJson,
-          "title" -> b.toJson,
-          "description" -> c.toJson
-        ).toJson
+        JsObject(
+          "url" -> a,
+          "title" -> b,
+          "description" -> c
+        )
       case (a, b, None, d) =>
-        Map(
-          "url" -> a.toJson,
-          "title" -> b.toJson,
-          "image" -> d.toJson
-        ).toJson
+        JsObject(
+          "url" -> a,
+          "title" -> b,
+          "image" -> d
+        )
       case (a, b, c, d) =>
-        Map(
-          "url" -> a.toJson,
-          "title" -> b.toJson,
-          "description" -> c.toJson,
-          "image" -> d.toJson
-        ).toJson
+        JsObject(
+          "url" -> a,
+          "title" -> b,
+          "description" -> c,
+          "image" -> d
+        )
     }.toJson
 
   val routes =
@@ -68,24 +65,24 @@ private[saloon] object Main extends App {
             val titlJson = format2SearchResults(titl)
             val json =
               if (auth.isEmpty && pub.isEmpty && titl.isEmpty)
-                Map("results" -> JsArray()).toJson
+                JsObject("results" -> JsArray())
               else
-                Map(
-                  "results" -> Map(
-                    "category1" -> Map(
-                      "name" -> "Authors".toJson,
+                JsObject(
+                  "results" -> JsObject(
+                    "category1" -> JsObject(
+                      "name" -> "Authors",
                       "results" -> format2SearchResults(auth)
-                    ).toJson,
-                    "category2" -> Map(
-                      "name" -> "Publications".toJson,
+                    ),
+                    "category2" -> JsObject(
+                      "name" -> "Publications",
                       "results" -> format2SearchResults(pub)
-                    ).toJson,
-                    "category3" -> Map(
-                      "name" -> "Titles".toJson,
+                    ),
+                    "category3" -> JsObject(
+                      "name" -> "Titles",
                       "results" -> format2SearchResults(titl)
-                    ).toJson
-                  ).toJson
-                ).toJson
+                    )
+                  )
+                )
             HttpResponse(entity = HttpEntity(ContentType(MediaTypes.`application/json`), json.compactPrint))
           }
         }
