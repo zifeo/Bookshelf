@@ -10,6 +10,9 @@
     <link rel="stylesheet" type="text/css" class="ui" href="semantic.css">
     <script>
         $(function() {
+
+            $('#results, #details').hide();
+
             $('.ui.search').search({
                 apiSettings: {
                     url: 'search/{query}'
@@ -20,45 +23,85 @@
                 ],
                 minCharacters: 3,
                 onSelect: function(result) {
-                    console.log(result.url);
+
+                    $('#results, #details').hide();
+                    $('#presets').dropdown('clear');
+                    $('#presets .text').html('Presets');
+
+                    $('#details').show();
+                    $('.prompt', this).val(result.title);
+                    $('.ui.search').search('hide results');
+                    $('.ui.search').addClass('loading');
+
+                    $.getJSON(result.url, function(content) {
+                        $('#details').show();
+                        $('.ui.search').removeClass('loading');
+
+                        var details = '';
+                        $.each(content, function(k, v) {
+                            console.log(k);
+                            const key = k.split(/(?=[A-Z])/).map(function(e) {
+                                return e.toLowerCase();
+                            }).join(' ');
+                            details += '<div class="item"><div class="content"><div class="header">' + key.charAt(0).toUpperCase() + key.slice(1) + '</div>' + v + '</div></div>';
+                        });
+                        $('#details').html(details);
+
+                    });
                     return false;
                 }
             });
-            $('.table').tablesort();
-            $('.ui.dropdown').dropdown();
-            $(document).on('click', '.details', function() {
-                $('#details').modal('show');
-            });
+
+            $('.ui.dropdown').dropdown({ on: 'hover' });
+
             $(document).on('click', '#go-new-title', function() {
                 $('#new-title').modal('show');
             });
-            $('.table').visibility({
-                onUpdate: function(calculations) {
-                    console.log(calculations);
-                }
-            });
-			const presets = $('#presets');
-            const headerId = $('#results thead tr');
-            const contentId = $('#results tbody');
+
             $(document).on('click', '#presets .item[rel]', function() {
-                const queryNum = $(this).attr('rel');
-                presets.addClass('loading');
-                $.getJSON('presets/' + queryNum, function(res) {				  
-				  headerId.empty();
-				  contentId.empty();
-				  res.headers.forEach(function(e) {
-					  headerId.append("<th>" + e + "</th>")
-				  });
-				  res.rows.forEach(function(e) {
-					  var row = "<tr>";
-					  e.forEach(function(r) {
-						 row += "<td>" + r + "</td>"; 
-					  });
-					  contentId.append(row + "</tr>");
-				  });          
-				  presets.removeClass('loading');
-				});
+
+                $('#results, #details').hide();
+                $('.ui.search .prompt').val('');
+                $('#presets').addClass('loading');
+
+                $.getJSON('presets/' + $(this).attr('rel'), function(res) {
+
+                    $('#results thead tr').empty();
+                    $('#results tbody').empty();
+
+                    res.headers.forEach(function(e) {
+                        $('#results thead tr').append("<th>" + e.charAt(0).toUpperCase() + e.slice(1) + "</th>")
+                    });
+
+                    res.rows.forEach(function(e) {
+                        var row = "<tr>";
+                        e.forEach(function(r) {
+                            row += "<td>" + r + "</td>";
+                        });
+                        $('#results tbody').append(row + "</tr>");
+                    });
+
+                    $('#presets').removeClass('loading');
+                    $('#results').show();
+                    $('.table').tablesort();
+                });
             });
+            				
+			$('#send-title').api({
+			    url: 'titles',
+			    method : 'GET',
+			    serializeForm: true,
+			    onSuccess: function(data) {
+				    console.log(data);
+				    $('#send-title').removeClass('red');
+				    $('.ui.form').form('clear');
+				    $('#new-title').modal('hide');
+			    },
+			    onError: function(err) {
+				    $('#send-title').addClass('red');
+			    }
+			});
+
         });
     </script>
     <style>
@@ -68,6 +111,7 @@
     </style>
 </head>
 <body>
+	
 <div class="ui fixed menu">
     <div class="ui container">
         <a class="header item" href="">
@@ -79,17 +123,17 @@
                 <i class="search link icon"></i>
             </div>
         </div>
-        <div class="ui pointing dropdown link item" id="presets">
+        <div class="ui dropdown link item" id="presets">
             <span class="text">Presets</span>
             <i class="dropdown icon"></i>
             <div class="menu">
                 <div class="header">Deliverable 2</div>
                 <div class="item" rel="1">For every year, the year and the number of publications for said year</div>
-                <div class="item" rel="2">The names of the ten authors with most publications</div>
-                <div class="item" rel="3">The names of the youngest and oldest authors to publish something in 2010</div>
+                <div class="item" rel="2">Names of the ten authors with most publications</div>
+                <div class="item" rel="3">Names of the youngest and oldest authors to publish something in 2010</div>
                 <div class="item">
                     <i class="dropdown icon"></i>
-                    <span class="text">The count of many comics (graphic titles) that have publications with</span>
+                    <span class="text">Count of many comics (graphic titles) that have publications with</span>
                     <div class="menu">
                         <div class="item" rel="4">less than 50 pages</div>
                         <div class="item" rel="5">less than 100 pages</div>
@@ -97,8 +141,8 @@
                     </div>
                 </div>
                 <div class="item" rel="7">For every publisher, the average price of its published novels (the ones that have a dollar price)</div>
-                <div class="item" rel="8">The name of the author with the highest number of titles that are tagged as “science fiction”</div>
-                <div class="item" rel="9">The three most popular titles (i.e., the ones with the most awards and reviews)</div>
+                <div class="item" rel="8">Name of the author with the highest number of titles that are tagged as “science fiction”</div>
+                <div class="item" rel="9">Three most popular titles (i.e., the ones with the most awards and reviews)</div>
                 <!--<div class="divider"></div>
                 <div class="header">Deliverable 3</div>
                 <div class="item">The average price per currency of the publications of the most popular title (i.e, the title with most publications overall)</div>
@@ -118,7 +162,7 @@
                 <div class="item">For publications that have been awarded the Nebula award, the top 10 with the most extensive web presence<br> (i.e, the highest number of author websites, publication websites, publisher websites, publication series websites, and title series websites in total)</div>-->
             </div>
         </div>
-        <div class="ui pointing dropdown link item">
+        <div class="ui dropdown link item">
             <span class="text">New</span>
             <i class="dropdown icon"></i>
             <div class="menu">
@@ -132,89 +176,14 @@
     <table class="ui selectable sortable celled table" id="results">
         <thead>
         <tr>
-            <th>Name</th>
-            <th>Status</th>
-            <th>Notes</th>
         </tr>
         </thead>
         <tbody>
-        <tr>
-            <td><a href="#" class="details">John</a></td>
-            <td>No Action</td>
-            <td>None</td>
-        </tr>
-        <tr>
-            <td>Jamie</td>
-            <td>Approved</td>
-            <td>Requires call</td>
-        </tr>
-        <tr>
-            <td>Jill</td>
-            <td>Denied</td>
-            <td>None</td>
-        </tr>
-        <tr>
-            <td>John</td>
-            <td>No Action</td>
-            <td>None</td>
-        </tr>
-        <tr>
-            <td>Jamie</td>
-            <td>Approved</td>
-            <td>Requires call</td>
-        </tr>
-        <tr>
-            <td>Jill</td>
-            <td>Denied</td>
-            <td>None</td>
-        </tr>
-        <tr>
-            <td>Jill</td>
-            <td>Denied</td>
-            <td>None</td>
-        </tr>
-        <tr>
-            <td>Jill</td>
-            <td>Denied</td>
-            <td>None</td>
-        </tr>
-        <tr>
-            <td>Jill</td>
-            <td>Denied</td>
-            <td>None</td>
-        </tr>
-        <tr>
-            <td>Jill</td>
-            <td>Denied</td>
-            <td>None</td>
-        </tr>
-        <tr>
-            <td>Jill</td>
-            <td>Denied</td>
-            <td>None</td>
-        </tr>
-        <tr>
-            <td>Jill</td>
-            <td>Denied</td>
-            <td>None</td>
-        </tr>
-        <tr>
-            <td>Jill</td>
-            <td>Denied</td>
-            <td>None</td>
-        </tr>
-        <tr>
-            <td>Jill</td>
-            <td>Denied</td>
-            <td>None</td>
-        </tr>
-        <tr>
-            <td>Jill</td>
-            <td>Denied</td>
-            <td>None</td>
-        </tr>
         </tbody>
     </table>
+
+    <div class="ui list" id="details">
+    </div>
 </div>
 
 <div class="ui modal" id="new-title">
@@ -223,7 +192,7 @@
         Save a new title
     </div>
     <div class="content">
-        <div class="ui form">
+        <form class="ui form">
             <div class="field">
                 <label>Title</label>
                 <input type="text" name="title">
@@ -233,21 +202,29 @@
                 <textarea rows="2" name="synopsis"></textarea>
             </div>
             <div class="field">
+                <label>Note</label>
+                <textarea rows="2" name="noteId"></textarea>
+            </div>
+            <div class="field">
                 <label>Series</label>
-                <select class="ui dropdown series" name="series_id">
-                    <option value="">Select type</option>
+                <select class="ui dropdown series" name="seriesId">
+                    <option value="">Select serie</option>
                     <option value="AD">Andorra</option>
                 </select>
             </div>
             <div class="field">
                 <label>Series number</label>
-                <input type="text" name="series_num">
+                <input type="text" name="seriesNum">
             </div>
             <div class="field">
                 <label>Story length</label>
-                <select class="ui dropdown story-length" name="story_length">
-                    <option value="">Select type</option>
-                    <option value="AD">Andorra</option>
+                <select class="ui dropdown story-length" name="storyLength">
+                    <option value="">Select length</option>
+                    <option value="novella">novella</option>
+                    <option value="shortstory">shortstory</option>
+                    <option value="juvenile_fiction">juvenile_fiction</option>
+                    <option value="novelization">novelization</option>
+                    <option value="short_fiction">short_fiction</option>
                 </select>
             </div>
             <div class="field">
@@ -260,14 +237,14 @@
             <div class="field">
                 <label>Parent</label>
                 <select class="ui dropdown parent" name="parent">
-                    <option value="">Select type</option>
+                    <option value="">Select parent</option>
                     <option value="AD">Andorra</option>
                 </select>
             </div>
             <div class="field">
                 <label>Language</label>
-                <select class="ui dropdown languages" name="language_id">
-                    <option value="">Select type</option>
+                <select class="ui dropdown languages" name="languageId">
+                    <option value="">Select language</option>
                     <option value="AD">Andorra</option>
                 </select>
             </div>
@@ -280,14 +257,14 @@
             <div class="field">
                 <label>Review</label>
                 <select class="ui dropdown reviews" name="review">
-                    <option value="">Select type</option>
+                    <option value="">Select reviewee</option>
                     <option value="AD">Andorra</option>
                 </select>
             </div>
             <div class="field">
                 <label>Tags</label>
                 <select multiple="" class="ui dropdown tags" name="tags">
-                    <option value="">Select Country</option>
+                    <option value="">Select tags</option>
                     <option value="AF">Afghanistan</option>
                     <option value="AX">Åland Islands</option>
                     <option value="AL">Albania</option>
@@ -296,45 +273,16 @@
             <div class="field">
                 <label>Awards</label>
                 <select multiple="" class="ui dropdown awards" name="awards">
-                    <option value="">Select Country</option>
+                    <option value="">Select awards</option>
                     <option value="AF">Afghanistan</option>
                     <option value="AX">Åland Islands</option>
                     <option value="AL">Albania</option>
                 </select>
             </div>
-            <div class="field">
-                <label>Note</label>
-                <textarea rows="2"></textarea>
-            </div>
-            <button class="ui button" type="submit">Submit</button>
-        </div>
+            <div class="ui button" id="send-title" type="submit">Submit</div>
+        </form>
     </div>
 </div>
 
-<div class="ui modal" id="details">
-    <i class="close icon"></i>
-    <div class="content">
-        <div class="ui list">
-            <div class="item">
-                <div class="content">
-                    <div class="header">Snickerdoodle</div>
-                    An excellent companion
-                </div>
-            </div>
-            <div class="item">
-                <div class="content">
-                    <div class="header">Poodle</div>
-                    A poodle, its pretty basic
-                </div>
-            </div>
-            <div class="item">
-                <div class="content">
-                    <div class="header">Paulo</div>
-                    He's also a dog
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 </body>
 </html>
