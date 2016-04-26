@@ -1,265 +1,318 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, user-scalable=no">
-  <title>Bookshelf</title>
-  <script src="jquery.js"></script>
-  <script src="semantic.js"></script>
-  <script src="tablesort.js"></script>
-  <link rel="stylesheet" type="text/css" class="ui" href="semantic.css">
-  <script>
-    $(function() {
-      $('.ui.search').search({
-        apiSettings: {
-          url: 'search/{query}'
-        },
-        type: 'category',
-        searchFields: [
-          'title'
-        ],
-        minCharacters: 3,
-        onSelect: function(result) {
-	        console.log(result.url);
-	        return false;
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no">
+    <title>Bookshelf</title>
+    <script src="jquery.js"></script>
+    <script src="semantic.js"></script>
+    <script src="tablesort.js"></script>
+    <link rel="stylesheet" type="text/css" class="ui" href="semantic.css">
+    <script>
+        $(function() {
+            $('.ui.search').search({
+                apiSettings: {
+                    url: 'search/{query}'
+                },
+                type: 'category',
+                searchFields: [
+                    'title'
+                ],
+                minCharacters: 3,
+                onSelect: function(result) {
+                    console.log(result.url);
+                    return false;
+                }
+            });
+            $('.table').tablesort();
+            $('.ui.dropdown').dropdown();
+            $(document).on('click', '.details', function() {
+                $('#details').modal('show');
+            });
+            $(document).on('click', '#go-new-title', function() {
+                $('#new-title').modal('show');
+            });
+            $('.table').visibility({
+                onUpdate: function(calculations) {
+                    console.log(calculations);
+                }
+            });
+        });
+    </script>
+    <style>
+        body {
+            padding-top: 50px;
         }
-      });
-      $('.table').tablesort();
-      $('.ui.dropdown').dropdown();
-      $(document).on('click', '.details', function() {
-        $('#details').modal('show');
-      });
-      $(document).on('click', '#insert', function() {
-        $('#inserts').modal('show');
-      });
-      $('.table').visibility({
-        onUpdate: function(calculations) {
-          console.log(calculations);
-        }
-      });
-    });
-  </script>
-  <style>
-    body {
-      padding-top: 50px;
-    }
-  </style>
+    </style>
 </head>
 <body>
 <div class="ui fixed menu">
-  <div class="ui container">
-    <a class="header item" href="">
-      BOOKSHELF
-    </a>
-    <div class="ui search item">
-      <div class="ui transparent icon input">
-        <input class="prompt" type="text" placeholder="Search animals...">
-        <i class="search link icon"></i>
-      </div>
-    </div>
-    <div class="ui pointing dropdown link item">
-      <span class="text">Presets</span>
-      <i class="dropdown icon"></i>
-      <div class="menu">
-        <div class="header">Deliverable 2</div>
-        <div class="item">For every year, the year and the number of publications for said year</div>
-        <div class="item">The names of the ten authors with most publications</div>
-        <div class="item">The names of the youngest and oldest authors to publish something in 2010</div>
-        <div class="item">
-          <i class="dropdown icon"></i>
-          <span class="text">The count of many comics (graphic titles) that have publications with</span>
-          <div class="menu">
-            <div class="item">less than 50 pages</div>
-            <div class="item">less than 100 pages</div>
-            <div class="item">more (or equal) than 100 pages</div>
-          </div>
+    <div class="ui container">
+        <a class="header item" href="">
+            BOOKSHELF
+        </a>
+        <div class="ui search item">
+            <div class="ui transparent icon input">
+                <input class="prompt" type="text" placeholder="Search animals...">
+                <i class="search link icon"></i>
+            </div>
         </div>
-        <div class="item">For every publisher, the average price of its published novels (the ones that have a dollar price)</div>
-        <div class="item">The name of the author with the highest number of titles that are tagged as “science fiction”</div>
-        <div class="item">The three most popular titles (i.e., the ones with the most awards and reviews)</div>
-        <!--<div class="divider"></div>
-        <div class="header">Deliverable 3</div>        
-        <div class="item">The average price per currency of the publications of the most popular title (i.e, the title with most publications overall)</div>
-        <div class="item">The names of the top ten title series with most awards</div>
-        <div class="item">The name of the author who has received the most awards after his/her death</div>
-        <div class="item">For a given year, the three publishers that published the most publications</div>
-        <div class="item">Given an author, his/her most reviewed title(s)</div>
-        <div class="item">For every language, the top three title types with most translations</div>
-        <div class="item">For each year, the average number of authors per publisher</div>
-        <div class="item">The publication series with most titles that have been given awards of “World Fantasy Award” type</div>
-        <div class="item">For every award category, the names of the three most awarded authors</div>
-        <div class="item">The names of all living authors that have published at least one anthology from youngest to oldest</div>
-        <div class="item">The average number of publications per publication series (single result/number expected)</div>
-        <div class="item">The author who has reviewed the most titles</div>
-        <div class="item">For every language, the three authors with the most translated titles of “novel” type</div>
-        <div class="item">The top ten authors whose publications have the largest pages per dollar ratio (considering all publications of an author that have a dollar price)</div>
-        <div class="item">For publications that have been awarded the Nebula award, the top 10 with the most extensive web presence<br> (i.e, the highest number of author websites, publication websites, publisher websites, publication series websites, and title series websites in total)</div>-->
-      </div>
+        <div class="ui pointing dropdown link item">
+            <span class="text">Presets</span>
+            <i class="dropdown icon"></i>
+            <div class="menu">
+                <div class="header">Deliverable 2</div>
+                <div class="item">For every year, the year and the number of publications for said year</div>
+                <div class="item">The names of the ten authors with most publications</div>
+                <div class="item">The names of the youngest and oldest authors to publish something in 2010</div>
+                <div class="item">
+                    <i class="dropdown icon"></i>
+                    <span class="text">The count of many comics (graphic titles) that have publications with</span>
+                    <div class="menu">
+                        <div class="item">less than 50 pages</div>
+                        <div class="item">less than 100 pages</div>
+                        <div class="item">more (or equal) than 100 pages</div>
+                    </div>
+                </div>
+                <div class="item">For every publisher, the average price of its published novels (the ones that have a dollar price)</div>
+                <div class="item">The name of the author with the highest number of titles that are tagged as “science fiction”</div>
+                <div class="item">The three most popular titles (i.e., the ones with the most awards and reviews)</div>
+                <!--<div class="divider"></div>
+                <div class="header">Deliverable 3</div>
+                <div class="item">The average price per currency of the publications of the most popular title (i.e, the title with most publications overall)</div>
+                <div class="item">The names of the top ten title series with most awards</div>
+                <div class="item">The name of the author who has received the most awards after his/her death</div>
+                <div class="item">For a given year, the three publishers that published the most publications</div>
+                <div class="item">Given an author, his/her most reviewed title(s)</div>
+                <div class="item">For every language, the top three title types with most translations</div>
+                <div class="item">For each year, the average number of authors per publisher</div>
+                <div class="item">The publication series with most titles that have been given awards of “World Fantasy Award” type</div>
+                <div class="item">For every award category, the names of the three most awarded authors</div>
+                <div class="item">The names of all living authors that have published at least one anthology from youngest to oldest</div>
+                <div class="item">The average number of publications per publication series (single result/number expected)</div>
+                <div class="item">The author who has reviewed the most titles</div>
+                <div class="item">For every language, the three authors with the most translated titles of “novel” type</div>
+                <div class="item">The top ten authors whose publications have the largest pages per dollar ratio (considering all publications of an author that have a dollar price)</div>
+                <div class="item">For publications that have been awarded the Nebula award, the top 10 with the most extensive web presence<br> (i.e, the highest number of author websites, publication websites, publisher websites, publication series websites, and title series websites in total)</div>-->
+            </div>
+        </div>
+        <div class="ui pointing dropdown link item">
+            <span class="text">New</span>
+            <i class="dropdown icon"></i>
+            <div class="menu">
+                <div class="item" id="go-new-title">Title</div>
+            </div>
+        </div>
     </div>
-    <a class="ui link item" id="insert">
-    	<i class="plus icon"></i>
-    </a>
-  </div>
 </div>
+
 <div class="ui container">
-  <table class="ui selectable sortable celled table">
-    <thead>
-    <tr>
-      <th>Name</th>
-      <th>Status</th>
-      <th>Notes</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr>
-      <td><a href="#" class="details">John</a></td>
-      <td>No Action</td>
-      <td>None</td>
-    </tr>
-    <tr>
-      <td>Jamie</td>
-      <td>Approved</td>
-      <td>Requires call</td>
-    </tr>
-    <tr>
-      <td>Jill</td>
-      <td>Denied</td>
-      <td>None</td>
-    </tr>
-    <tr>
-      <td>John</td>
-      <td>No Action</td>
-      <td>None</td>
-    </tr>
-    <tr>
-      <td>Jamie</td>
-      <td>Approved</td>
-      <td>Requires call</td>
-    </tr>
-    <tr>
-      <td>Jill</td>
-      <td>Denied</td>
-      <td>None</td>
-    </tr>
-    <tr>
-      <td>Jill</td>
-      <td>Denied</td>
-      <td>None</td>
-    </tr>
-    <tr>
-      <td>Jill</td>
-      <td>Denied</td>
-      <td>None</td>
-    </tr>
-    <tr>
-      <td>Jill</td>
-      <td>Denied</td>
-      <td>None</td>
-    </tr>
-    <tr>
-      <td>Jill</td>
-      <td>Denied</td>
-      <td>None</td>
-    </tr>
-    <tr>
-      <td>Jill</td>
-      <td>Denied</td>
-      <td>None</td>
-    </tr>
-    <tr>
-      <td>Jill</td>
-      <td>Denied</td>
-      <td>None</td>
-    </tr>
-    <tr>
-      <td>Jill</td>
-      <td>Denied</td>
-      <td>None</td>
-    </tr>
-    <tr>
-      <td>Jill</td>
-      <td>Denied</td>
-      <td>None</td>
-    </tr>
-    <tr>
-      <td>Jill</td>
-      <td>Denied</td>
-      <td>None</td>
-    </tr>
-    </tbody>
-  </table>
+    <table class="ui selectable sortable celled table">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Status</th>
+            <th>Notes</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><a href="#" class="details">John</a></td>
+            <td>No Action</td>
+            <td>None</td>
+        </tr>
+        <tr>
+            <td>Jamie</td>
+            <td>Approved</td>
+            <td>Requires call</td>
+        </tr>
+        <tr>
+            <td>Jill</td>
+            <td>Denied</td>
+            <td>None</td>
+        </tr>
+        <tr>
+            <td>John</td>
+            <td>No Action</td>
+            <td>None</td>
+        </tr>
+        <tr>
+            <td>Jamie</td>
+            <td>Approved</td>
+            <td>Requires call</td>
+        </tr>
+        <tr>
+            <td>Jill</td>
+            <td>Denied</td>
+            <td>None</td>
+        </tr>
+        <tr>
+            <td>Jill</td>
+            <td>Denied</td>
+            <td>None</td>
+        </tr>
+        <tr>
+            <td>Jill</td>
+            <td>Denied</td>
+            <td>None</td>
+        </tr>
+        <tr>
+            <td>Jill</td>
+            <td>Denied</td>
+            <td>None</td>
+        </tr>
+        <tr>
+            <td>Jill</td>
+            <td>Denied</td>
+            <td>None</td>
+        </tr>
+        <tr>
+            <td>Jill</td>
+            <td>Denied</td>
+            <td>None</td>
+        </tr>
+        <tr>
+            <td>Jill</td>
+            <td>Denied</td>
+            <td>None</td>
+        </tr>
+        <tr>
+            <td>Jill</td>
+            <td>Denied</td>
+            <td>None</td>
+        </tr>
+        <tr>
+            <td>Jill</td>
+            <td>Denied</td>
+            <td>None</td>
+        </tr>
+        <tr>
+            <td>Jill</td>
+            <td>Denied</td>
+            <td>None</td>
+        </tr>
+        </tbody>
+    </table>
 </div>
-<div class="ui modal" id="inserts">
-  <i class="close icon"></i>
-  <div class="header">
-	  Save a new award
-  </div>
-  <div class="content">
-	<div class="ui form">
-	  <div class="field">
-	    <label>Title</label>
-	    <input type="text">
-	  </div>
-	  <div class="field">
-	    <label>Date</label>
-	    <input type="date">
-	  </div>
-	  <div class="field">
-	    <label>Category</label>
-	    <select class="ui dropdown">
-	      <option value="">Select category</option>
-	      <option value="AF">Afghanistan</option>
-		  <option value="AX">Åland Islands</option>
-	      <option value="AL">Albania</option>
-	      <option value="DZ">Algeria</option>
-	      <option value="AS">American Samoa</option>
-	      <option value="AD">Andorra</option>
-	    </select>
-	  </div>
-	  <div class="field">
-	    <label>Type</label>
-	    <select class="ui dropdown">
-	      <option value="">Select type</option>
-	      <option value="AF">Afghanistan</option>
-		  <option value="AX">Åland Islands</option>
-	      <option value="AL">Albania</option>
-	      <option value="DZ">Algeria</option>
-	      <option value="AS">American Samoa</option>
-	      <option value="AD">Andorra</option>
-	    </select>
-	  </div>
-	  <div class="field">
-	    <label>Note</label>
-	    <textarea rows="2"></textarea>
-	  </div>
-	  <button class="ui button" type="submit">Submit</button>
+
+<div class="ui modal" id="new-title">
+    <i class="close icon"></i>
+    <div class="header">
+        Save a new title
     </div>
-  </div>
+    <div class="content">
+        <div class="ui form">
+            <div class="field">
+                <label>Title</label>
+                <input type="text" name="title">
+            </div>
+            <div class="field">
+                <label>Synopsis</label>
+                <textarea rows="2" name="synopsis"></textarea>
+            </div>
+            <div class="field">
+                <label>Series</label>
+                <select class="ui dropdown series" name="series_id">
+                    <option value="">Select type</option>
+                    <option value="AD">Andorra</option>
+                </select>
+            </div>
+            <div class="field">
+                <label>Series number</label>
+                <input type="text" name="series_num">
+            </div>
+            <div class="field">
+                <label>Story length</label>
+                <select class="ui dropdown story-length" name="story_length">
+                    <option value="">Select type</option>
+                    <option value="AD">Andorra</option>
+                </select>
+            </div>
+            <div class="field">
+                <label>Type</label>
+                <select class="ui dropdown type" name="type">
+                    <option value="">Select type</option>
+                    <option value="AD">Andorra</option>
+                </select>
+            </div>
+            <div class="field">
+                <label>Parent</label>
+                <select class="ui dropdown parent" name="parent">
+                    <option value="">Select type</option>
+                    <option value="AD">Andorra</option>
+                </select>
+            </div>
+            <div class="field">
+                <label>Language</label>
+                <select class="ui dropdown languages" name="language_id">
+                    <option value="">Select type</option>
+                    <option value="AD">Andorra</option>
+                </select>
+            </div>
+            <div class="field">
+                <div class="ui toggle checkbox">
+                    <input type="checkbox" name="graphic">
+                    <label>Graphic</label>
+                </div>
+            </div>
+            <div class="field">
+                <label>Review</label>
+                <select class="ui dropdown reviews" name="review">
+                    <option value="">Select type</option>
+                    <option value="AD">Andorra</option>
+                </select>
+            </div>
+            <div class="field">
+                <label>Tags</label>
+                <select multiple="" class="ui dropdown tags" name="tags">
+                    <option value="">Select Country</option>
+                    <option value="AF">Afghanistan</option>
+                    <option value="AX">Åland Islands</option>
+                    <option value="AL">Albania</option>
+                </select>
+            </div>
+            <div class="field">
+                <label>Awards</label>
+                <select multiple="" class="ui dropdown awards" name="awards">
+                    <option value="">Select Country</option>
+                    <option value="AF">Afghanistan</option>
+                    <option value="AX">Åland Islands</option>
+                    <option value="AL">Albania</option>
+                </select>
+            </div>
+            <div class="field">
+                <label>Note</label>
+                <textarea rows="2"></textarea>
+            </div>
+            <button class="ui button" type="submit">Submit</button>
+        </div>
+    </div>
 </div>
+
 <div class="ui modal" id="details">
-  <i class="close icon"></i>
-  <div class="content">
-    <div class="ui list">
-      <div class="item">
-        <div class="content">
-          <div class="header">Snickerdoodle</div>
-          An excellent companion
+    <i class="close icon"></i>
+    <div class="content">
+        <div class="ui list">
+            <div class="item">
+                <div class="content">
+                    <div class="header">Snickerdoodle</div>
+                    An excellent companion
+                </div>
+            </div>
+            <div class="item">
+                <div class="content">
+                    <div class="header">Poodle</div>
+                    A poodle, its pretty basic
+                </div>
+            </div>
+            <div class="item">
+                <div class="content">
+                    <div class="header">Paulo</div>
+                    He's also a dog
+                </div>
+            </div>
         </div>
-      </div>
-      <div class="item">
-        <div class="content">
-          <div class="header">Poodle</div>
-          A poodle, its pretty basic
-        </div>
-      </div>
-      <div class="item">
-        <div class="content">
-          <div class="header">Paulo</div>
-          He's also a dog
-        </div>
-      </div>
     </div>
-  </div>
 </div>
 </body>
 </html>
