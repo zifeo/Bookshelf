@@ -11,32 +11,44 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 object Presets extends App {
 
-  val host = config.getString("db.host")
-  val port = config.getString("db.port")
-  val user = config.getString("db.user")
-  val password = config.getString("db.password")
-  val database = config.getString("db.database")
-
-  val addr = URLParser.parse(s"jdbc:postgresql://$host:$port/$database?user=$user&password=$password")
-  val connection = new PostgreSQLConnection(addr)
-
-  Await.result(connection.connect, 5 seconds)
-
-  val future: Future[QueryResult] = connection.sendQuery("SELECT 0")
-
-  val mapResult: Future[Any] = future.map(queryResult => queryResult.rows match {
-    case Some(resultSet) => {
-      val row : RowData = resultSet.head
-      row(0)
-    }
-    case None => -1
+  private lazy val db = {
+    val host = config.getString("db.host")
+    val port = config.getString("db.port")
+    val user = config.getString("db.user")
+    val password = config.getString("db.password")
+    val database = config.getString("db.database")
+    val url = URLParser.parse(s"jdbc:postgresql://$host:$port/$database?user=$user&password=$password")
+    val connection = new PostgreSQLConnection(url)
+    Await.result(connection.connect, 5 seconds)
   }
-  )
 
-  val result = Await.result( mapResult, 5 seconds )
+  val sql1 =
+    """
+      |SELECT A.name, COUNT(*) AS count
+      |FROM PUBLICATIONS_AUTHORS P
+      |INNER JOIN AUTHORS A ON P.author_id = A.id
+      |GROUP BY A.name
+      |ORDER BY count DESC
+      |LIMIT 10;
+      |
+    """.stripMargin
+
+  def sql(query: String): Future[List[Map[String, String]]] =
+    db.sendQuery(query).map { resQuery =>
+      resQuery.rows match {
+        case Some(res) =>
+          val cols = res.columnNames
+          res.toList.map {row =>
+            cols.zip(row.map(_.toString)).toMap
+          }
+        case None =>
+          throw new Exception("no result")
+      }
+    }
+
+
+  val result = Await.result(sql(sql1), 5 seconds )
 
   println(result)
-
-  connection.disconnect
 
 }
