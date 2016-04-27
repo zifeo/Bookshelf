@@ -1,18 +1,19 @@
 package bookshelf.saloon
 
 import akka.actor.ActorSystem
-import akka.event.Logging
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import akka.http.scaladsl.model.{ContentType, HttpEntity, HttpResponse, MediaTypes}
 import akka.http.scaladsl.server.Directives._
 import akka.stream.ActorMaterializer
-import com.typesafe.config.ConfigFactory
+import akka.util.Timeout
+import bookshelf.saloon.Inserts.NewTitle
 import spray.json._
 
-private[saloon] object Main extends App {
+import scala.concurrent.duration._
+import scala.language.{implicitConversions, postfixOps}
 
-  val config = ConfigFactory.load()
+private[saloon] object Main extends App {
 
   implicit val system = ActorSystem("Bookshelf-system")
   implicit val materializer = ActorMaterializer()
@@ -21,38 +22,43 @@ private[saloon] object Main extends App {
   import DefaultJsonProtocol._
   import SprayJsonSupport._
 
+  implicit val timeout = Timeout(15 seconds)
+
+  implicit def toJson[T: JsonWriter](obj: T): JsValue =
+    obj.toJson
+
   def format2SearchResults[A : JsonFormat, B : JsonFormat, C : JsonFormat, D : JsonFormat]
   (res: List[(A, B, C, D)]): JsValue =
     res.map {
       case (a, b, None, None) =>
-        Map(
-          "url" -> a.toJson,
-          "title" -> b.toJson
-        ).toJson
+        JsObject(
+          "url" -> a,
+          "title" -> b
+        )
       case (a, b, c, None) =>
-        Map(
-          "url" -> a.toJson,
-          "title" -> b.toJson,
-          "description" -> c.toJson
-        ).toJson
+        JsObject(
+          "url" -> a,
+          "title" -> b,
+          "description" -> c
+        )
       case (a, b, None, d) =>
-        Map(
-          "url" -> a.toJson,
-          "title" -> b.toJson,
-          "image" -> d.toJson
-        ).toJson
+        JsObject(
+          "url" -> a,
+          "title" -> b,
+          "image" -> d
+        )
       case (a, b, c, d) =>
-        Map(
-          "url" -> a.toJson,
-          "title" -> b.toJson,
-          "description" -> c.toJson,
-          "image" -> d.toJson
-        ).toJson
+        JsObject(
+          "url" -> a,
+          "title" -> b,
+          "description" -> c,
+          "image" -> d
+        )
     }.toJson
 
   val routes =
-    path("search" / Segment) { term =>
-      get {
+    get {
+      path("search" / Segment) { term =>
         complete {
           for {
             auth <- Search.authors(term)
@@ -64,54 +70,87 @@ private[saloon] object Main extends App {
             val titlJson = format2SearchResults(titl)
             val json =
               if (auth.isEmpty && pub.isEmpty && titl.isEmpty)
-                Map("results" -> JsArray()).toJson
+                JsObject("results" -> JsArray())
               else
-                Map(
-                  "results" -> Map(
-                    "category1" -> Map(
-                      "name" -> "Authors".toJson,
+                JsObject(
+                  "results" -> JsObject(
+                    "category1" -> JsObject(
+                      "name" -> "Authors",
                       "results" -> format2SearchResults(auth)
-                    ).toJson,
-                    "category2" -> Map(
-                      "name" -> "Publications".toJson,
+                    ),
+                    "category2" -> JsObject(
+                      "name" -> "Publications",
                       "results" -> format2SearchResults(pub)
-                    ).toJson,
-                    "category3" -> Map(
-                      "name" -> "Titles".toJson,
+                    ),
+                    "category3" -> JsObject(
+                      "name" -> "Titles",
                       "results" -> format2SearchResults(titl)
-                    ).toJson
-                  ).toJson
-                ).toJson
+                    )
+                  )
+                )
             HttpResponse(entity = HttpEntity(ContentType(MediaTypes.`application/json`), json.compactPrint))
-          }
-        }
-      }
-    } ~
-      path("authors" / IntNumber) { id =>
-        complete {
-          for {
-            res <- Queries.authors(id)
-          } yield res match {
-            case Some(author) => author
-            case _ => throw new Exception
+
           }
         }
       } ~
-      pathSingleSlash {
-        getFromFile("../static/index.html")
-      } ~
-      getFromDirectory("../static")
+        path("authors" / IntNumber) { id =>
+          complete {
+            Queries.authors(id)
+          }
+        } ~
+        path("publications" / IntNumber) { id =>
+          complete {
+            Queries.publications(id)
+          }
+        } ~
+        path("titles" / IntNumber) { id =>
+          complete {
+            Queries.titles(id)
+          }
+        } ~
+        path("presets" / IntNumber) { numQuery =>
+          validate(Presets.exists(numQuery), "unknown query number") {
+            complete {
+              Presets(numQuery).map { case (headers, rows) =>
+                JsObject(
+                  "headers" -> headers,
+                  "rows" -> rows
+                )
+              }
+            }
+          }
+        } ~
+        path("titles") {
+          parameter(
+            'title,
+            'synopsis.?,
+            'noteId.?,
+            'seriesId.as[Int].?,
+            'seriesNum.as[Int].?,
+            'storyLength.?,
+            'type.?,
+            'parent.as[Int].?,
+            'languageId.as[Int].?,
+            'graphic.as[Boolean].?,
+            'review.as[Int].?,
+            'tags.?,
+            'awards.?
+          ).as(NewTitle) { title =>
+            complete {
+              Inserts.title(title)
+            }
+          }
+        } ~
+        pathSingleSlash {
+          getFromFile("../static/index.html")
+        } ~
+        getFromDirectory("../static")
+    }
 
   val bind = Http().bindAndHandle(
-    logRequestResult("Bookshelf", Logging.InfoLevel)(routes),
+    routes,
     config.getString("http.interface"),
     config.getInt("http.port")
   )
-
-  println("Press ENTER to stop.")
-  /*StdIn.readLine()
-  bind
-    .flatMap(_.unbind())
-    .onComplete(_ => system.terminate())*/
 
 }
