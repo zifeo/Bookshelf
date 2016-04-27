@@ -176,7 +176,7 @@ $$
 \newpage
 
 \begin{center}
-    \includegraphics[scale = 0.5]{DBMS_ER}
+    \includegraphics[scale = 0.5]{DBMS_ER_OLD}
 \end{center}
 
 \section{SQL schema}
@@ -847,13 +847,18 @@ ON DELETE SET NULL;
 \end{center}
 
 \part{Delivrable 2}
-\section{Modifications of the previous milestone regarding remarks}
+\section{Modifications and improvements}
 
 \subsection{Justifications}
 We are now considering \texttt{Award\char`_Category} as a weak entity of \texttt{Award\char`_Type} since it doesn’t make sense for a category to exist without type. Therefore, the primary key of the category is now not only \texttt{cat\char`_ID} but also a tuple containing \texttt{cat\char`_ID} and \texttt{type\char`_ID}. This leads us to store again in our Award table the \texttt{type\char`_ID} attribute to make the connection between awards and their categories.After analyzing the data, the graphic attribute may be null, we lead us to remove the NOT NULL constraint on this attribute.
 
 
 \subsection{New ER Model}
+
+\begin{center}
+    \includegraphics[scale = 0.5]{DBMS_ER_NEW}
+\end{center}
+
 \newpage
 \section{Queries implementation}
 
@@ -1044,12 +1049,12 @@ AND p.Pages >= 100;
 	\item Description of logic : This query joins the publications and authors via the \texttt{publications\char`_authors} table. Then it filters the publications to keep only the ones that have a price in dollar. Finally it groups everything on the author’s name and do an average on the price.
 	\item SQL statement :
 		\begin{lstlisting}[language=SQL,showspaces=false,basicstyle=\ttfamily,numberstyle=\tiny,commentstyle=\color{gray}]
-SELECT a.name, AVG(p.price)
+ELECT pr.name, AVG(p.price) AS average
 FROM publications p
-JOIN publications_authors AS pa ON p.id = pa.publication_id
-JOIN authors AS a ON pa.author_id = a.id
+JOIN publishers pr ON p.publisher_id = pr.id
 WHERE p.currency = '$'
-GROUP BY a.name;
+GROUP BY pr.name
+ORDER BY average DESC;
 		\end{lstlisting}
 
 	\item Results (partial, 10 first):\\
@@ -1058,16 +1063,16 @@ GROUP BY a.name;
 	  \hline
 		  name & avg \\
 	  \hline
-			A. A. Aguirre & 7.99\\
-			A. A. Attanasio	& 10.992027027027035\\
-			A. A. Bell	& 11.135000000000002\\
-			A. A. Cheshire	& 17.49\\
-			A. Afanasyev	& 14.95\\
-			A. A. Gallardo	& 14.95\\
-			A. A. Garrison	& 15.95\\
-			A. A. Glynn	& 6.330000000000001\\
-			A. Ahad	& 19.95\\
-			A. A. Lanoie	& 12.95\\
+		Library Fellows of the Whitney Museum of American Art & 2200\\
+		The Pennyroyal Press & 1000\\
+		Pickering & Chatto & 795\\
+		Epic Ink Books & 500\\
+		The Book Club of California & 375\\
+		Tradition Books & 357\\
+		Charnel House & 344.88235294117646\\
+		Subterranean Press & PS Publishing & 300\\
+		Sirius Science Fiction & 262.5\\
+		Kluwer Academic Publishers & 259\\
 	  \hline
 \end{tabular}
 
@@ -1081,19 +1086,19 @@ GROUP BY a.name;
 SELECT a.name
 FROM authors a
 JOIN (
-  SELECT a.name AS n, COUNT(*) AS count_sf
-  FROM authors a
-  JOIN publications_authors pa ON a.id = pa.author_id
-  JOIN publications p ON pa.publication_id = p.id
-  JOIN publications_contents pc ON pc.publication_id = p.id
-  JOIN titles t ON pc.title_id = t.id
-  JOIN titles_tags tt ON t.id = tt.title_id
-  JOIN tags ON tt.tag_id = tags.id
-
-  WHERE tags.name LIKE '%sf%'
-  GROUP BY a.name
-  ORDER BY count_sf DESC
-  LIMIT 1)
+	SELECT a.name AS n, COUNT(*) AS count_sf
+	FROM authors a
+	JOIN publications_authors pa ON a.id = pa.author_id
+	JOIN publications p ON pa.publication_id = p.id
+	JOIN publications_contents pc ON pc.publication_id = p.id
+	JOIN titles t ON pc.title_id = t.id
+	JOIN titles_tags tt ON t.id = tt.title_id
+	JOIN tags ON tt.tag_id = tags.id
+	WHERE tags.name LIKE '%sf%'
+	OR tags.name LIKE '%science-fiction%'
+	GROUP BY a.name
+	ORDER BY count_sf DESC
+	LIMIT 1)
 c ON c.n = a.name;
 		\end{lstlisting}
 
@@ -1142,9 +1147,54 @@ LIMIT 3;
 
 \end{enumerate}
 
+\newpage
 \section{Interface}
 
 \subsection{Screenshots}
+
+\subsubsection{Menu}
+\begin{figure}[!htb]
+	\centering
+    \includegraphics[scale = 0.5]{ui-menu}
+    \caption{Menu view}
+\end{figure}
+
+\subsubsection{Selection}
+\begin{figure}[!htb]
+	\centering
+    \includegraphics[scale = 0.5]{ui-selection}
+    \caption{Selection view}
+\end{figure}
+
+\subsubsection{Preset}
+\begin{figure}[!htb]
+  \centering
+  \includegraphics[scale = 0.45]{ui-preset}
+  \caption{Preset view}
+\end{figure}
+
+\newpage
+
+\subsubsection{Search}
+\begin{figure}[!htb]
+	\centering
+    \includegraphics[scale = 0.4]{ui-search}
+    \caption{Search view}
+\end{figure}
+
+\subsubsection{Insert}
+\begin{figure}[!htb]
+	\centering
+    \includegraphics[scale = 0.25]{ui-insert}
+    \caption{Insert view}
+\end{figure}
+
+\subsubsection{Result}
+\begin{figure}[!htb]
+	\centering
+    \includegraphics[scale = 0.5]{ui-result}
+    \caption{Result view}
+\end{figure}
 
 \subsection{Implementation details}
 
