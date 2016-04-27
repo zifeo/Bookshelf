@@ -118,7 +118,7 @@
 \vspace*{3cm}
 \titlefont CS-323 : Project delivrable\par
 \vspace*{0.5cm}
-\epigraph{This is our first deliverable for the \textit{Bookshelf} project of the introduction to database course (spring 2016 - Pr. Anastasia Ailamaki), which sums up our ER-model and schema. It also contains some justifications.}%
+\epigraph{This is first deliverable for the \textit{Bookshelf} project of the introduction to database course (spring 2016 - Pr. Anastasia Ailamaki), which sums up our work. It also contains some justifications.}%
 {\textit{March 2016} - \textsc{Team n°3}}
 \null\vfill
 \vspace*{5cm}
@@ -136,7 +136,7 @@
 \titlepagedecoration
 \end{titlepage}
 
-\setcounter{tocdepth}{1}
+\setcounter{tocdepth}{3}
 \vspace{-1cm}
 \tableofcontents
 
@@ -850,8 +850,31 @@ ON DELETE SET NULL;
 \section{Modifications and improvements}
 
 \subsection{Justifications}
-We are now considering \texttt{Award\char`_Category} as a weak entity of \texttt{Award\char`_Type} since it doesn’t make sense for a category to exist without type. Therefore, the primary key of the category is now not only \texttt{cat\char`_ID} but also a tuple containing \texttt{cat\char`_ID} and \texttt{type\char`_ID}. This leads us to store again in our Award table the \texttt{type\char`_ID} attribute to make the connection between awards and their categories.After analyzing the data, the graphic attribute may be null, we lead us to remove the NOT NULL constraint on this attribute.
-
+We are now considering \texttt{award\char`_category} as a weak entity of \texttt{award\char`_type} since it doesn’t make sense for a category to exist without type. Therefore, the primary key of the category is now not only \texttt{cat\char`_ID} but also a tuple containing \texttt{cat\char`_ID} and \texttt{type\char`_ID}. This leads us to store again in our award table the \texttt{type\char`_ID} attribute to make the connection between awards and their categories.\\After analyzing the data, the graphic attribute may be null, we lead us to remove the NOT NULL constraint on this attribute.
+\\
+While inserting, we removed some of the notes entries due to bad formatting or empty content. Advanced data such as dates or combined page numbers have been parse the best possible. When that was not sufficient the field might have been replaced by null or replaced by the nearest value (e.g. 0/0/xxxx to 1/1/xxxx) as discussed in class. The translator field of titles has been extracted into a many to many relationship. The parser also been adapted to manage ‹ $\backslash\backslash$t › as an escape character for tabulation.
+~\\~\\
+In the DDL and according to the data, the following changes have been made :
+\begin{itemize}
+	\item \texttt{publisher\char`_id} in publication is now nullable
+	\item \texttt{type} in publication is now nullable
+	\item \texttt{parent} in titles is now nullable
+	\item \texttt{url} in webpages is now not unique, as many url could reference different items
+	\item \texttt{code} in \texttt{award\char`_type} is now not unique, as two awards could share the same initials
+	\item drop table statements have been added to make easier the deletion and creation of the database
+	\item dead foreign key values removal queries have been added to allow the creation of corresponding foreign keys
+	\item a constraint ensuring at least of the entities is linked in each webpages entries has been added for not having a page referencing no entity
+\end{itemize}
+~\\
+About cascade justifications, we decided with one of the TAs to only specify the behaviour for deleting as updating is not involved in the project. If not specified otherwise, we set the deleted field to null as they entities lifetime are independent of each others :
+\begin{itemize}
+	\item \texttt{authors\char`_id} and \texttt{pseudonym} are linked to the same person, thus requiring a cascade deletion.
+	\item all many to many relationship have a cascade deletion, as there is no meaning of a two entity mapping missing one of the entity.
+	\item \texttt{webpages} have a cascade deletion whenever one the referring entity is deleted.
+	\item \texttt{awards\char`_categories} has a cascade deletion as it is a weak entity.
+\end{itemize}
+~\\
+The enumerations values have been kept as inline values for flexibility and simplicity reasons as discussed with one of the teaching assistants. The full inserts are batched and executed in about 12 minutes.
 
 \subsection{New ER Model}
 
@@ -862,8 +885,8 @@ We are now considering \texttt{Award\char`_Category} as a weak entity of \texttt
 \newpage
 \section{Queries implementation}
 
-\begin{enumerate}
-\item For every year, output the year and the number of publications for said year.
+
+\subsection{For every year, output the year and the number of publications for said year}
 	\begin{enumerate}
 	\item Description of logic : We are using the \texttt{DATE\char`_PART} function provided by Postgresql to extract the year of the date stored for each publication. Then
       we simply do a GROUP BY on the year and count the number of entries.
@@ -898,7 +921,9 @@ ORDER BY year ASC;
 \hline
 \end{tabular}
 
-	\end{enumerate}\item Output the names of the ten authors with most publications.
+	\end{enumerate}
+	
+\subsection{Output the names of the ten authors with most publications}
 
 		\begin{enumerate}
 	\item Description of logic : This query simply joins the authors and their publications and then GROUP BY on the author’s name. We just have to count the number of entries, ORDER BY that count and set a limit to 10.
@@ -932,7 +957,9 @@ Terry Pratchett	& 1354\\
 \end{tabular}
 
 	\end{enumerate}
-\newpage\item What are the names of the youngest and oldest authors to publish something in 2010?
+\newpage
+
+\subsection{What are the names of the youngest and oldest authors to publish something in 2010?}
 
 			\begin{enumerate}
 	\item Description of logic : Slightly more complicated this query uses nested subqueries to first select publications of 2010, then to select the maximum and minimum  birth dates of author that have some publication of 2010.
@@ -984,7 +1011,7 @@ Gottfried von Strassburg\\
 \end{tabular}
 
 	\end{enumerate}
-\item How many comics (graphic titles) have publications with less than 50 pages, less than 100 pages, and more (or equal) than 100 pages?
+\subsection{How many comics (graphic titles) have publications with less than 50 pages, less than 100 pages, and more (or equal) than 100 pages?}
 
 	\begin{enumerate}
 	\item Description of logic : After joining titles and publications, filtering them using the “graphic” field of titles and setting the condition on the number of pages, we just have to count the number of entries.
@@ -1043,7 +1070,7 @@ AND p.Pages >= 100;
 	\end{tabular}
 
 \end{enumerate}
-\item For every publisher, calculate the average price of its published novels (the ones that have a dollar price).
+\subsection{For every publisher, calculate the average price of its published novels (the ones that have a dollar price)}
 
 	\begin{enumerate}
 	\item Description of logic : This query joins the publications and authors via the \texttt{publications\char`_authors} table. Then it filters the publications to keep only the ones that have a price in dollar. Finally it groups everything on the author’s name and do an average on the price.
@@ -1065,19 +1092,19 @@ ORDER BY average DESC;
 	  \hline
 		Library Fellows of the Whitney Museum of American Art & 2200\\
 		The Pennyroyal Press & 1000\\
-		Pickering & Chatto & 795\\
+		Pickering \& Chatto & 795\\
 		Epic Ink Books & 500\\
 		The Book Club of California & 375\\
 		Tradition Books & 357\\
 		Charnel House & 344.88235294117646\\
-		Subterranean Press & PS Publishing & 300\\
+		Subterranean Press \& PS Publishing & 300\\
 		Sirius Science Fiction & 262.5\\
 		Kluwer Academic Publishers & 259\\
 	  \hline
 \end{tabular}
 
 \end{enumerate}
-\item What is the name of the author with the highest number of titles that are tagged as “science fiction”?
+\subsection{What is the name of the author with the highest number of titles that are tagged as “science fiction”?}
 
 	\begin{enumerate}
 	\item Description of logic : This query use a subquery. This subquery links authors with their publications, the publications with their titles and finally the titles with their tags. A simple filter on tags to keep only the ones that have the keyword \texttt{sf} (meaning science fiction), then group by authors name, count the entries for each authors and order by this counter. Then the main query is there to keep the name without the counter.
@@ -1094,8 +1121,7 @@ JOIN (
 	JOIN titles t ON pc.title_id = t.id
 	JOIN titles_tags tt ON t.id = tt.title_id
 	JOIN tags ON tt.tag_id = tags.id
-	WHERE tags.name LIKE '%sf%'
-	OR tags.name LIKE '%science-fiction%'
+	WHERE tags.name '%science-fiction%'
 	GROUP BY a.name
 	ORDER BY count_sf DESC
 	LIMIT 1)
@@ -1108,26 +1134,27 @@ c ON c.n = a.name;
 	  \hline
 		name\\
 	  \hline
-		Robert A. Heinlein\\
+		Maurice Level\\
 	  \hline
 	\end{tabular}
 \end{enumerate}
-\item List the three most popular titles (i.e., the ones with the most awards and reviews).
+\subsection{List the three most popular titles (i.e., the ones with the most awards and reviews)}
 
 	\begin{enumerate}
-	\item Description of logic : Here we order the titles on their number of awards and reviews and then simply sum them and order them on that total.
+	\item Description of logic : Here we order the titles on their number of awards and reviews and then simply sum them and order them on that total. Note that union is mandatory as otherwise we will miss some datas (e.g. all titles that only appear to have awards or titles).
 	\item SQL statement :
 		\begin{lstlisting}[language=SQL,showspaces=false,basicstyle=\ttfamily,numberstyle=\tiny,commentstyle=\color{gray}]
-SELECT t.title, count_awards + count_reviews as total
-FROM titles t
-JOIN(
-  SELECT ta.title_id, COUNT(ta.award_id) AS count_awards
+SELECT t.title, ts.count_awards + ts.count_reviews as total
+FROM (
+  SELECT ta.title_id, 0 AS count_reviews, COUNT(ta.award_id) AS count_awards
   FROM titles_awards ta
-  GROUP BY ta.title_id) c ON c.title_id = t.id
-JOIN(
-  SELECT r.title_id, COUNT(r.review_id) AS count_reviews
+  GROUP BY ta.title_id
+  UNION
+  SELECT r.title_id, COUNT(r.review_id) AS count_reviews, 0 AS count_awards
   FROM reviews r
-  GROUP BY r.title_id) d ON d.title_id = t.id
+  GROUP BY r.title_id
+) as ts
+  INNER JOIN titles t on t.id = ts.title_id
 ORDER BY total DESC
 LIMIT 3;
 		\end{lstlisting}
@@ -1139,12 +1166,10 @@ LIMIT 3;
 		title & total\\
 	  \hline
 		The Wonderful Wizard of Oz	& 100\\
-		The Dispossessed: An Ambiguous Utopia	& 43\\
-		Neuromancer	& 33\\
+		Sky Island	& 54\\
+		The Sea Fairies	& 48\\
 	  \hline
 	\end{tabular}
-\end{enumerate}
-
 \end{enumerate}
 
 \newpage
@@ -1197,6 +1222,8 @@ LIMIT 3;
 \end{figure}
 
 \subsection{Implementation details}
+
+The search field is using ajax to access our backend server in Scala (cf. search). For each search query, we run in parallel 3 queries using « LIKE » statements to find all relevant results and send it be aggregated to the requester. We limit the number of result to 4 for visibility reason. The user is able to always enter the main field (either name or title), a secondary field for more information about the entry (but not searchable) and optionally a picture of the entry if relevant. Once the entry is select more information about the result in a formatted way (cf. result).
 
 \newpage
 \part{Delivrable 3}
