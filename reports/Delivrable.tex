@@ -136,7 +136,7 @@
 \titlepagedecoration
 \end{titlepage}
 
-\setcounter{tocdepth}{1}
+\setcounter{tocdepth}{3}
 \vspace{-1cm}
 \tableofcontents
 
@@ -885,8 +885,8 @@ The enumerations values have been kept as inline values for flexibility and simp
 \newpage
 \section{Queries implementation}
 
-\begin{enumerate}
-\item For every year, output the year and the number of publications for said year.
+
+\subsection{For every year, output the year and the number of publications for said year}
 	\begin{enumerate}
 	\item Description of logic : We are using the \texttt{DATE\char`_PART} function provided by Postgresql to extract the year of the date stored for each publication. Then
       we simply do a GROUP BY on the year and count the number of entries.
@@ -921,7 +921,9 @@ ORDER BY year ASC;
 \hline
 \end{tabular}
 
-	\end{enumerate}\item Output the names of the ten authors with most publications.
+	\end{enumerate}
+	
+\subsection{Output the names of the ten authors with most publications}
 
 		\begin{enumerate}
 	\item Description of logic : This query simply joins the authors and their publications and then GROUP BY on the author’s name. We just have to count the number of entries, ORDER BY that count and set a limit to 10.
@@ -955,7 +957,9 @@ Terry Pratchett	& 1354\\
 \end{tabular}
 
 	\end{enumerate}
-\newpage\item What are the names of the youngest and oldest authors to publish something in 2010?
+\newpage
+
+\subsection{What are the names of the youngest and oldest authors to publish something in 2010?}
 
 			\begin{enumerate}
 	\item Description of logic : Slightly more complicated this query uses nested subqueries to first select publications of 2010, then to select the maximum and minimum  birth dates of author that have some publication of 2010.
@@ -1007,7 +1011,7 @@ Gottfried von Strassburg\\
 \end{tabular}
 
 	\end{enumerate}
-\item How many comics (graphic titles) have publications with less than 50 pages, less than 100 pages, and more (or equal) than 100 pages?
+\subsection{How many comics (graphic titles) have publications with less than 50 pages, less than 100 pages, and more (or equal) than 100 pages?}
 
 	\begin{enumerate}
 	\item Description of logic : After joining titles and publications, filtering them using the “graphic” field of titles and setting the condition on the number of pages, we just have to count the number of entries.
@@ -1066,7 +1070,7 @@ AND p.Pages >= 100;
 	\end{tabular}
 
 \end{enumerate}
-\item For every publisher, calculate the average price of its published novels (the ones that have a dollar price).
+\subsection{For every publisher, calculate the average price of its published novels (the ones that have a dollar price)}
 
 	\begin{enumerate}
 	\item Description of logic : This query joins the publications and authors via the \texttt{publications\char`_authors} table. Then it filters the publications to keep only the ones that have a price in dollar. Finally it groups everything on the author’s name and do an average on the price.
@@ -1100,7 +1104,7 @@ ORDER BY average DESC;
 \end{tabular}
 
 \end{enumerate}
-\item What is the name of the author with the highest number of titles that are tagged as “science fiction”?
+\subsection{What is the name of the author with the highest number of titles that are tagged as “science fiction”?}
 
 	\begin{enumerate}
 	\item Description of logic : This query use a subquery. This subquery links authors with their publications, the publications with their titles and finally the titles with their tags. A simple filter on tags to keep only the ones that have the keyword \texttt{sf} (meaning science fiction), then group by authors name, count the entries for each authors and order by this counter. Then the main query is there to keep the name without the counter.
@@ -1134,7 +1138,7 @@ c ON c.n = a.name;
 	  \hline
 	\end{tabular}
 \end{enumerate}
-\item List the three most popular titles (i.e., the ones with the most awards and reviews).
+\subsection{List the three most popular titles (i.e., the ones with the most awards and reviews)}
 
 	\begin{enumerate}
 	\item Description of logic : Here we order the titles on their number of awards and reviews and then simply sum them and order them on that total.
@@ -1165,8 +1169,6 @@ LIMIT 3;
 		Neuromancer	& 33\\
 	  \hline
 	\end{tabular}
-\end{enumerate}
-
 \end{enumerate}
 
 \newpage
@@ -1219,6 +1221,8 @@ LIMIT 3;
 \end{figure}
 
 \subsection{Implementation details}
+
+The search field is using ajax to access our backend server in Scala (cf. search). For each search query, we run in parallel 3 queries using « LIKE » statements to find all relevant results and send it be aggregated to the requester. We limit the number of result to 4 for visibility reason. The user is able to always the main field (either name or title), a secondary field for more information about the entry (but not searchable) and optionally a picture of the entry if relevant. Once the entry is select more information about the result in a formatted way (cf. result).
 
 \newpage
 \part{Delivrable 3}
