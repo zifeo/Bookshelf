@@ -52,27 +52,26 @@ package object mine {
 
   def getPages(raw: String): (Option[Int], Option[Int]) = {
     def impl(raw: String): (String, String) = raw match {
-      case "[]" => ("0", "0")
+      case "[]" => ("", "")
       case REGEX_PAGES_1(g1, g2, g3, g4, g5) => (g1 + g3 + g5, (toArabic(g2) + g4.toInt).toString)
       case REGEX_PAGES_2(g1, g2, g3, g4, g5) => (g1 + g3 + g5, (g2.toInt + toArabic(g4)).toString)
       case REGEX_PAGES_3(g1, g2, g3) => (g1 + g3, g2)
       case REGEX_PAGES_4(g1, g2, g3) => (g1 + g3, toArabic(g2).toString)
-      case x => (x, "0")
+      case x => (x, "")
     }
 
-    def numberOrEmpty(num: String): Int =
-      if (num.isEmpty || num == "[]") 0
-      else num.toInt
+    def numberOrEmpty(num: String): Option[Int] =
+      if (num.isEmpty || num == "[]") None
+      else intOrNone(num)
 
     val (pagesLeft, pagesRight) = impl(raw)
 
-    val leftRes = Try {
-      pagesLeft.split('+').map(numberOrEmpty).sum
-    }.toOption
+    val leftRes = pagesLeft.split('+').flatMap(intOrNone).toList match {
+      case Nil => None
+      case x => Some(x.sum)
+    }
 
-    val rightRes = Try {
-      numberOrEmpty(pagesRight)
-    }.toOption
+    val rightRes = intOrNone(pagesRight)
 
     (leftRes, rightRes)
   }

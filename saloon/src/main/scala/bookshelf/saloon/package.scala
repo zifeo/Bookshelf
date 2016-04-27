@@ -2,13 +2,19 @@ package bookshelf
 
 import java.time.Instant
 import java.util.Date
+import java.util.logging.LogManager
 
-import bookshelf.mine.schema.Authors
+import bookshelf.mine.schema.{Titles, Publications, Authors}
+import bookshelf.saloon.Inserts.NewTitle
+import com.typesafe.config.ConfigFactory
 import io.getquill._
 import io.getquill.naming.SnakeCase
 import spray.json._
 
 package object saloon {
+
+  LogManager.getLogManager.readConfiguration()
+  val config = ConfigFactory.load()
 
   val db = source(new PostgresAsyncSourceConfig[SnakeCase]("db"))
 
@@ -26,6 +32,8 @@ package object saloon {
   }
 
   implicit val authorsJF = jsonFormat12(Authors.apply)
-
+  implicit val publicationsJF = jsonFormat15(Publications.apply)
+  implicit val titlesJF = jsonFormat11(Titles.apply)
+  implicit val newTitleJF = jsonFormat13(NewTitle)
 
 }
