@@ -7,6 +7,7 @@
     <script src="jquery.js"></script>
     <script src="semantic.js"></script>
     <script src="tablesort.js"></script>
+    <script src="moment.js"></script>
     <link rel="stylesheet" type="text/css" class="ui" href="semantic.css">
     <script>
         $(function() {
@@ -47,14 +48,18 @@
                         $('#details .image').remove();
                         if (content.cover !== undefined) {
                             $('#details').prepend('<div class="image"><img src="' + content.cover + '"></div>');
+                        } else if (content.image !== undefined) {
+                            $('#details').prepend('<div class="image"><img src="' + content.image + '"></div>');
                         }
 
                         $.each(content, function(k, v) {
-                            if (k != 'title' && k != 'name' && k != 'cover' && k != 'id') {
+                            if (k != 'title' && k != 'name' && k != 'cover' && k != 'image' && k != 'id') {
 
-                                if (k.indexOf('date') > -1) {
-                                    v = new Date(v);
+                                if (k.toLowerCase().indexOf('date') > -1) {
+                                    console.log('daate');
+                                    v = moment(v).format("MMMM Do YYYY")
                                 }
+                                console.log(k);
 
                                 const key = k.split(/(?=[A-Z])/).map(function (e) {
                                     return e.toLowerCase();
