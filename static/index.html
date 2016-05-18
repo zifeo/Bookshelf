@@ -24,28 +24,50 @@
                 minCharacters: 3,
                 onSelect: function(result) {
 
-                    $('#results, #details').hide();
-                    $('#presets').dropdown('clear');
-                    $('#presets .text').html('Presets');
+                    $('.presets').dropdown('restore defaults');
+                    $('.presets .default.text').removeClass('default');
 
-                    $('#details').show();
-                    $('.prompt', this).val(result.title);
+                    $('#results, #details').hide();
+
                     $('.ui.search').search('hide results');
                     $('.ui.search').addClass('loading');
 
                     $.getJSON(result.url, function(content) {
-                        $('#details').show();
-                        $('.ui.search').removeClass('loading');
-
                         var details = '';
+
+                        if (content.name !== undefined) {
+                            $('#details .header').html(content.name);
+                        } else if (content.title !== undefined) {
+                            $('#details .header').html(content.title);
+                        }
+
+                        $('#details .remove').attr('rel', content.id);
+                        $('#details .meta').html(content.id);
+
+                        $('#details .image').remove();
+                        if (content.cover !== undefined) {
+                            $('#details').prepend('<div class="image"><img src="' + content.cover + '"></div>');
+                        }
+
                         $.each(content, function(k, v) {
-                            console.log(k);
-                            const key = k.split(/(?=[A-Z])/).map(function(e) {
-                                return e.toLowerCase();
-                            }).join(' ');
-                            details += '<div class="item"><div class="content"><div class="header">' + key.charAt(0).toUpperCase() + key.slice(1) + '</div>' + v + '</div></div>';
+                            if (k != 'title' && k != 'name' && k != 'cover' && k != 'id') {
+
+                                if (k.indexOf('date') > -1) {
+                                    v = new Date(v);
+                                }
+
+                                const key = k.split(/(?=[A-Z])/).map(function (e) {
+                                    return e.toLowerCase();
+                                }).join(' ');
+                                details += '<div class="item"><div class="content"><div class="header">' + key.charAt(0).toUpperCase() + key.slice(1) + '</div>' + v + '</div></div>';
+
+                            }
                         });
-                        $('#details').html(details);
+
+                        $('#details .description').html(details);
+                        $('#details').show();
+                        $('#details').removeClass('hidden');
+                        $('.ui.search').removeClass('loading');
 
                     });
                     return false;
@@ -58,11 +80,22 @@
                 $('#new-title').modal('show');
             });
 
-            $(document).on('click', '#presets .item[rel]', function() {
+            $(document).on('click', '#details .remove', function() {
+                var id = $(this).attr('rel');
+                $('#details').transition('horizontal flip');
+                $('#details .header, #details .content')
+            });
+
+            $(document).on('click', '.presets .item[rel]', function() {
 
                 $('#results, #details').hide();
                 $('.ui.search .prompt').val('');
-                $('#presets').addClass('loading');
+
+                $('.presets').not($(this).parents('.presets')).dropdown('restore defaults');
+                $('.presets .default.text').removeClass('default');
+
+                $('.presets').removeClass('loading');
+                $(this).parents('.presets').addClass('loading');
 
                 $.getJSON('presets/' + $(this).attr('rel'), function(res) {
 
@@ -81,26 +114,26 @@
                         $('#results tbody').append(row + "</tr>");
                     });
 
-                    $('#presets').removeClass('loading');
+                    $('.presets').removeClass('loading');
                     $('#results').show();
                     $('.table').tablesort();
                 });
             });
-            				
-			$('#send-title').api({
-			    url: 'titles',
-			    method : 'GET',
-			    serializeForm: true,
-			    onSuccess: function(data) {
-				    console.log(data);
-				    $('#send-title').removeClass('red');
-				    $('.ui.form').form('clear');
-				    $('#new-title').modal('hide');
-			    },
-			    onError: function(err) {
-				    $('#send-title').addClass('red');
-			    }
-			});
+
+            $('#send-title').api({
+                url: 'titles',
+                method : 'GET',
+                serializeForm: true,
+                onSuccess: function(data) {
+                    console.log(data);
+                    $('#send-title').removeClass('red');
+                    $('.ui.form').form('clear');
+                    $('#new-title').modal('hide');
+                },
+                onError: function(err) {
+                    $('#send-title').addClass('red');
+                }
+            });
 
         });
     </script>
@@ -111,7 +144,7 @@
     </style>
 </head>
 <body>
-	
+
 <div class="ui fixed menu">
     <div class="ui container">
         <a class="header item" href="">
@@ -119,11 +152,11 @@
         </a>
         <div class="ui search item">
             <div class="ui transparent icon input">
-                <input class="prompt" type="text" placeholder="Search animals...">
+                <input class="prompt" type="text" placeholder="Search...">
                 <i class="search link icon"></i>
             </div>
         </div>
-        <div class="ui dropdown link item" id="presets">
+        <div class="ui dropdown link item presets">
             <span class="text">Deliverable 2</span>
             <i class="dropdown icon"></i>
             <div class="menu">
@@ -138,7 +171,7 @@
                 <div class="item" rel="9">Three most popular titles (i.e., the ones with the most awards and reviews)</div>
             </div>
         </div>
-        <div class="ui dropdown link item" id="presets">
+        <div class="ui dropdown link item presets">
             <span class="text">Deliverable 3</span>
             <i class="dropdown icon"></i>
             <div class="menu">
@@ -170,6 +203,19 @@
 </div>
 
 <div class="ui container">
+
+    <div class="ui centered card" id="details">
+        <div class="content">
+            <div class="header"></div>
+            <div class="meta"></div>
+            <div class="ui list description"></div>
+        </div>
+        <a class="ui bottom attached red button remove">
+            <i class="remove icon"></i>
+            Remove
+        </a>
+    </div>
+
     <table class="ui selectable sortable celled table" id="results">
         <thead>
         <tr>
@@ -179,8 +225,6 @@
         </tbody>
     </table>
 
-    <div class="ui list" id="details">
-    </div>
 </div>
 
 <div class="ui modal" id="new-title">
