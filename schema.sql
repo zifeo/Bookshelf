@@ -186,7 +186,7 @@ CREATE TABLE titles_translators
   title_id           INT NOT NULL, -- fk
   translator_id      INT NOT NULL, -- fk
   year               INT NOT NULL,
-  language_id           VARCHAR(64) NOT NULL,
+  language_id        INT NOT NULL, -- fk
   CONSTRAINT pk_titles_translators PRIMARY KEY (title_id, translator_id, year, language)
 );
 
@@ -491,7 +491,12 @@ ON DELETE CASCADE;
 ALTER TABLE titles_translators
 ADD FOREIGN KEY (translator_id)
 REFERENCES translators (id)
-ON DELETE CASCADE;
+ON DELETE SET NULL;
+
+ALTER TABLE titles_translators
+ADD FOREIGN KEY (language_id)
+REFERENCES languages (id)
+ON DELETE SET NULL;
 
 /* Reviews */
 ALTER TABLE reviews
