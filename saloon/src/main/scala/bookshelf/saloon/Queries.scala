@@ -24,23 +24,27 @@ object Queries {
 
     require(title.nonEmpty)
 
-    require(TitlesLengths.all.exists(_.name == storyLength))
-    require(TitlesTypes.all.exists(_.name == `type`))
+    require(storyLength.exists(_.isEmpty) || TitlesLengths.all.exists(_.name == storyLength))
+    require(`type`.exists(_.isEmpty) || TitlesTypes.all.exists(_.name == `type`))
 
-    def gen: Titles =
-      Titles(
+    def gen: Titles = {
+      val t = Titles(
         id = 0,
         title,
-        synopsis = synopsis.map(x => Await.result(Queries.notesIns(Notes(0, x)), 10 seconds)),
-        noteId = noteId.map(x => Await.result(Queries.notesIns(Notes(0, x)), 10 seconds)),
+        synopsis = synopsis.filter(_.nonEmpty).map(x => Await.result(Queries.notesIns(Notes(0, x)), 10 seconds)),
+        noteId = noteId.filter(_.nonEmpty).map(x => Await.result(Queries.notesIns(Notes(0, x)), 10 seconds)),
         seriesId,
         seriesNum,
-        storyLength,
-        `type`,
+        storyLength.filter(_.nonEmpty),
+        `type`.filter(_.nonEmpty),
         parent,
         languageId,
         graphic
       )
+      println(t)
+      t
+    }
+
 
   }
 

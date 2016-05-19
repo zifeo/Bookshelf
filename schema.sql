@@ -614,4 +614,14 @@ ADD CONSTRAINT webpages_no_full_null CHECK (
   award_type_id IS NOT NULL OR
   title_series_id IS NOT NULL OR
   award_category_id IS NOT NULL
-)
+);
+
+CREATE SEQUENCE titles_id_seq;
+SELECT setval('titles_id_seq', (SELECT id FROM titles ORDER BY id DESC LIMIT 1));
+ALTER TABLE titles ALTER COLUMN id SET DEFAULT nextval('titles_id_seq');
+ALTER SEQUENCE titles_id_seq OWNED BY titles.id;
+
+CREATE SEQUENCE notes_id_seq;
+SELECT setval('notes_id_seq', (SELECT id FROM notes ORDER BY id DESC LIMIT 1));
+ALTER TABLE notes ALTER COLUMN id SET DEFAULT nextval('notes_id_seq');
+ALTER SEQUENCE notes_id_seq OWNED BY notes.id;
