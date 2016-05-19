@@ -186,7 +186,7 @@ CREATE TABLE titles_translators
   title_id           INT NOT NULL, -- fk
   translator_id      INT NOT NULL, -- fk
   year               INT NOT NULL,
-  language           VARCHAR(64) NOT NULL,
+  language_id           VARCHAR(64) NOT NULL,
   CONSTRAINT pk_titles_translators PRIMARY KEY (title_id, translator_id, year, language)
 );
 
