@@ -108,18 +108,26 @@ private[saloon] object Main extends App {
             Queries.titles(id)
           }
         } ~
-        path("presets" / IntNumber) { numQuery =>
-          validate(Presets.exists(numQuery), "unknown query number") {
-            complete {
-              Presets(numQuery).map { case (headers, rows) =>
-                JsObject(
-                  "headers" -> headers,
-                  "rows" -> rows
-                )
-              }
+        path("delete" / Segment / IntNumber) { (table, id) =>
+          val del = table match {
+            case "authors" => Queries.authorsDel(id)
+            case "publications" => Queries.publicationsDel(id)
+            case "titles" => Queries.titlesDel(id)
+          }
+          complete(del.map(_.toString))
+        } ~
+      path("presets" / IntNumber) { numQuery =>
+        validate(Presets.exists(numQuery), "unknown query number") {
+          complete {
+            Presets(numQuery).map { case (headers, rows) =>
+              JsObject(
+                "headers" -> headers,
+                "rows" -> rows
+              )
             }
           }
-        } ~
+        }
+      } ~
         path("titles") {
           parameter(
             'title,

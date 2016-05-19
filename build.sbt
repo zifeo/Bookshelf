@@ -29,7 +29,7 @@ lazy val mine = project
     name := "Mine",
     libraryDependencies ++= Seq(
       "org.postgresql" % "postgresql" % "9.4-1206-jdbc41",
-      "io.getquill" %% "quill-jdbc" % "0.5.0"
+      "io.getquill" %% "quill-jdbc" % "0.6.0"
     ),
     javaOptions += "-Xmx4G"
   )
@@ -41,7 +41,7 @@ lazy val saloon = project
   .settings(
     name := "Saloon",
     libraryDependencies ++= Seq(
-      "io.getquill" %% "quill-async" % "0.5.0",
+      "io.getquill" %% "quill-async" % "0.6.0",
       "com.typesafe.akka" %% "akka-slf4j" % "2.4.4",
       "com.typesafe.akka" %% "akka-http-experimental" % "2.4.4",
       "com.typesafe.akka" %% "akka-http-spray-json-experimental" % "2.4.4",

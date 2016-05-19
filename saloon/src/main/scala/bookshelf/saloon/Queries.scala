@@ -27,6 +27,24 @@ object Queries {
         .filter(_.id == id)
     }
 
+    val authDel = quote { id: Int =>
+      query[Authors]
+        .filter(_.id == id)
+        .delete
+    }
+
+    val pubDel = quote { id: Int =>
+      query[Publications]
+        .filter(_.id == id)
+        .delete
+    }
+
+    val titlDel = quote { id: Int =>
+      query[Titles]
+        .filter(_.id == id)
+        .delete
+    }
+
   }
 
   def authors(id: Int): Future[Authors] =
@@ -37,5 +55,14 @@ object Queries {
 
   def titles(id: Int): Future[Titles] =
     db.run(Query.titlById)(id).map(_.head)
+
+  def authorsDel(id: Int): Future[Long] =
+    db.run(Query.authDel)(id)
+
+  def publicationsDel(id: Int): Future[Long] =
+    db.run(Query.pubDel)(id)
+
+  def titlesDel(id: Int): Future[Long] =
+    db.run(Query.titlDel)(id)
 
 }

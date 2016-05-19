@@ -13,21 +13,21 @@ object Search {
 
     val auth = db.run(quote { term: String =>
       query[Authors]
-        .filter(_.name like term)
+        .filter(_.name.toLowerCase like term)
         .map(a => (a.id, a.name, a.birthPlace, a.image))
         .take(4)
     })
 
     val pub = db.run(quote { term: String =>
       query[Publications]
-        .filter(_.title like term)
+        .filter(_.title.toLowerCase like term)
         .map(a => (a.id, a.title, a.`type`, a.cover))
         .take(4)
     })
 
     val titl = db.run(quote { term: String =>
       query[Titles]
-        .filter(_.title like term)
+        .filter(_.title.toLowerCase like term)
         .map(a => (a.id, a.title, a.storyLength))
         .take(4)
     })
