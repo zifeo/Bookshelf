@@ -69,7 +69,7 @@ package object mine {
 
     val rightRes = intOrNone(pagesRight)
 
-    (leftRes, if (rightRes.isDefined && rightRes.get == 0) None else rightRes)
+    (leftRes, rightRes.filter(_ > 0))
   }
 
   private def toArabic(number: String): Int = {
