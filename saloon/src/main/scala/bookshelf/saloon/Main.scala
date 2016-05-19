@@ -7,6 +7,7 @@ import akka.http.scaladsl.model.{ContentType, HttpEntity, HttpResponse, MediaTyp
 import akka.http.scaladsl.server.Directives._
 import akka.stream.ActorMaterializer
 import akka.util.Timeout
+import bookshelf.mine.schema.TitlesTypes
 import bookshelf.saloon.Queries.NewTitle
 import spray.json._
 
@@ -151,6 +152,8 @@ private[saloon] object Main extends App {
         } ~
         getFromDirectory("../static")
     }
+
+  println(TitlesTypes.values)
 
   val bind = Http().bindAndHandle(
     routes,

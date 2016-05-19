@@ -34,6 +34,6 @@ package object saloon {
   implicit val authorsJF = jsonFormat12(Authors.apply)
   implicit val publicationsJF = jsonFormat15(Publications.apply)
   implicit val titlesJF = jsonFormat11(Titles.apply)
-  implicit val newTitleJF = jsonFormat13(NewTitle)
+  implicit val newTitleJF = jsonFormat10(NewTitle)
 
 }

@@ -130,10 +130,12 @@
                 method : 'GET',
                 serializeForm: true,
                 onSuccess: function(data) {
-                    console.log(data);
                     $('#send-title').removeClass('red');
                     $('.ui.form').form('clear');
                     $('#new-title').modal('hide');
+                },
+                onComplete: function(response) {
+                    console.log(response);
                 },
                 onError: function(err) {
                     $('#send-title').addClass('red');
@@ -253,10 +255,7 @@
             </div>
             <div class="field">
                 <label>Series</label>
-                <select class="ui dropdown series" name="seriesId">
-                    <option value="">Select serie</option>
-                    <option value="AD">Andorra</option>
-                </select>
+                <input type="text" name="seriesId">
             </div>
             <div class="field">
                 <label>Series number</label>
@@ -266,32 +265,146 @@
                 <label>Story length</label>
                 <select class="ui dropdown story-length" name="storyLength">
                     <option value="">Select length</option>
-                    <option value="novella">novella</option>
-                    <option value="shortstory">shortstory</option>
-                    <option value="juvenile_fiction">juvenile_fiction</option>
-                    <option value="novelization">novelization</option>
-                    <option value="short_fiction">short_fiction</option>
+                    <option value="novella">Novella</option>
+                    <option value="shortstory">Shortstory</option>
+                    <option value="juvenile_fiction">Juvenile fiction</option>
+                    <option value="novelization">Novelization</option>
+                    <option value="short_fiction">Short fiction</option>
                 </select>
             </div>
             <div class="field">
                 <label>Type</label>
                 <select class="ui dropdown type" name="type">
                     <option value="">Select type</option>
-                    <option value="AD">Andorra</option>
+                    <option value="anthology">Anthology</option>
+                    <option value="backcoverart">Backcoverart</option>
+                    <option value="collection">Collection</option>
+                    <option value="coverart">Coverart</option>
+                    <option value="interiorart">Interiorart</option>
+                    <option value="editor">Editor</option>
+                    <option value="essay">Essay</option>
+                    <option value="interview">Interview</option>
+                    <option value="novel">Novel</option>
+                    <option value="nonfiction">Nonfiction</option>
+                    <option value="omnibus">Omnibus</option>
+                    <option value="poem">Poem</option>
+                    <option value="review">Review</option>
+                    <option value="serial">Serial</option>
+                    <option value="shortfiction">Shortfiction</option>
+                    <option value="chapbook">Chapbook</option>
                 </select>
             </div>
             <div class="field">
                 <label>Parent</label>
-                <select class="ui dropdown parent" name="parent">
-                    <option value="">Select parent</option>
-                    <option value="AD">Andorra</option>
-                </select>
+                <input type="text" name="parent">
             </div>
             <div class="field">
                 <label>Language</label>
                 <select class="ui dropdown languages" name="languageId">
                     <option value="">Select language</option>
-                    <option value="AD">Andorra</option>
+                    <option value="1">Afrikaans</option>
+                    <option value="2">Albanian</option>
+                    <option value="3">Ancient Greek</option>
+                    <option value="4">Arabic</option>
+                    <option value="5">Armenian</option>
+                    <option value="6">Azerbaijani</option>
+                    <option value="7">Basque</option>
+                    <option value="8">Belarusian</option>
+                    <option value="9">Bengali</option>
+                    <option value="10">Bulgarian</option>
+                    <option value="11">Burmese</option>
+                    <option value="12">Catalan</option>
+                    <option value="13">Chinese</option>
+                    <option value="14">Czech</option>
+                    <option value="15">Danish</option>
+                    <option value="16">Dutch</option>
+                    <option value="17">English</option>
+                    <option value="18">Esperanto</option>
+                    <option value="19">Estonian</option>
+                    <option value="20">Filipino</option>
+                    <option value="21">Finnish</option>
+                    <option value="22">French</option>
+                    <option value="23">Frisian</option>
+                    <option value="24">Galician</option>
+                    <option value="25">Georgian</option>
+                    <option value="26">German</option>
+                    <option value="27">Greek</option>
+                    <option value="28">Gujarati</option>
+                    <option value="29">Hebrew</option>
+                    <option value="30">Hindi</option>
+                    <option value="31">Croatian</option>
+                    <option value="32">Hungarian</option>
+                    <option value="33">Icelandic</option>
+                    <option value="34">Indonesian</option>
+                    <option value="35">Irish</option>
+                    <option value="36">Italian</option>
+                    <option value="37">Japanese</option>
+                    <option value="38">Kazakh</option>
+                    <option value="39">Khmer</option>
+                    <option value="40">Kyrgyz</option>
+                    <option value="41">Korean</option>
+                    <option value="42">Latvian</option>
+                    <option value="43">Latin</option>
+                    <option value="44">Lithuanian</option>
+                    <option value="45">Macedonian</option>
+                    <option value="46">Malay</option>
+                    <option value="47">Malayalam</option>
+                    <option value="48">Marathi</option>
+                    <option value="49">Mongolian</option>
+                    <option value="50">Norwegian</option>
+                    <option value="51">Persian</option>
+                    <option value="52">Polish</option>
+                    <option value="53">Portuguese</option>
+                    <option value="54">Romanian</option>
+                    <option value="55">Russian</option>
+                    <option value="56">Scottish Gaelic</option>
+                    <option value="57">Slovak</option>
+                    <option value="58">Slovenian</option>
+                    <option value="59">Spanish</option>
+                    <option value="60">Serbian</option>
+                    <option value="61">Sinhalese</option>
+                    <option value="62">Swedish</option>
+                    <option value="63">Tajik</option>
+                    <option value="64">Tamil</option>
+                    <option value="65">Thai</option>
+                    <option value="66">Tibetan</option>
+                    <option value="67">Turkish</option>
+                    <option value="68">Ukrainian</option>
+                    <option value="69">Urdu</option>
+                    <option value="70">Uzbek</option>
+                    <option value="71">Vietnamese</option>
+                    <option value="72">Welsh</option>
+                    <option value="73">Yiddish</option>
+                    <option value="74">Amharic</option>
+                    <option value="75">Bosnian</option>
+                    <option value="76">Hausa</option>
+                    <option value="77">Hawaiian</option>
+                    <option value="78">Javanese</option>
+                    <option value="79">Judeo-Arabic</option>
+                    <option value="80">Karen</option>
+                    <option value="81">Ladino</option>
+                    <option value="82">Maltese</option>
+                    <option value="83">Minangkabau</option>
+                    <option value="84">Nyanja</option>
+                    <option value="85">Panjabi</option>
+                    <option value="86">Samoan</option>
+                    <option value="87">Sindhi</option>
+                    <option value="88">Somali</option>
+                    <option value="89">Sundanese</option>
+                    <option value="90">Swahili</option>
+                    <option value="91">Tagalog</option>
+                    <option value="92">Tatar</option>
+                    <option value="93">Telugu</option>
+                    <option value="94">Uighur</option>
+                    <option value="95">Sanskrit</option>
+                    <option value="96">Serbo-Croatian Cyrillic</option>
+                    <option value="97">Serbo-Croatian Roman</option>
+                    <option value="98">Scots</option>
+                    <option value="99">Old English</option>
+                    <option value="100">Old French</option>
+                    <option value="101">Middle English</option>
+                    <option value="102">Middle High German</option>
+                    <option value="103">Yoruba</option>
                 </select>
             </div>
             <div class="field">
@@ -299,31 +412,6 @@
                     <input type="checkbox" name="graphic">
                     <label>Graphic</label>
                 </div>
-            </div>
-            <div class="field">
-                <label>Review</label>
-                <select class="ui dropdown reviews" name="review">
-                    <option value="">Select reviewee</option>
-                    <option value="AD">Andorra</option>
-                </select>
-            </div>
-            <div class="field">
-                <label>Tags</label>
-                <select multiple="" class="ui dropdown tags" name="tags">
-                    <option value="">Select tags</option>
-                    <option value="AF">Afghanistan</option>
-                    <option value="AX">Åland Islands</option>
-                    <option value="AL">Albania</option>
-                </select>
-            </div>
-            <div class="field">
-                <label>Awards</label>
-                <select multiple="" class="ui dropdown awards" name="awards">
-                    <option value="">Select awards</option>
-                    <option value="AF">Afghanistan</option>
-                    <option value="AX">Åland Islands</option>
-                    <option value="AL">Albania</option>
-                </select>
             </div>
             <div class="ui button" id="send-title" type="submit">Submit</div>
         </form>
