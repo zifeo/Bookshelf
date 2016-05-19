@@ -22,6 +22,7 @@
                 searchFields: [
                     'title'
                 ],
+                cache: false,
                 minCharacters: 3,
                 onSelect: function(result) {
 
@@ -42,7 +43,7 @@
                             $('#details .header').html(content.title);
                         }
 
-                        $('#details .remove').attr('rel', content.id);
+                        $('#details .remove').attr('rel', result.url);
                         $('#details .meta').html(content.id);
 
                         $('#details .image').remove();
@@ -56,10 +57,8 @@
                             if (k != 'title' && k != 'name' && k != 'cover' && k != 'image' && k != 'id') {
 
                                 if (k.toLowerCase().indexOf('date') > -1) {
-                                    console.log('daate');
                                     v = moment(v).format("MMMM Do YYYY")
                                 }
-                                console.log(k);
 
                                 const key = k.split(/(?=[A-Z])/).map(function (e) {
                                     return e.toLowerCase();
@@ -87,6 +86,7 @@
 
             $(document).on('click', '#details .remove', function() {
                 var id = $(this).attr('rel');
+                $.get('delete/'+id);
                 $('#details').transition('horizontal flip');
                 $('#details .header, #details .content')
             });
