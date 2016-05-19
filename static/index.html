@@ -7,11 +7,65 @@
     <script src="jquery.js"></script>
     <script src="semantic.js"></script>
     <script src="tablesort.js"></script>
+    <script src="moment.js"></script>
     <link rel="stylesheet" type="text/css" class="ui" href="semantic.css">
     <script>
         $(function() {
 
             $('#results, #details').hide();
+
+            function hydrate(result) {
+
+                $('.presets').dropdown('restore defaults');
+                $('.presets .default.text').removeClass('default');
+
+                $('#results, #details').hide();
+
+                $('.ui.search').search('hide results');
+                $('.ui.search').addClass('loading');
+
+                $.getJSON(result.url, function(content) {
+                    var details = '';
+
+                    if (content.name !== undefined) {
+                        $('#details .header').html(content.name);
+                    } else if (content.title !== undefined) {
+                        $('#details .header').html(content.title);
+                    }
+
+                    $('#details .remove').attr('rel', result.url);
+                    $('#details .meta').html(content.id);
+
+                    $('#details .image').remove();
+                    if (content.cover !== undefined) {
+                        $('#details').prepend('<div class="image"><img src="' + content.cover + '"></div>');
+                    } else if (content.image !== undefined) {
+                        $('#details').prepend('<div class="image"><img src="' + content.image + '"></div>');
+                    }
+
+                    $.each(content, function(k, v) {
+                        if (k != 'title' && k != 'name' && k != 'cover' && k != 'image' && k != 'id') {
+
+                            if (k.toLowerCase().indexOf('date') > -1) {
+                                v = moment(v).format("MMMM Do YYYY")
+                            }
+
+                            const key = k.split(/(?=[A-Z])/).map(function (e) {
+                                return e.toLowerCase();
+                            }).join(' ');
+                            details += '<div class="item"><div class="content"><div class="header">' + key.charAt(0).toUpperCase() + key.slice(1) + '</div>' + v + '</div></div>';
+
+                        }
+                    });
+
+                    $('#details .description').html(details);
+                    $('#details').show();
+                    $('#details').removeClass('hidden');
+                    $('.ui.search').removeClass('loading');
+
+                });
+                return false;
+            }
 
             $('.ui.search').search({
                 apiSettings: {
@@ -21,48 +75,40 @@
                 searchFields: [
                     'title'
                 ],
+                cache: false,
                 minCharacters: 3,
-                onSelect: function(result) {
-
-                    $('#results, #details').hide();
-                    $('#presets').dropdown('clear');
-                    $('#presets .text').html('Presets');
-
-                    $('#details').show();
-                    $('.prompt', this).val(result.title);
-                    $('.ui.search').search('hide results');
-                    $('.ui.search').addClass('loading');
-
-                    $.getJSON(result.url, function(content) {
-                        $('#details').show();
-                        $('.ui.search').removeClass('loading');
-
-                        var details = '';
-                        $.each(content, function(k, v) {
-                            console.log(k);
-                            const key = k.split(/(?=[A-Z])/).map(function(e) {
-                                return e.toLowerCase();
-                            }).join(' ');
-                            details += '<div class="item"><div class="content"><div class="header">' + key.charAt(0).toUpperCase() + key.slice(1) + '</div>' + v + '</div></div>';
-                        });
-                        $('#details').html(details);
-
-                    });
-                    return false;
-                }
+                onSelect: hydrate
             });
 
             $('.ui.dropdown').dropdown({ on: 'hover' });
 
             $(document).on('click', '#go-new-title', function() {
                 $('#new-title').modal('show');
+                $('#new-title').modal({
+                    onHide: function() {
+                        $('#inserts').dropdown('restore defaults');
+                        $('#inserts .default.text').removeClass('default');
+                    }
+                });
             });
 
-            $(document).on('click', '#presets .item[rel]', function() {
+            $(document).on('click', '#details .remove', function() {
+                var id = $(this).attr('rel');
+                $.get('delete/'+id);
+                $('#details').transition('horizontal flip');
+                $('#details .header, #details .content')
+            });
+
+            $(document).on('click', '.presets .item[rel]', function() {
 
                 $('#results, #details').hide();
                 $('.ui.search .prompt').val('');
-                $('#presets').addClass('loading');
+
+                $('.presets').not($(this).parents('.presets')).dropdown('restore defaults');
+                $('.presets .default.text').removeClass('default');
+
+                $('.presets').removeClass('loading');
+                $(this).parents('.presets').addClass('loading');
 
                 $.getJSON('presets/' + $(this).attr('rel'), function(res) {
 
@@ -81,26 +127,28 @@
                         $('#results tbody').append(row + "</tr>");
                     });
 
-                    $('#presets').removeClass('loading');
+                    $('.presets').removeClass('loading');
                     $('#results').show();
                     $('.table').tablesort();
                 });
             });
-            				
-			$('#send-title').api({
-			    url: 'titles',
-			    method : 'GET',
-			    serializeForm: true,
-			    onSuccess: function(data) {
-				    console.log(data);
-				    $('#send-title').removeClass('red');
-				    $('.ui.form').form('clear');
-				    $('#new-title').modal('hide');
-			    },
-			    onError: function(err) {
-				    $('#send-title').addClass('red');
-			    }
-			});
+
+            $('#send-title').api({
+                url: 'titles',
+                method : 'GET',
+                serializeForm: true,
+                onSuccess: function(data) {
+                    $('#send-title').removeClass('red');
+                    $('.ui.form').form('clear');
+                    $('#new-title').modal('hide');
+                },
+                onComplete: function(response) {
+                    hydrate({url: 'titles/'+response});
+                },
+                onError: function(err) {
+                    $('#send-title').addClass('red');
+                }
+            });
 
         });
     </script>
@@ -111,7 +159,7 @@
     </style>
 </head>
 <body>
-	
+
 <div class="ui fixed menu">
     <div class="ui container">
         <a class="header item" href="">
@@ -119,50 +167,47 @@
         </a>
         <div class="ui search item">
             <div class="ui transparent icon input">
-                <input class="prompt" type="text" placeholder="Search animals...">
+                <input class="prompt" type="text" placeholder="Search...">
                 <i class="search link icon"></i>
             </div>
         </div>
-        <div class="ui dropdown link item" id="presets">
-            <span class="text">Presets</span>
+        <div class="ui dropdown link item presets">
+            <span class="text">Deliverable 2</span>
             <i class="dropdown icon"></i>
             <div class="menu">
-                <div class="header">Deliverable 2</div>
                 <div class="item" rel="1">For every year, the year and the number of publications for said year</div>
                 <div class="item" rel="2">Names of the ten authors with most publications</div>
                 <div class="item" rel="3">Names of the youngest and oldest authors to publish something in 2010</div>
-                <div class="item">
-                    <i class="dropdown icon"></i>
-                    <span class="text">Count of many comics (graphic titles) that have publications with</span>
-                    <div class="menu">
-                        <div class="item" rel="4">less than 50 pages</div>
-                        <div class="item" rel="5">less than 100 pages</div>
-                        <div class="item" rel="6">more (or equal) than 100 pages</div>
-                    </div>
-                </div>
+                <div class="item" rel="4">Count of many comics (graphic titles) that have publications with less than 50 pages</div>
+                <div class="item" rel="5">Count of many comics (graphic titles) that have publications with less than 100 pages</div>
+                <div class="item" rel="6">Count of many comics (graphic titles) that have publications with more (or equal) than 100 pages</div>
                 <div class="item" rel="7">For every publisher, the average price of its published novels (the ones that have a dollar price)</div>
                 <div class="item" rel="8">Name of the author with the highest number of titles that are tagged as “science fiction”</div>
                 <div class="item" rel="9">Three most popular titles (i.e., the ones with the most awards and reviews)</div>
-                <!--<div class="divider"></div>
-                <div class="header">Deliverable 3</div>
-                <div class="item">The average price per currency of the publications of the most popular title (i.e, the title with most publications overall)</div>
-                <div class="item">The names of the top ten title series with most awards</div>
-                <div class="item">The name of the author who has received the most awards after his/her death</div>
-                <div class="item">For a given year, the three publishers that published the most publications</div>
-                <div class="item">Given an author, his/her most reviewed title(s)</div>
-                <div class="item">For every language, the top three title types with most translations</div>
-                <div class="item">For each year, the average number of authors per publisher</div>
-                <div class="item">The publication series with most titles that have been given awards of “World Fantasy Award” type</div>
-                <div class="item">For every award category, the names of the three most awarded authors</div>
-                <div class="item">The names of all living authors that have published at least one anthology from youngest to oldest</div>
-                <div class="item">The average number of publications per publication series (single result/number expected)</div>
-                <div class="item">The author who has reviewed the most titles</div>
-                <div class="item">For every language, the three authors with the most translated titles of “novel” type</div>
-                <div class="item">The top ten authors whose publications have the largest pages per dollar ratio (considering all publications of an author that have a dollar price)</div>
-                <div class="item">For publications that have been awarded the Nebula award, the top 10 with the most extensive web presence<br> (i.e, the highest number of author websites, publication websites, publisher websites, publication series websites, and title series websites in total)</div>-->
             </div>
         </div>
-        <div class="ui dropdown link item">
+        <div class="ui dropdown link item presets">
+            <span class="text">Deliverable 3</span>
+            <i class="dropdown icon"></i>
+            <div class="menu">
+                <div class="item" rel="10">Average price per currency of the publications of the most popular title</div>
+                <div class="item" rel="11">Names of the top ten title series with most awards</div>
+                <div class="item" rel="12">Name of the author who has received the most awards after his/her death</div>
+                <div class="item" rel="13">For a given year, the three publishers that published the most publications</div>
+                <div class="item" rel="14">Given an author, his/her most reviewed title(s)</div>
+                <div class="item" rel="15">For every language, the top three title types with most translations</div>
+                <div class="item" rel="16">For each year, the average number of authors per publisher</div>
+                <div class="item" rel="17">Publication series with most titles that have been given awards of “World Fantasy Award” type</div>
+                <div class="item" rel="18">For every award category, the names of the three most awarded authors</div>
+                <div class="item" rel="19">Names of all living authors that have published at least one anthology from youngest to oldest</div>
+                <div class="item" rel="20">Average number of publications per publication series (single result/number expected)</div>
+                <div class="item" rel="21">Author who has reviewed the most titles</div>
+                <div class="item" rel="22">For every language, the three authors with the most translated titles of “novel” type</div>
+                <div class="item" rel="23">Top ten authors whose publications have the largest pages per dollar ratio</div>
+                <div class="item" rel="24">For publications that have been awarded the Nebula award, the top 10 with the most extensive web presence</div>
+            </div>
+        </div>
+        <div class="ui dropdown link item" id="inserts">
             <span class="text">New</span>
             <i class="dropdown icon"></i>
             <div class="menu">
@@ -173,6 +218,19 @@
 </div>
 
 <div class="ui container">
+
+    <div class="ui centered card" id="details">
+        <div class="content">
+            <div class="header"></div>
+            <div class="meta"></div>
+            <div class="ui list description"></div>
+        </div>
+        <a class="ui bottom attached red button remove">
+            <i class="remove icon"></i>
+            Remove
+        </a>
+    </div>
+
     <table class="ui selectable sortable celled table" id="results">
         <thead>
         <tr>
@@ -182,8 +240,6 @@
         </tbody>
     </table>
 
-    <div class="ui list" id="details">
-    </div>
 </div>
 
 <div class="ui modal" id="new-title">
@@ -207,10 +263,7 @@
             </div>
             <div class="field">
                 <label>Series</label>
-                <select class="ui dropdown series" name="seriesId">
-                    <option value="">Select serie</option>
-                    <option value="AD">Andorra</option>
-                </select>
+                <input type="text" name="seriesId">
             </div>
             <div class="field">
                 <label>Series number</label>
@@ -220,32 +273,146 @@
                 <label>Story length</label>
                 <select class="ui dropdown story-length" name="storyLength">
                     <option value="">Select length</option>
-                    <option value="novella">novella</option>
-                    <option value="shortstory">shortstory</option>
-                    <option value="juvenile_fiction">juvenile_fiction</option>
-                    <option value="novelization">novelization</option>
-                    <option value="short_fiction">short_fiction</option>
+                    <option value="novella">Novella</option>
+                    <option value="shortstory">Shortstory</option>
+                    <option value="juvenile_fiction">Juvenile fiction</option>
+                    <option value="novelization">Novelization</option>
+                    <option value="short_fiction">Short fiction</option>
                 </select>
             </div>
             <div class="field">
                 <label>Type</label>
                 <select class="ui dropdown type" name="type">
                     <option value="">Select type</option>
-                    <option value="AD">Andorra</option>
+                    <option value="anthology">Anthology</option>
+                    <option value="backcoverart">Backcoverart</option>
+                    <option value="collection">Collection</option>
+                    <option value="coverart">Coverart</option>
+                    <option value="interiorart">Interiorart</option>
+                    <option value="editor">Editor</option>
+                    <option value="essay">Essay</option>
+                    <option value="interview">Interview</option>
+                    <option value="novel">Novel</option>
+                    <option value="nonfiction">Nonfiction</option>
+                    <option value="omnibus">Omnibus</option>
+                    <option value="poem">Poem</option>
+                    <option value="review">Review</option>
+                    <option value="serial">Serial</option>
+                    <option value="shortfiction">Shortfiction</option>
+                    <option value="chapbook">Chapbook</option>
                 </select>
             </div>
             <div class="field">
                 <label>Parent</label>
-                <select class="ui dropdown parent" name="parent">
-                    <option value="">Select parent</option>
-                    <option value="AD">Andorra</option>
-                </select>
+                <input type="text" name="parent">
             </div>
             <div class="field">
                 <label>Language</label>
                 <select class="ui dropdown languages" name="languageId">
                     <option value="">Select language</option>
-                    <option value="AD">Andorra</option>
+                    <option value="1">Afrikaans</option>
+                    <option value="2">Albanian</option>
+                    <option value="3">Ancient Greek</option>
+                    <option value="4">Arabic</option>
+                    <option value="5">Armenian</option>
+                    <option value="6">Azerbaijani</option>
+                    <option value="7">Basque</option>
+                    <option value="8">Belarusian</option>
+                    <option value="9">Bengali</option>
+                    <option value="10">Bulgarian</option>
+                    <option value="11">Burmese</option>
+                    <option value="12">Catalan</option>
+                    <option value="13">Chinese</option>
+                    <option value="14">Czech</option>
+                    <option value="15">Danish</option>
+                    <option value="16">Dutch</option>
+                    <option value="17">English</option>
+                    <option value="18">Esperanto</option>
+                    <option value="19">Estonian</option>
+                    <option value="20">Filipino</option>
+                    <option value="21">Finnish</option>
+                    <option value="22">French</option>
+                    <option value="23">Frisian</option>
+                    <option value="24">Galician</option>
+                    <option value="25">Georgian</option>
+                    <option value="26">German</option>
+                    <option value="27">Greek</option>
+                    <option value="28">Gujarati</option>
+                    <option value="29">Hebrew</option>
+                    <option value="30">Hindi</option>
+                    <option value="31">Croatian</option>
+                    <option value="32">Hungarian</option>
+                    <option value="33">Icelandic</option>
+                    <option value="34">Indonesian</option>
+                    <option value="35">Irish</option>
+                    <option value="36">Italian</option>
+                    <option value="37">Japanese</option>
+                    <option value="38">Kazakh</option>
+                    <option value="39">Khmer</option>
+                    <option value="40">Kyrgyz</option>
+                    <option value="41">Korean</option>
+                    <option value="42">Latvian</option>
+                    <option value="43">Latin</option>
+                    <option value="44">Lithuanian</option>
+                    <option value="45">Macedonian</option>
+                    <option value="46">Malay</option>
+                    <option value="47">Malayalam</option>
+                    <option value="48">Marathi</option>
+                    <option value="49">Mongolian</option>
+                    <option value="50">Norwegian</option>
+                    <option value="51">Persian</option>
+                    <option value="52">Polish</option>
+                    <option value="53">Portuguese</option>
+                    <option value="54">Romanian</option>
+                    <option value="55">Russian</option>
+                    <option value="56">Scottish Gaelic</option>
+                    <option value="57">Slovak</option>
+                    <option value="58">Slovenian</option>
+                    <option value="59">Spanish</option>
+                    <option value="60">Serbian</option>
+                    <option value="61">Sinhalese</option>
+                    <option value="62">Swedish</option>
+                    <option value="63">Tajik</option>
+                    <option value="64">Tamil</option>
+                    <option value="65">Thai</option>
+                    <option value="66">Tibetan</option>
+                    <option value="67">Turkish</option>
+                    <option value="68">Ukrainian</option>
+                    <option value="69">Urdu</option>
+                    <option value="70">Uzbek</option>
+                    <option value="71">Vietnamese</option>
+                    <option value="72">Welsh</option>
+                    <option value="73">Yiddish</option>
+                    <option value="74">Amharic</option>
+                    <option value="75">Bosnian</option>
+                    <option value="76">Hausa</option>
+                    <option value="77">Hawaiian</option>
+                    <option value="78">Javanese</option>
+                    <option value="79">Judeo-Arabic</option>
+                    <option value="80">Karen</option>
+                    <option value="81">Ladino</option>
+                    <option value="82">Maltese</option>
+                    <option value="83">Minangkabau</option>
+                    <option value="84">Nyanja</option>
+                    <option value="85">Panjabi</option>
+                    <option value="86">Samoan</option>
+                    <option value="87">Sindhi</option>
+                    <option value="88">Somali</option>
+                    <option value="89">Sundanese</option>
+                    <option value="90">Swahili</option>
+                    <option value="91">Tagalog</option>
+                    <option value="92">Tatar</option>
+                    <option value="93">Telugu</option>
+                    <option value="94">Uighur</option>
+                    <option value="95">Sanskrit</option>
+                    <option value="96">Serbo-Croatian Cyrillic</option>
+                    <option value="97">Serbo-Croatian Roman</option>
+                    <option value="98">Scots</option>
+                    <option value="99">Old English</option>
+                    <option value="100">Old French</option>
+                    <option value="101">Middle English</option>
+                    <option value="102">Middle High German</option>
+                    <option value="103">Yoruba</option>
                 </select>
             </div>
             <div class="field">
@@ -253,31 +420,6 @@
                     <input type="checkbox" name="graphic">
                     <label>Graphic</label>
                 </div>
-            </div>
-            <div class="field">
-                <label>Review</label>
-                <select class="ui dropdown reviews" name="review">
-                    <option value="">Select reviewee</option>
-                    <option value="AD">Andorra</option>
-                </select>
-            </div>
-            <div class="field">
-                <label>Tags</label>
-                <select multiple="" class="ui dropdown tags" name="tags">
-                    <option value="">Select tags</option>
-                    <option value="AF">Afghanistan</option>
-                    <option value="AX">Åland Islands</option>
-                    <option value="AL">Albania</option>
-                </select>
-            </div>
-            <div class="field">
-                <label>Awards</label>
-                <select multiple="" class="ui dropdown awards" name="awards">
-                    <option value="">Select awards</option>
-                    <option value="AF">Afghanistan</option>
-                    <option value="AX">Åland Islands</option>
-                    <option value="AL">Albania</option>
-                </select>
             </div>
             <div class="ui button" id="send-title" type="submit">Submit</div>
         </form>

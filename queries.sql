@@ -1,3 +1,35 @@
+
+---- Deliverable 2
+
+-- 1. For every year, output the year and the number of publications for said year.
+-- 2. Output the names of the ten authors with most publications.
+-- 3. What are the names of the youngest and oldest authors to publish something in 2010?
+-- 4. How many comics (graphic titles) have publications with less than 50 pages?
+-- 5. How many comics (graphic titles) have publications with less than 100 pages?
+-- 6. How many comics (graphic titles) have publications with more (or equal) than 100 pages?
+-- 7. For every publisher, calculate the average price of its published novels (the ones that have a dollarprice).
+-- 8. What is the name of the author with the highest number of titles that are tagged as “science fiction”?
+-- 9. List the three most popular titles (i.e., the ones with the most awards and reviews).
+
+---- Deliverable 3
+
+-- 10. Compute the average price per currency of the publications of the most popular title (i.e, the title with most publications overall).
+-- 11. Output the names of the top ten title series with most awards.
+-- 12. Output the name of the author who has received the most awards after his/her death.
+-- 13. For a given year, output the three publishers that published the most publications.
+-- 14. Given an author, compute his/her most reviewed title(s).
+-- 15. For every language, find the top three title types with most translations.
+-- 16. For each year, compute the average number of authors per publisher.
+-- 17. Find the publication series with most titles that have been given awards of “World Fantasy Award” type.
+-- 18. For every award category, list the names of the three most awarded authors.
+-- 19. Output the names of all living authors that have published at least one anthology from youngest to oldest.
+-- 20. Compute the average number of publications per publication series (single result/number expected).
+-- 21. Find the author who has reviewed the most titles.
+-- 22. For every language, list the three authors with the most translated titles of “novel” type.
+-- 23. Order the top ten authors whose publications have the largest pages per dollar ratio (considering all publications of an author that have a dollar price).
+-- 24. For publications that have been awarded the Nebula award, find the top 10 with the most extensive web presence (i.e, the highest number of author websites, publication websites, publisher websites, publication series websites, and title series websites in total)
+
+
 SELECT A.name, COUNT(*) AS count
 FROM PUBLICATIONS_AUTHORS P
 INNER JOIN AUTHORS A ON P.author_id = A.id

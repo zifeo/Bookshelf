@@ -7,7 +7,7 @@ import akka.http.scaladsl.model.{ContentType, HttpEntity, HttpResponse, MediaTyp
 import akka.http.scaladsl.server.Directives._
 import akka.stream.ActorMaterializer
 import akka.util.Timeout
-import bookshelf.saloon.Inserts.NewTitle
+import bookshelf.saloon.Queries.NewTitle
 import spray.json._
 
 import scala.concurrent.duration._
@@ -108,18 +108,26 @@ private[saloon] object Main extends App {
             Queries.titles(id)
           }
         } ~
-        path("presets" / IntNumber) { numQuery =>
-          validate(Presets.exists(numQuery), "unknown query number") {
-            complete {
-              Presets(numQuery).map { case (headers, rows) =>
-                JsObject(
-                  "headers" -> headers,
-                  "rows" -> rows
-                )
-              }
+        path("delete" / Segment / IntNumber) { (table, id) =>
+          val del = table match {
+            case "authors" => Queries.authorsDel(id)
+            case "publications" => Queries.publicationsDel(id)
+            case "titles" => Queries.titlesDel(id)
+          }
+          complete(del.map(_.toString))
+        } ~
+      path("presets" / IntNumber) { numQuery =>
+        validate(Presets.exists(numQuery), "unknown query number") {
+          complete {
+            Presets(numQuery).map { case (headers, rows) =>
+              JsObject(
+                "headers" -> headers,
+                "rows" -> rows
+              )
             }
           }
-        } ~
+        }
+      } ~
         path("titles") {
           parameter(
             'title,
@@ -131,13 +139,10 @@ private[saloon] object Main extends App {
             'type.?,
             'parent.as[Int].?,
             'languageId.as[Int].?,
-            'graphic.as[Boolean].?,
-            'review.as[Int].?,
-            'tags.?,
-            'awards.?
+            'graphic.as[Boolean].?
           ).as(NewTitle) { title =>
             complete {
-              Inserts.title(title)
+              Queries.titleIns(title).map(_.toString)
             }
           }
         } ~
