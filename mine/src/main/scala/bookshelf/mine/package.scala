@@ -60,20 +60,16 @@ package object mine {
       case x => (x, "")
     }
 
-    def numberOrEmpty(num: String): Option[Int] =
-      if (num.isEmpty || num == "[]") None
-      else intOrNone(num)
-
     val (pagesLeft, pagesRight) = impl(raw)
 
     val leftRes = pagesLeft.split('+').flatMap(intOrNone).toList match {
       case Nil => None
-      case x => Some(x.sum)
+      case x => if (x.sum == 0) None else Some(x.sum)
     }
 
     val rightRes = intOrNone(pagesRight)
 
-    (leftRes, rightRes)
+    (leftRes, if (rightRes.isDefined && rightRes.get == 0) None else rightRes)
   }
 
   private def toArabic(number: String): Int = {
