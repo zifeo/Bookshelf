@@ -7,7 +7,7 @@ import akka.http.scaladsl.model.{ContentType, HttpEntity, HttpResponse, MediaTyp
 import akka.http.scaladsl.server.Directives._
 import akka.stream.ActorMaterializer
 import akka.util.Timeout
-import bookshelf.saloon.Inserts.NewTitle
+import bookshelf.saloon.Queries.NewTitle
 import spray.json._
 
 import scala.concurrent.duration._
@@ -139,13 +139,10 @@ private[saloon] object Main extends App {
             'type.?,
             'parent.as[Int].?,
             'languageId.as[Int].?,
-            'graphic.as[Boolean].?,
-            'review.as[Int].?,
-            'tags.?,
-            'awards.?
+            'graphic.as[Boolean].?
           ).as(NewTitle) { title =>
             complete {
-              Inserts.title(title)
+              Queries.titleIns(title).map(_.toString)
             }
           }
         } ~

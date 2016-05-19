@@ -5,7 +5,7 @@ import java.util.Date
 import java.util.logging.LogManager
 
 import bookshelf.mine.schema.{Titles, Publications, Authors}
-import bookshelf.saloon.Inserts.NewTitle
+import bookshelf.saloon.Queries.NewTitle
 import com.typesafe.config.ConfigFactory
 import io.getquill._
 import io.getquill.naming.SnakeCase

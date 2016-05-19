@@ -1,14 +1,48 @@
 package bookshelf.saloon
 
-import bookshelf.mine.schema.{Titles, Publications, Authors}
+import bookshelf.mine.schema._
 import io.getquill._
 
-import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global._
-import bookshelf._
+import scala.concurrent.{Await, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration._
 
 object Queries {
+
+  case class NewTitle(
+                       title: String,
+                       synopsis: Option[String],
+                       noteId: Option[String],
+                       seriesId: Option[Int],
+                       seriesNum: Option[Int],
+                       storyLength: Option[String],
+                       `type`: Option[String],
+                       parent: Option[Int],
+                       languageId: Option[Int],
+                       graphic: Option[Boolean]
+                     ) {
+
+    require(title.nonEmpty)
+
+    require(TitlesLengths.all.exists(_.name == storyLength))
+    require(TitlesTypes.all.exists(_.name == `type`))
+
+    def gen: Titles =
+      Titles(
+        id = 0,
+        title,
+        synopsis = synopsis.map(x => Await.result(Queries.notesIns(Notes(0, x)), 10 seconds)),
+        noteId = noteId.map(x => Await.result(Queries.notesIns(Notes(0, x)), 10 seconds)),
+        seriesId,
+        seriesNum,
+        storyLength,
+        `type`,
+        parent,
+        languageId,
+        graphic
+      )
+
+  }
 
   private object Query {
 
@@ -45,6 +79,18 @@ object Queries {
         .delete
     }
 
+    val titlIns = quote {
+      query[Titles]
+        .schema(_.generated(_.id))
+        .insert
+    }
+
+    val notesIns = quote {
+      query[Notes]
+          .schema(_.generated(_.id))
+        .insert
+    }
+
   }
 
   def authors(id: Int): Future[Authors] =
@@ -64,5 +110,11 @@ object Queries {
 
   def titlesDel(id: Int): Future[Long] =
     db.run(Query.titlDel)(id)
+
+  def titleIns(t: NewTitle): Future[Long] =
+    db.run(Query.titlIns)(t.gen)
+
+  def notesIns(t: Notes): Future[Int] =
+    db.run(Query.notesIns)(t).map(_.toInt)
 
 }
