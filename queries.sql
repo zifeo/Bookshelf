@@ -174,37 +174,32 @@ LIMIT
 
 -- 14. Given an author, compute his/her most reviewed title(s).
 
+SELECT
+  *
+FROM
+  authors a
+  INNER JOIN publications_authors pa
+    ON pa.author_id = a.id
+INNER JOIN publications p
+    ON p.id = pa.publication_id
+INNER JOIN publications_contents pc
+    ON pc.publication_id = p.id
+INNER JOIN titles t
+  ON t.id = pc.publication_id
+INNER JOIN reviews r
+    ON r.title_id = t.id
+GROUP BY
+  t.id  ;
 
+-- TODO : given year
 
 -- 15. For every language, find the top three title types with most translations.
-
-SELECT *
-FROM languages l;
 
 SELECT tt.language, COUNT(*)
 FROM titles t
   INNER JOIN titles_translators tt
-  ON tt.title_id = t.id
-GROUP BY tt.language; -- TODO : for every
-
-SELECT DISTINCT t.type
-FROM titles t
-WHERE t.type NOTNULL AND t.type != '';
-
-SELECT
-  *
-FROM
-  titles t
-  INNER
-  JOIN titles_translators tt
-    on tt.title_id = t.id
-WHERE
-  1 = 1
-GROUP BY
-  tt.title_id
-ORDER BY
-  COUNT(*)
-
+    ON tt.title_id = t.id
+GROUP BY tt.language; -- TODO : for every language ?
 
 -- 16. For each year, compute the average number of authors per publisher.
 
