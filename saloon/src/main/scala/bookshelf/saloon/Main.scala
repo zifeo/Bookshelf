@@ -116,10 +116,10 @@ private[saloon] object Main extends App {
           }
           complete(del.map(_.toString))
         } ~
-      path("presets" / IntNumber) { numQuery =>
+      path("presets" / IntNumber / Segment.?) { (numQuery, arg1) =>
         validate(Presets.exists(numQuery), "unknown query number") {
           complete {
-            Presets(numQuery).map { case (headers, rows) =>
+            Presets(numQuery, arg1).map { case (headers, rows) =>
               JsObject(
                 "headers" -> headers,
                 "rows" -> rows
