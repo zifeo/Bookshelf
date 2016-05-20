@@ -24,24 +24,34 @@ object Presets {
 
   val queries = Source.fromFile("../queries.sql").mkString.split(';').map(_.trim)
 
-  def sql(query: String, args: Seq[String]): Future[(List[String], List[List[String]])] =
-    db.sendPreparedStatement(query, args).map { resQuery =>
+  def sql(query: String, args: List[String]): Future[(List[String], List[List[String]])] = {
+    val q =
+      if (query.contains("?") && args.nonEmpty)
+        db.sendPreparedStatement(query, args)
+      else
+        db.sendQuery(query)
+
+    q.map { resQuery =>
       resQuery.rows match {
         case Some(res) =>
           val cols = res.columnNames.toList
           val rows = res.toList.map { row =>
-            row.map(_.toString).toList
+            row
+              .filter(_ != null)
+              .map(_.toString)
+              .toList
           }
           (cols, rows)
         case None =>
-          (List(), List())
+          (List.empty, List.empty)
       }
     }
+  }
 
   def exists(numQuery: Int): Boolean =
     numQuery - 1 < queries.length && numQuery > 0
 
-  def apply(numQuery: Int, args: String*): Future[(List[String], List[List[String]])] =
+  def apply(numQuery: Int, args: List[String]): Future[(List[String], List[List[String]])] =
     sql(queries(numQuery - 1), args)
 
 }

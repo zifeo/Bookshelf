@@ -119,7 +119,7 @@ private[saloon] object Main extends App {
       path("presets" / IntNumber / Segment.?) { (numQuery, arg1) =>
         validate(Presets.exists(numQuery), "unknown query number") {
           complete {
-            Presets(numQuery, arg1).map { case (headers, rows) =>
+            Presets(numQuery, arg1.filter(_.nonEmpty).toList).map { case (headers, rows) =>
               JsObject(
                 "headers" -> headers,
                 "rows" -> rows

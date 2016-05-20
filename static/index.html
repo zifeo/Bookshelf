@@ -110,7 +110,7 @@
                 $('.presets').removeClass('loading');
                 $(this).parents('.presets').addClass('loading');
 
-                $.getJSON('presets/' + $(this).attr('rel'), function(res) {
+                $.getJSON('presets/' + $(this).attr('rel') + '/' + $('#param').val(), function(res) {
 
                     $('#results thead tr').empty();
                     $('#results tbody').empty();
@@ -205,6 +205,12 @@
                 <div class="item" rel="22">For every language, the three authors with the most translated titles of “novel” type</div>
                 <div class="item" rel="23">Top ten authors whose publications have the largest pages per dollar ratio</div>
                 <div class="item" rel="24">For publications that have been awarded the Nebula award, the top 10 with the most extensive web presence</div>
+                <div class="header">
+                    Optional query parameter
+                </div>
+                <div class="ui input">
+                    <input type="text" id="param" placeholder="2009, J. K. Rowling, ...">
+                </div>
             </div>
         </div>
         <div class="ui dropdown link item" id="inserts">

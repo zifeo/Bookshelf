@@ -6,7 +6,7 @@
 SELECT DATE_PART('year', p.date_pub) AS year, COUNT(*) AS count
 FROM publications p
 GROUP BY year
-ORDER BY year; -- TODO order ?
+ORDER BY year; -- TODO order
 
 -- 2. Output the names of the ten authors with most publications.
 
@@ -20,7 +20,7 @@ WHERE a.id IN (
   LIMIT 10
 );
 
--- 3. What are the names of the youngest and oldest authors to publish something in 2010?
+-- 3. What are the names of the youngest and oldest authors to publish something in 2010
 
 -- TODO : review
 SELECT a.name
@@ -44,7 +44,7 @@ WHERE a.birth_date = (
           WHERE DATE_PART('year', PUB.date_pub) = '2010'
         ));
 
--- 4. How many comics (graphic titles) have publications with less than 50 pages?
+-- 4. How many comics (graphic titles) have publications with less than 50 pages
 
 SELECT COUNT(*)
 FROM titles t
@@ -53,7 +53,7 @@ FROM titles t
 WHERE t.graphic = 'YES'
       AND p.Pages < 50;
 
--- 5. How many comics (graphic titles) have publications with less than 100 pages?
+-- 5. How many comics (graphic titles) have publications with less than 100 pages
 
 SELECT COUNT(*)
 FROM titles t
@@ -62,7 +62,7 @@ FROM titles t
 WHERE t.graphic = 'YES'
       AND p.Pages < 100;
 
--- 6. How many comics (graphic titles) have publications with more (or equal) than 100 pages?
+-- 6. How many comics (graphic titles) have publications with more (or equal) than 100 pages
 
 SELECT COUNT(*)
 FROM titles t
@@ -79,7 +79,7 @@ FROM publications p
 WHERE p.currency = '$'
 GROUP BY pr.name;
 
--- 8. What is the name of the author with the highest number of titles that are tagged as “science fiction”?
+-- 8. What is the name of the author with the highest number of titles that are tagged as “science fiction”
 
 SELECT a.name AS name
 FROM authors a
@@ -90,7 +90,7 @@ FROM authors a
 WHERE tags.name LIKE '%science fiction%'
 GROUP BY a.name
 ORDER BY COUNT(*) DESC
-LIMIT 1; -- TODO : join vs where clause, distinct titles ?
+LIMIT 1; -- TODO : join vs where clause, distinct titles
 
 -- 9. List the three most popular titles (i.e., the ones with the most awards and reviews).
 
@@ -105,7 +105,7 @@ FROM titles t
         FROM reviews r
         GROUP BY r.title_id) d ON d.title_id = t.id
 ORDER BY count_awards + count_reviews DESC
-LIMIT 3; -- TODO : Alllllllo ? twice the wizard
+LIMIT 3; -- TODO : Alllllllo  twice the wizard
 
 ---- Deliverable 3
 
@@ -199,7 +199,7 @@ SELECT tt.language, COUNT(*)
 FROM titles t
   INNER JOIN titles_translators tt
     ON tt.title_id = t.id
-GROUP BY tt.language; -- TODO : for every language ?
+GROUP BY tt.language; -- TODO : for every language 
 
 -- 16. For each year, compute the average number of authors per publisher.
 
