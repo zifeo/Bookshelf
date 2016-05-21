@@ -261,11 +261,14 @@ ORDER BY a.birth_date DESC;
 
 -- 20. Compute the average number of publications per publication series (single result/number expected).
 
-
+SELECT AVG(ncount)
+FROM (SELECT ps.name, COUNT(ps.name) as ncount
+FROM publications p
+INNER JOIN publications_series ps ON ps.id = p.pub_series_id
+GROUP BY ps.name) as count;
 
 -- 21. Find the author who has reviewed the most titles.
 
--- TODO remove LIMIT 1 and take the max of group by
 SELECT a.name
 FROM authors a
   INNER JOIN (
@@ -279,6 +282,7 @@ FROM authors a
                               WHERE t.type = 'review'
                             ) AS rev ON rev.id = pc.title_id
                GROUP BY pa.author_id
+               ORDER BY COUNT(*) DESC
                LIMIT 1
              ) AS paa ON paa.author_id = a.id;
 
