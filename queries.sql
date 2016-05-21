@@ -203,11 +203,41 @@ GROUP BY tt.language; -- TODO : for every language
 
 -- 16. For each year, compute the average number of authors per publisher.
 
-
+SELECT pub.publisher_id AS pub_id, pa.author_id AS auth_id
+FROM publications pub
+INNER JOIN publications_authors pa ON pa.publication_id = pub.id
+WHERE DATE_PART('year', pub.date_pub) = '2010'
+GROUP BY pub_id, auth_id
+;
 
 -- 17. Find the publication series with most titles that have been given awards of “World Fantasy Award” type.
 
-
+-- TODO this outputs the pub_id, need to group by pub_id and count the size of the group,
+-- take the max and its pub_Series_id and do inner_join on publications_series to get the name
+SELECT p.publisher_id
+FROM publications p
+  INNER JOIN (
+    SELECT pc.publication_id
+    FROM publications_contents pc
+      INNER JOIN (
+        SELECT t.id
+        FROM titles t
+          INNER JOIN (
+            SELECT ta.title_id
+            FROM titles_awards ta
+              INNER JOIN (
+                SELECT a.id
+                FROM awards a
+                  INNER JOIN  (
+                    SELECT at.id
+                    FROM awards_types at
+                    WHERE at.name = 'World Fantasy Award')
+                  as c ON c.id = a.type_id)
+              as aw ON ta.award_id = aw.id)
+          as taw ON taw.title_id = t.id)
+      as pt ON pt.id = pc.title_id)
+  as pct ON pct.publication_id = p.id
+GROUP BY p.publisher_id;
 
 -- 18. For every award category, list the names of the three most awarded authors.
 
@@ -215,7 +245,19 @@ GROUP BY tt.language; -- TODO : for every language
 
 -- 19. Output the names of all living authors that have published at least one anthology from youngest to oldest.
 
-
+-- TODO check the birth date not null, not specified but otherwise they appear before while sorting
+SELECT a.name
+FROM authors a
+  INNER JOIN publications_authors pa ON pa.author_id = a.id
+  INNER JOIN publications p ON p.id = pa.publication_id
+  INNER JOIN publications_contents pc ON pc.publication_id = p.id
+  INNER JOIN (
+      SELECT t.id
+      FROM titles t
+      WHERE t.type = 'anthology'
+    ) AS antho ON antho.id = pc.title_id
+WHERE a.death_date IS NULL AND a.birth_date IS NOT NULL
+ORDER BY a.birth_date DESC;
 
 -- 20. Compute the average number of publications per publication series (single result/number expected).
 
@@ -223,7 +265,22 @@ GROUP BY tt.language; -- TODO : for every language
 
 -- 21. Find the author who has reviewed the most titles.
 
-
+-- TODO remove LIMIT 1 and take the max of group by
+SELECT a.name
+FROM authors a
+  INNER JOIN (
+               SELECT pa.author_id
+               FROM publications p
+                 INNER JOIN publications_authors pa ON pa.publication_id = p.id
+                 INNER JOIN publications_contents pc ON pc.publication_id = p.id
+                 INNER JOIN (
+                              SELECT *
+                              FROM titles t
+                              WHERE t.type = 'review'
+                            ) AS rev ON rev.id = pc.title_id
+               GROUP BY pa.author_id
+               LIMIT 1
+             ) AS paa ON paa.author_id = a.id;
 
 -- 22. For every language, list the three authors with the most translated titles of “novel” type.
 
@@ -231,7 +288,19 @@ GROUP BY tt.language; -- TODO : for every language
 
 -- 23. Order the top ten authors whose publications have the largest pages per dollar ratio (considering all publications of an author that have a dollar price).
 
-
+SELECT a.name
+FROM authors a
+  INNER JOIN (
+    SELECT pa.author_id
+    FROM publications p
+      INNER JOIN publications_authors pa ON pa.publication_id = p.id
+      WHERE p.currency = '$'
+        AND p.pages IS NOT NULL AND p.pages != 0
+        AND p.price IS NOT NULL AND p.price != 0
+      GROUP BY pa.author_id, p.price, p.pages
+      ORDER BY p.pages / p.price ASC
+      LIMIT 10
+  ) AS paa ON paa.author_id = a.id;
 
 -- 24. For publications that have been awarded the Nebula award, find the top 10 with the most extensive web presence (i.e, the highest number of author websites, publication websites, publisher websites, publication series websites, and title series websites in total)
 
