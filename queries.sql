@@ -180,13 +180,13 @@ FROM
   authors a
   INNER JOIN publications_authors pa
     ON pa.author_id = a.id
-INNER JOIN publications p
+  INNER JOIN publications p
     ON p.id = pa.publication_id
-INNER JOIN publications_contents pc
+  INNER JOIN publications_contents pc
     ON pc.publication_id = p.id
-INNER JOIN titles t
-  ON t.id = pc.publication_id
-INNER JOIN reviews r
+  INNER JOIN titles t
+    ON t.id = pc.publication_id
+  INNER JOIN reviews r
     ON r.title_id = t.id
 GROUP BY
   t.id  ;
@@ -205,7 +205,7 @@ GROUP BY tt.language; -- TODO : for every language
 
 SELECT pub.publisher_id AS pub_id, pa.author_id AS auth_id
 FROM publications pub
-INNER JOIN publications_authors pa ON pa.publication_id = pub.id
+  INNER JOIN publications_authors pa ON pa.publication_id = pub.id
 WHERE DATE_PART('year', pub.date_pub) = '2010'
 GROUP BY pub_id, auth_id;
 
@@ -216,31 +216,44 @@ GROUP BY pub_id, auth_id;
 SELECT p.publisher_id
 FROM publications p
   INNER JOIN (
-    SELECT pc.publication_id
-    FROM publications_contents pc
-      INNER JOIN (
-        SELECT t.id
-        FROM titles t
-          INNER JOIN (
-            SELECT ta.title_id
-            FROM titles_awards ta
-              INNER JOIN (
-                SELECT a.id
-                FROM awards a
-                  INNER JOIN  (
-                    SELECT at.id
-                    FROM awards_types at
-                    WHERE at.name = 'World Fantasy Award')
-                  as c ON c.id = a.type_id)
-              as aw ON ta.award_id = aw.id)
-          as taw ON taw.title_id = t.id)
-      as pt ON pt.id = pc.title_id)
-  as pct ON pct.publication_id = p.id
+               SELECT pc.publication_id
+               FROM publications_contents pc
+                 INNER JOIN (
+                              SELECT t.id
+                              FROM titles t
+                                INNER JOIN (
+                                             SELECT ta.title_id
+                                             FROM titles_awards ta
+                                               INNER JOIN (
+                                                            SELECT a.id
+                                                            FROM awards a
+                                                              INNER JOIN  (
+                                                                            SELECT at.id
+                                                                            FROM awards_types at
+                                                                            WHERE at.name = 'World Fantasy Award')
+                                                                as c ON c.id = a.type_id)
+                                                 as aw ON ta.award_id = aw.id)
+                                  as taw ON taw.title_id = t.id)
+                   as pt ON pt.id = pc.title_id)
+    as pct ON pct.publication_id = p.id
 GROUP BY p.publisher_id;
 
 -- 18. For every award category, list the names of the three most awarded authors.
 
-
+SELECT ac.name, a.name
+FROM awards_categories ac, authors a
+WHERE
+  (a.id, ac.id) IN (
+    SELECT a.id, aw.category_id
+    FROM authors a
+      INNER JOIN publications_authors pa ON pa.author_id = a.id
+      INNER JOIN publications_contents pc ON pc.publication_id = pa.author_id
+      INNER JOIN titles_awards ta ON ta.title_id = pc.title_id
+      INNER JOIN awards aw ON aw.id = ta.award_id
+    GROUP BY (a.id, aw.category_id)
+    ORDER BY COUNT(aw.id) DESC
+  )
+); -- TODO : limit 3
 
 -- 19. Output the names of all living authors that have published at least one anthology from youngest to oldest.
 
@@ -251,10 +264,10 @@ FROM authors a
   INNER JOIN publications p ON p.id = pa.publication_id
   INNER JOIN publications_contents pc ON pc.publication_id = p.id
   INNER JOIN (
-      SELECT t.id
-      FROM titles t
-      WHERE t.type = 'anthology'
-    ) AS antho ON antho.id = pc.title_id
+               SELECT t.id
+               FROM titles t
+               WHERE t.type = 'anthology'
+             ) AS antho ON antho.id = pc.title_id
 WHERE a.death_date IS NULL AND a.birth_date IS NOT NULL
 ORDER BY a.birth_date DESC;
 
@@ -262,28 +275,28 @@ ORDER BY a.birth_date DESC;
 
 SELECT AVG(ncount)
 FROM (SELECT ps.name, COUNT(ps.name) as ncount
-FROM publications p
-INNER JOIN publications_series ps ON ps.id = p.pub_series_id
-GROUP BY ps.name) as count;
+      FROM publications p
+        INNER JOIN publications_series ps ON ps.id = p.pub_series_id
+      GROUP BY ps.name) as count;
 
 -- 21. Find the author who has reviewed the most titles.
 
 SELECT a.name
 FROM authors a
 WHERE a.id = (
-               SELECT pa.author_id
-               FROM publications p
-                 INNER JOIN publications_authors pa ON pa.publication_id = p.id
-                 INNER JOIN publications_contents pc ON pc.publication_id = p.id
-                 INNER JOIN (
-                              SELECT *
-                              FROM titles t
-                              WHERE t.type = 'review'
-                            ) AS rev ON rev.id = pc.title_id
-               GROUP BY pa.author_id
-                 ORDER BY COUNT(*) DESC
-               LIMIT 1
-             );
+  SELECT pa.author_id
+  FROM publications p
+    INNER JOIN publications_authors pa ON pa.publication_id = p.id
+    INNER JOIN publications_contents pc ON pc.publication_id = p.id
+    INNER JOIN (
+                 SELECT *
+                 FROM titles t
+                 WHERE t.type = 'review'
+               ) AS rev ON rev.id = pc.title_id
+  GROUP BY pa.author_id
+  ORDER BY COUNT(*) DESC
+  LIMIT 1
+);
 
 -- 22. For every language, list the three authors with the most translated titles of “novel” type.
 
@@ -292,7 +305,7 @@ FROM languages l, authors a
 WHERE
   l.name IN (
     SELECT tt.language
-      FROM titles_translators tt
+    FROM titles_translators tt
   ) AND
   a.id IN (
     SELECT DISTINCT pa.author_id
@@ -312,52 +325,52 @@ WHERE
     GROUP BY pa.author_id
     ORDER BY COUNT(DISTINCT pa.publication_id) DESC
     LIMIT 3
-);  -- TODO : where in distinct
+  );  -- TODO : where in distinct
 
 -- 23. Order the top ten authors whose publications have the largest pages per dollar ratio (considering all publications of an author that have a dollar price).
 
 SELECT a.name
 FROM authors a
   INNER JOIN (
-    SELECT pa.author_id
-    FROM publications p
-      INNER JOIN publications_authors pa ON pa.publication_id = p.id
-      WHERE p.currency = '$'
-        AND p.pages != 0
-        AND p.price != 0
-      GROUP BY pa.author_id, p.price, p.pages
-      ORDER BY p.pages / p.price ASC
-      LIMIT 10
-  ) AS paa ON paa.author_id = a.id;
+               SELECT pa.author_id
+               FROM publications p
+                 INNER JOIN publications_authors pa ON pa.publication_id = p.id
+               WHERE p.currency = '$'
+                     AND p.pages != 0
+                     AND p.price != 0
+               GROUP BY pa.author_id, p.price, p.pages
+               ORDER BY p.pages / p.price ASC
+               LIMIT 10
+             ) AS paa ON paa.author_id = a.id;
 
 -- 24. For publications that have been awarded the Nebula award, find the top 10 with the most extensive web presence (i.e, the highest number of author websites, publication websites, publisher websites, publication series websites, and title series websites in total)
 
 SELECT e.title
 FROM webpages w
   INNER JOIN (
-    SELECT DISTINCT
-  pc.publication_id AS publication_id,
-  ps.id AS publications_series_id,
-  p2.id AS publisher_id,
-  pa.author_id AS author_id,
-  ts.id AS title_series_id,
-    p.title AS title
-FROM publications_contents pc
-  INNER JOIN publications p ON p.id = pc.publication_id
-  INNER JOIN publishers p2 ON p2.id = p.publisher_id
-  INNER JOIN titles t ON t.id = pc.title_id
-  INNER JOIN titles_series ts ON ts.id = t.series_id
-  INNER JOIN publications_series ps ON ps.id = p.pub_series_id
-  INNER JOIN publications_authors pa ON pa.publication_id = pc.publication_id
-INNER JOIN titles_awards ta ON ta.title_id = pc.title_id
-  INNER JOIN awards a ON a.id = ta.award_id
-INNER JOIN awards_types at ON at.id = a.type_id
-WHERE at.name = 'Nebula Award'
-    ) AS e ON e.author_id = w.author_id
-  OR e.publisher_id = w.publisher_id
-  OR e.publications_series_id = w.publications_series_id
-  OR e.title_series_id = w.title_series_id
- -- TODO : no publication series
+               SELECT DISTINCT
+                 pc.publication_id AS publication_id,
+                 ps.id AS publications_series_id,
+                 p2.id AS publisher_id,
+                 pa.author_id AS author_id,
+                 ts.id AS title_series_id,
+                 p.title AS title
+               FROM publications_contents pc
+                 INNER JOIN publications p ON p.id = pc.publication_id
+                 INNER JOIN publishers p2 ON p2.id = p.publisher_id
+                 INNER JOIN titles t ON t.id = pc.title_id
+                 INNER JOIN titles_series ts ON ts.id = t.series_id
+                 INNER JOIN publications_series ps ON ps.id = p.pub_series_id
+                 INNER JOIN publications_authors pa ON pa.publication_id = pc.publication_id
+                 INNER JOIN titles_awards ta ON ta.title_id = pc.title_id
+                 INNER JOIN awards a ON a.id = ta.award_id
+                 INNER JOIN awards_types at ON at.id = a.type_id
+               WHERE at.name = 'Nebula Award'
+             ) AS e ON e.author_id = w.author_id
+                       OR e.publisher_id = w.publisher_id
+                       OR e.publications_series_id = w.publications_series_id
+                       OR e.title_series_id = w.title_series_id
+-- TODO : no publication series
 GROUP BY (e.publication_id, e.title)
 ORDER BY COUNT(e.author_id) + COUNT(e.publisher_id) + COUNT(e.publications_series_id) + COUNT(e.title_series_id) DESC
 LIMIT 10;
