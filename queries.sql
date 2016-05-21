@@ -207,8 +207,7 @@ SELECT pub.publisher_id AS pub_id, pa.author_id AS auth_id
 FROM publications pub
 INNER JOIN publications_authors pa ON pa.publication_id = pub.id
 WHERE DATE_PART('year', pub.date_pub) = '2010'
-GROUP BY pub_id, auth_id
-;
+GROUP BY pub_id, auth_id;
 
 -- 17. Find the publication series with most titles that have been given awards of “World Fantasy Award” type.
 
@@ -268,7 +267,7 @@ ORDER BY a.birth_date DESC;
 -- TODO remove LIMIT 1 and take the max of group by
 SELECT a.name
 FROM authors a
-  INNER JOIN (
+WHERE a.id = (
                SELECT pa.author_id
                FROM publications p
                  INNER JOIN publications_authors pa ON pa.publication_id = p.id
@@ -279,12 +278,38 @@ FROM authors a
                               WHERE t.type = 'review'
                             ) AS rev ON rev.id = pc.title_id
                GROUP BY pa.author_id
+                 ORDER BY COUNT(*) DESC
                LIMIT 1
-             ) AS paa ON paa.author_id = a.id;
+             );
 
 -- 22. For every language, list the three authors with the most translated titles of “novel” type.
 
-
+SELECT l.name, a.name
+FROM languages l, authors a
+WHERE
+  l.name IN (
+    SELECT tt.language
+      FROM titles_translators tt
+  ) AND
+  a.id IN (
+    SELECT DISTINCT pa.author_id
+    FROM publications_authors pa
+      INNER JOIN publications_contents pc ON pc.publication_id = pa.publication_id
+      INNER JOIN titles_translators tt ON tt.title_id = pc.title_id
+      INNER JOIN titles t ON t.id = tt.title_id
+    WHERE t.type = 'novel'
+  ) AND
+  a.id IN (
+    SELECT pa.author_id
+    FROM publications_authors pa
+      INNER JOIN publications_contents pc ON pc.publication_id = pa.publication_id
+      INNER JOIN titles_translators tt ON tt.title_id = pc.title_id
+      INNER JOIN titles t ON t.id = tt.title_id
+    WHERE tt.language = l.name
+    GROUP BY pa.author_id
+    ORDER BY COUNT(DISTINCT pa.publication_id) DESC
+    LIMIT 3
+);  -- TODO : where in distinct
 
 -- 23. Order the top ten authors whose publications have the largest pages per dollar ratio (considering all publications of an author that have a dollar price).
 
@@ -295,8 +320,8 @@ FROM authors a
     FROM publications p
       INNER JOIN publications_authors pa ON pa.publication_id = p.id
       WHERE p.currency = '$'
-        AND p.pages IS NOT NULL AND p.pages != 0
-        AND p.price IS NOT NULL AND p.price != 0
+        AND p.pages != 0
+        AND p.price != 0
       GROUP BY pa.author_id, p.price, p.pages
       ORDER BY p.pages / p.price ASC
       LIMIT 10
@@ -304,5 +329,32 @@ FROM authors a
 
 -- 24. For publications that have been awarded the Nebula award, find the top 10 with the most extensive web presence (i.e, the highest number of author websites, publication websites, publisher websites, publication series websites, and title series websites in total)
 
-
-
+SELECT e.title
+FROM webpages w
+  INNER JOIN (
+    SELECT DISTINCT
+  pc.publication_id AS publication_id,
+  ps.id AS publications_series_id,
+  p2.id AS publisher_id,
+  pa.author_id AS author_id,
+  ts.id AS title_series_id,
+    p.title AS title
+FROM publications_contents pc
+  INNER JOIN publications p ON p.id = pc.publication_id
+  INNER JOIN publishers p2 ON p2.id = p.publisher_id
+  INNER JOIN titles t ON t.id = pc.title_id
+  INNER JOIN titles_series ts ON ts.id = t.series_id
+  INNER JOIN publications_series ps ON ps.id = p.pub_series_id
+  INNER JOIN publications_authors pa ON pa.publication_id = pc.publication_id
+INNER JOIN titles_awards ta ON ta.title_id = pc.title_id
+  INNER JOIN awards a ON a.id = ta.award_id
+INNER JOIN awards_types at ON at.id = a.type_id
+WHERE at.name = 'Nebula Award'
+    ) AS e ON e.author_id = w.author_id
+  OR e.publisher_id = w.publisher_id
+  OR e.publications_series_id = w.publications_series_id
+  OR e.title_series_id = w.title_series_id
+ -- TODO : no publication series
+GROUP BY (e.publication_id, e.title)
+ORDER BY COUNT(e.author_id) + COUNT(e.publisher_id) + COUNT(e.publications_series_id) + COUNT(e.title_series_id) DESC
+LIMIT 10;
