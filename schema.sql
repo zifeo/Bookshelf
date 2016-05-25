@@ -187,7 +187,7 @@ CREATE TABLE titles_translators
   translator_id      INT NOT NULL, -- fk
   year               INT NOT NULL,
   language_id        INT NOT NULL, -- fk
-  CONSTRAINT pk_titles_translators PRIMARY KEY (title_id, translator_id, year, language)
+  CONSTRAINT pk_titles_translators PRIMARY KEY (title_id, translator_id, year, language_id)
 );
 
 DROP TABLE IF EXISTS titles_tags CASCADE;

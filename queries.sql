@@ -300,6 +300,16 @@ WHERE a.id = (
 
 -- 22. For every language, list the three authors with the most translated titles of “novel” type.
 
+ SELECT pa.author_id
+    FROM publications_authors pa
+      INNER JOIN publications_contents pc ON pc.publication_id = pa.publication_id
+      INNER JOIN titles_translators tt ON tt.title_id = pc.title_id
+      INNER JOIN titles t ON t.id = tt.title_id
+    WHERE tt.language = l.name
+    GROUP BY pa.author_id
+    ORDER BY COUNT(DISTINCT pa.publication_id) DESC
+    LIMIT 3;
+
 SELECT l.name, a.name
 FROM languages l, authors a
 WHERE
@@ -343,7 +353,7 @@ FROM authors a
                LIMIT 10
              ) AS paa ON paa.author_id = a.id;
 
--- 24. For publications that have been awarded the Nebula award, find the top 10 with the most extensive web presence (i.e, the highest number of author websites, publication websites, publisher websites, publication series websites, and title series websites in total)
+-- 24. For publications that have been awarded the Nebula award, find the top 10 with the most extensive web presence (i.e, the highest number of author websites, publisher websites, publication series websites, and title series websites in total)
 
 SELECT e.title
 FROM webpages w
@@ -370,7 +380,6 @@ FROM webpages w
                        OR e.publisher_id = w.publisher_id
                        OR e.publications_series_id = w.publications_series_id
                        OR e.title_series_id = w.title_series_id
--- TODO : no publication series
 GROUP BY (e.publication_id, e.title)
 ORDER BY COUNT(e.author_id) + COUNT(e.publisher_id) + COUNT(e.publications_series_id) + COUNT(e.title_series_id) DESC
 LIMIT 10;
