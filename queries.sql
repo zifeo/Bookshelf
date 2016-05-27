@@ -7,10 +7,7 @@ SELECT
   DATE_PART('year', p.date_pub) AS year,
   COUNT(p.id) AS count
 FROM publications p
-GROUP BY year
-ORDER BY year;
--- TODO order needed
--- TODO year 1
+GROUP BY year;
 
 -- 2. Output the names of the ten authors with most publications.
 
@@ -23,7 +20,6 @@ WHERE a.id IN (
   ORDER BY COUNT(p.author_id) DESC
   LIMIT 10
 );
--- TODO uncredited
 
 -- 3. What are the names of the youngest and oldest authors to publish something in 2010
 
@@ -52,7 +48,6 @@ WHERE
       WHERE DATE_PART('year', p.date_pub) = '2010'
     )
   );
--- TODO year 0001
 
 -- 4. How many comics (graphic titles) have publications with less than 50 pages
 
@@ -63,7 +58,6 @@ FROM titles t
 WHERE
   t.graphic = 'YES'
   AND p.pages < 50;
--- TODO count * or specific
 
 -- 5. How many comics (graphic titles) have publications with less than 100 pages
 
@@ -107,14 +101,10 @@ WHERE tags.name LIKE '%science fiction%'
 GROUP BY a.name
 ORDER BY COUNT(pc.title_id) DESC
 LIMIT 1;
--- TODO join vs where clause
--- TODO distinct titles
 
 -- 9. List the three most popular titles (i.e., the ones with the most awards and reviews).
 
-SELECT
-  t.title,
-  count_awards + count_reviews as total
+SELECT t.title
 FROM titles t
   JOIN (
          SELECT ta.title_id, COUNT(ta.award_id) AS count_awards
@@ -128,7 +118,6 @@ FROM titles t
        ) d ON d.title_id = t.id
 ORDER BY count_awards + count_reviews DESC
 LIMIT 3;
--- TODO twice the wizard, for us
 
 ---- Deliverable 3
 
@@ -150,7 +139,6 @@ WHERE
   )
   AND p.currency IS NOT NULL
 GROUP BY p.currency;
--- TODO avoid currency not null
 
 -- 11. Output the names of the top ten title series with most awards.
 
@@ -162,7 +150,6 @@ WHERE t.series_id IS NOT NULL
 GROUP BY ts.title
 ORDER BY COUNT(ta.award_id) DESC
 LIMIT 10;
--- TODO join order
 
 -- 12. Output the name of the author who has received the most awards after his/her death.
 
@@ -176,7 +163,8 @@ WHERE
   a.death_date IS NOT NULL
   AND aw.date > a.death_date
 GROUP BY a.name
-ORDER BY COUNT(ta.award_id) DESC;
+ORDER BY COUNT(ta.award_id) DESC
+LIMIT 1;
 
 -- 13. For a given year, output the three publishers that published the most publications.
 
@@ -200,87 +188,72 @@ WHERE a.id = ?
 GROUP BY t.id
 ORDER BY COUNT(r.review_id) DESC
 LIMIT 1;
--- TODO given author name
 
 -- 15. For every language, find the top three title types with most translations.
 
 SELECT
   r.name,
-  r.title,
-  r.count
+  r.title
 FROM (
        SELECT
          l.name,
          t.title,
-         ROW_NUMBER() OVER (PARTITION BY l.id) as row,
-         COUNT(t.id) OVER (PARTITION BY t.id) as count
+         ROW_NUMBER() OVER (PARTITION BY l.id) as row
        FROM languages l
          INNER JOIN titles_translators tt ON tt.language_id = l.id
          INNER JOIN titles t ON tt.title_id = t.id
-       ORDER BY count DESC
+       GROUP BY t.id, l.name, t.title, l.id
+       ORDER BY COUNT(t.id) DESC
      ) r
 WHERE r.row <= 3;
--- TODO count
--- TODO implicit order
 
 -- 16. For each year, compute the average number of authors per publisher.
 
 SELECT DISTINCT
   pr.name,
-  DATE_PART('year', p.date_pub) as year,
-  AVG(pa.author_id) OVER (PARTITION BY DATE_PART('year', p.date_pub), pr.id) as avg
+  DATE_PART('year', p.date_pub) AS year,
+  AVG(pa.author_id) AS avg
 FROM publications p
   INNER JOIN publications_authors pa ON pa.publication_id = p.id
   INNER JOIN publishers pr ON pr.id = p.publisher_id
-ORDER BY year DESC;
--- TODO year 9999
--- TODO order
+GROUP BY year, pr.id, pr.name;
 
 -- 17. Find the publication series with most titles that have been given awards of “World Fantasy Award” type.
 
-SELECT ps.name, COUNT(pc.title_id)
+SELECT ps.name
 FROM publications_series ps
   INNER JOIN publications p ON p.pub_series_id = ps.id
   INNER JOIN publications_contents pc ON pc.publication_id = p.id
-WHERE pc.title_id IN (
-  SELECT ta.title_id
-  FROM titles_awards ta
-    INNER JOIN awards a ON a.id = ta.award_id
-    INNER JOIN awards_types at ON at.id = a.type_id
-  WHERE at.name = 'World Fantasy Award'
-)
+  INNER JOIN titles_awards ta ON  ta.title_id = pc.title_id
+  INNER JOIN awards a ON a.id = ta.award_id
+  INNER JOIN awards_types at ON at.id = a.type_id
+WHERE at.name = 'World Fantasy Award'
 GROUP BY ps.id
 ORDER BY COUNT(pc.title_id) DESC;
--- TODO when to flatten
 
 -- 18. For every award category, list the names of the three most awarded authors.
 
 SELECT
   r.name,
-  r.cat_name,
-  r.count
+  r.cat_name
 FROM (
        SELECT
-         *,
-         ROW_NUMBER() OVER (PARTITION BY p.cat_id ORDER BY p.count DESC) AS row
-       FROM (
-              SELECT DISTINCT
-                a.name,
-                ac.name                  AS cat_name,
-                ac.id AS cat_id,
-                COUNT(aw.id)
-                OVER (PARTITION BY a.id) AS count
-              FROM authors a
-                INNER JOIN publications_authors pa ON pa.author_id = a.id
-                INNER JOIN publications_contents pc ON pc.publication_id = pa.author_id
-                INNER JOIN titles_awards ta ON ta.title_id = pc.title_id
-                INNER JOIN awards aw ON aw.id = ta.award_id
-                INNER JOIN awards_categories ac ON ac.id = aw.category_id
-              ORDER BY count DESC
-            ) p
+         a.name,
+         ac.name AS cat_name,
+         COUNT(aw.id) as count,
+         ROW_NUMBER() OVER (PARTITION BY ac.id ORDER BY COUNT(aw.id) DESC) AS row
+       FROM awards_categories ac
+         INNER JOIN awards aw ON aw.category_id = ac.id
+         INNER JOIN titles_awards ta ON ta.award_id = aw.id
+         INNER JOIN publications_contents pc ON pc.title_id = ta.title_id
+         INNER JOIN publications_authors pa ON pa.publication_id = pc.publication_id
+         INNER JOIN authors a ON a.id = pa.author_id
+       WHERE ac.name LIKE '%Anthology%'
+       GROUP BY a.name, cat_name, ac.id, a.id
+       ORDER BY count DESC
      ) r
 WHERE r.row <= 3;
--- TODO other possiblities
+-- TODO where
 
 -- 19. Output the names of all living authors that have published at least one anthology from youngest to oldest.
 
@@ -289,27 +262,22 @@ FROM authors a
   INNER JOIN publications_authors pa ON pa.author_id = a.id
   INNER JOIN publications p ON p.id = pa.publication_id
   INNER JOIN publications_contents pc ON pc.publication_id = p.id
-  INNER JOIN (
-               SELECT t.id
-               FROM titles t
-               WHERE t.type = 'anthology'
-             ) AS antho ON antho.id = pc.title_id
+  INNER JOIN titles t ON t.id = pc.title_id
 WHERE
-  a.death_date IS NULL AND
-  a.birth_date IS NOT NULL
+  t.type = 'anthology'
+  AND a.death_date IS NULL
+  AND a.birth_date IS NOT NULL
 ORDER BY a.birth_date DESC;
--- TODO inner join select where opti
 
 -- 20. Compute the average number of publications per publication series (single result/number expected).
 
-SELECT AVG(ncount)
+SELECT AVG(count.ncount)
 FROM (
-       SELECT ps.name, COUNT(ps.name) as ncount
+       SELECT COUNT(ps.name) as ncount
        FROM publications p
          INNER JOIN publications_series ps ON ps.id = p.pub_series_id
        GROUP BY ps.name
-     ) as count;
--- TODO better than final ops
+     ) count;
 
 -- 21. Find the author who has reviewed the most titles.
 
@@ -329,39 +297,31 @@ WHERE a.id = (
   ORDER BY COUNT(*) DESC
   LIMIT 1
 );
--- TODO inner join select where opti
+-- TODO rewrite
 
 -- 22. For every language, list the three authors with the most translated titles of “novel” type.
 
--- 15. For every language, find the top three title types with most translations.
-
 SELECT
   r.name,
-  r.auth_name,
-  r.count
+  r.auth_name
 FROM (
-       SELECT
-         *,
-         ROW_NUMBER() OVER (PARTITION BY p.id ORDER BY p.count DESC) as row
-       FROM (
-
-              SELECT DISTINCT
-                l.name,
-                l.id,
-                a.name                   AS auth_name,
-                COUNT(t.id) OVER (PARTITION BY t.id) AS count
-              FROM languages l
-                INNER JOIN titles_translators tt ON tt.language_id = l.id
-                INNER JOIN titles t ON tt.title_id = t.id
-                INNER JOIN publications_contents pc ON pc.title_id = t.id
-                INNER JOIN publications_authors pa ON pa.publication_id = pc.publication_id
-                INNER JOIN authors a ON a.id = pa.author_id
-              WHERE t.type = 'novel'
-              ORDER BY count DESC
-            ) p
+       SELECT DISTINCT
+         l.name,
+         l.id,
+         a.name AS auth_name,
+         COUNT(t.id) AS count,
+         ROW_NUMBER() OVER (PARTITION BY l.id ORDER BY COUNT(t.id) DESC) as row
+       FROM languages l
+         INNER JOIN titles_translators tt ON tt.language_id = l.id
+         INNER JOIN titles t ON tt.title_id = t.id
+         INNER JOIN publications_contents pc ON pc.title_id = t.id
+         INNER JOIN publications_authors pa ON pa.publication_id = pc.publication_id
+         INNER JOIN authors a ON a.id = pa.author_id
+       WHERE t.type = 'novel'
+       GROUP BY l.id, l.name, a.id, a.name
+       ORDER BY count DESC
      ) r
 WHERE r.row <= 3;
--- TODO so few results
 
 -- 23. Order the top ten authors whose publications have the largest pages per dollar ratio (considering all
 -- publications of an author that have a dollar price).
@@ -377,10 +337,10 @@ FROM authors a
                  AND p.pages != 0
                  AND p.price != 0
                GROUP BY pa.author_id, p.price, p.pages
-               ORDER BY p.pages / p.price ASC
+               ORDER BY p.pages / p.price DESC
                LIMIT 10
              ) AS paa ON paa.author_id = a.id;
--- TODO check non null
+-- TODO rewrite
 
 -- 24. For publications that have been awarded the Nebula award, find the top 10 with the most extensive web presence
 -- (i.e, the highest number of author websites, publisher websites, publication series websites, and title series
@@ -414,7 +374,3 @@ FROM webpages w
 GROUP BY (e.publication_id, e.title)
 ORDER BY COUNT(e.author_id) + COUNT(e.publisher_id) + COUNT(e.publications_series_id) + COUNT(e.title_series_id) DESC
 LIMIT 10;
--- TODO does this ignore some queries
-
-
--- TODO should we put the explorer online
