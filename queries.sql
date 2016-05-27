@@ -53,8 +53,8 @@ WHERE
 
 SELECT COUNT(t.id)
 FROM titles t
-  JOIN publications_contents pc ON t.id = pc.title_id
-  JOIN publications p ON pc.publication_id = p.id
+  INNER JOIN publications_contents pc ON t.id = pc.title_id
+  INNER JOIN publications p ON pc.publication_id = p.id
 WHERE
   t.graphic = 'YES'
   AND p.pages < 50;
@@ -63,7 +63,7 @@ WHERE
 
 SELECT COUNT(t.id)
 FROM titles t
-  JOIN publications_contents pc ON t.id = pc.title_id
+  INNER JOIN publications_contents pc ON t.id = pc.title_id
   JOIN publications p ON pc.publication_id = p.id
 WHERE
   t.graphic = 'YES'
@@ -85,8 +85,10 @@ SELECT
   pr.name,
   AVG(p.price)
 FROM publications p
-  JOIN publishers pr ON p.publisher_id = pr.id
-WHERE p.currency = '$'
+  INNER JOIN publishers pr ON p.publisher_id = pr.id
+WHERE
+  p.currency = '$'
+  AND p.type = 'novel'
 GROUP BY pr.name;
 
 -- 8. What is the name of the author with the highest number of titles that are tagged as “science fiction”
@@ -99,12 +101,12 @@ FROM authors a
   INNER JOIN tags ON tt.tag_id = tags.id
 WHERE tags.name LIKE '%science fiction%'
 GROUP BY a.name
-ORDER BY COUNT(pc.title_id) DESC
+ORDER BY COUNT(DISTINCT pc.title_id) DESC
 LIMIT 1;
 
 -- 9. List the three most popular titles (i.e., the ones with the most awards and reviews).
 
-SELECT t.title
+SELECT t.title, count_awards, count_reviews
 FROM titles t
   JOIN (
          SELECT ta.title_id, COUNT(ta.award_id) AS count_awards
@@ -118,6 +120,7 @@ FROM titles t
        ) d ON d.title_id = t.id
 ORDER BY count_awards + count_reviews DESC
 LIMIT 3;
+-- JOIN, NULL cases
 
 ---- Deliverable 3
 
@@ -186,23 +189,22 @@ FROM authors a
   INNER JOIN reviews r ON r.title_id = t.id
 WHERE a.id = ?
 GROUP BY t.id
-ORDER BY COUNT(r.review_id) DESC
-LIMIT 1;
+ORDER BY COUNT(DISTINCT r.review_id) DESC;
 
 -- 15. For every language, find the top three title types with most translations.
 
 SELECT
   r.name,
-  r.title
+  r.type
 FROM (
        SELECT
          l.name,
-         t.title,
-         ROW_NUMBER() OVER (PARTITION BY l.id) as row
+         t.type,
+         ROW_NUMBER() OVER (PARTITION BY l.id ORDER BY COUNT(t.id) DESC) as row
        FROM languages l
          INNER JOIN titles_translators tt ON tt.language_id = l.id
          INNER JOIN titles t ON tt.title_id = t.id
-       GROUP BY t.id, l.name, t.title, l.id
+       GROUP BY t.type, l.name, l.id
        ORDER BY COUNT(t.id) DESC
      ) r
 WHERE r.row <= 3;
@@ -240,20 +242,18 @@ FROM (
        SELECT
          a.name,
          ac.name AS cat_name,
-         COUNT(aw.id) as count,
-         ROW_NUMBER() OVER (PARTITION BY ac.id ORDER BY COUNT(aw.id) DESC) AS row
+         COUNT(DISTINCT aw.id) as count,
+         ROW_NUMBER() OVER (PARTITION BY ac.id ORDER BY COUNT(DISTINCT aw.id) DESC) AS row
        FROM awards_categories ac
          INNER JOIN awards aw ON aw.category_id = ac.id
          INNER JOIN titles_awards ta ON ta.award_id = aw.id
          INNER JOIN publications_contents pc ON pc.title_id = ta.title_id
          INNER JOIN publications_authors pa ON pa.publication_id = pc.publication_id
          INNER JOIN authors a ON a.id = pa.author_id
-       WHERE ac.name LIKE '%Anthology%'
        GROUP BY a.name, cat_name, ac.id, a.id
        ORDER BY count DESC
      ) r
 WHERE r.row <= 3;
--- TODO where
 
 -- 19. Output the names of all living authors that have published at least one anthology from youngest to oldest.
 
@@ -309,8 +309,8 @@ FROM (
          l.name,
          l.id,
          a.name AS auth_name,
-         COUNT(t.id) AS count,
-         ROW_NUMBER() OVER (PARTITION BY l.id ORDER BY COUNT(t.id) DESC) as row
+         COUNT(DISTINCT t.id) AS count,
+         ROW_NUMBER() OVER (PARTITION BY l.id ORDER BY COUNT(DISTINCT t.id) DESC) as row
        FROM languages l
          INNER JOIN titles_translators tt ON tt.language_id = l.id
          INNER JOIN titles t ON tt.title_id = t.id
@@ -346,7 +346,7 @@ FROM authors a
 -- (i.e, the highest number of author websites, publisher websites, publication series websites, and title series
 -- websites in total)
 
-SELECT e.title
+SELECT e.title, COUNT(e.author_id) + COUNT(e.publisher_id) + COUNT(e.publications_series_id) + COUNT(e.title_series_id)
 FROM webpages w
   INNER JOIN (
                SELECT DISTINCT
@@ -374,3 +374,5 @@ FROM webpages w
 GROUP BY (e.publication_id, e.title)
 ORDER BY COUNT(e.author_id) + COUNT(e.publisher_id) + COUNT(e.publications_series_id) + COUNT(e.title_series_id) DESC
 LIMIT 10;
+
+-- COUNT DISTINCT
