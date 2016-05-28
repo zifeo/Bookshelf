@@ -51,7 +51,7 @@ WHERE
 
 -- 4. How many comics (graphic titles) have publications with less than 50 pages
 
-SELECT COUNT(t.id)
+SELECT COUNT(DISTINCT t.id)
 FROM titles t
   INNER JOIN publications_contents pc ON t.id = pc.title_id
   INNER JOIN publications p ON pc.publication_id = p.id
@@ -61,20 +61,20 @@ WHERE
 
 -- 5. How many comics (graphic titles) have publications with less than 100 pages
 
-SELECT COUNT(t.id)
+SELECT COUNT(DISTINCT t.id)
 FROM titles t
   INNER JOIN publications_contents pc ON t.id = pc.title_id
-  JOIN publications p ON pc.publication_id = p.id
+  INNER JOIN publications p ON pc.publication_id = p.id
 WHERE
   t.graphic = 'YES'
   AND p.pages < 100;
 
 -- 6. How many comics (graphic titles) have publications with more (or equal) than 100 pages
 
-SELECT COUNT(t.id)
+SELECT COUNT(DISTINCT t.id)
 FROM titles t
-  JOIN publications_contents pc ON t.id = pc.title_id
-  JOIN publications p ON pc.publication_id = p.id
+  INNER JOIN publications_contents pc ON t.id = pc.title_id
+  INNER JOIN publications p ON pc.publication_id = p.id
 WHERE
   t.graphic = 'YES'
   AND p.pages >= 100;
@@ -106,21 +106,13 @@ LIMIT 1;
 
 -- 9. List the three most popular titles (i.e., the ones with the most awards and reviews).
 
-SELECT t.title, count_awards, count_reviews
+SELECT t.title
 FROM titles t
-  JOIN (
-         SELECT ta.title_id, COUNT(ta.award_id) AS count_awards
-         FROM titles_awards ta
-         GROUP BY ta.title_id
-       ) c ON c.title_id = t.id
-  JOIN (
-         SELECT r.title_id, COUNT(r.review_id) AS count_reviews
-         FROM reviews r
-         GROUP BY r.title_id
-       ) d ON d.title_id = t.id
-ORDER BY count_awards + count_reviews DESC
+  LEFT OUTER JOIN titles_awards ta ON ta.title_id = t.id
+  LEFT OUTER JOIN reviews r ON r.title_id = t.id
+GROUP BY t.id, t.title
+ORDER BY COUNT(DISTINCT ta.award_id) + COUNT(DISTINCT r.review_id) DESC
 LIMIT 3;
--- JOIN, NULL cases
 
 ---- Deliverable 3
 
@@ -200,25 +192,32 @@ FROM (
        SELECT
          l.name,
          t.type,
-         ROW_NUMBER() OVER (PARTITION BY l.id ORDER BY COUNT(t.id) DESC) as row
+         ROW_NUMBER() OVER (PARTITION BY l.id ORDER BY COUNT(DISTINCT t.id) DESC) as row
        FROM languages l
          INNER JOIN titles_translators tt ON tt.language_id = l.id
          INNER JOIN titles t ON tt.title_id = t.id
        GROUP BY t.type, l.name, l.id
-       ORDER BY COUNT(t.id) DESC
+       ORDER BY COUNT(DISTINCT t.id) DESC
      ) r
 WHERE r.row <= 3;
 
 -- 16. For each year, compute the average number of authors per publisher.
 
-SELECT DISTINCT
-  pr.name,
-  DATE_PART('year', p.date_pub) AS year,
-  AVG(pa.author_id) AS avg
-FROM publications p
-  INNER JOIN publications_authors pa ON pa.publication_id = p.id
-  INNER JOIN publishers pr ON pr.id = p.publisher_id
-GROUP BY year, pr.id, pr.name;
+SELECT
+  r.name,
+  r.year,
+  AVG(r.count)
+FROM (
+       SELECT DISTINCT
+         pr.name,
+         DATE_PART('year', p.date_pub) AS year,
+         COUNT(DISTINCT pa.author_id) as count
+       FROM publications p
+         INNER JOIN publications_authors pa ON pa.publication_id = p.id
+         INNER JOIN publishers pr ON pr.id = p.publisher_id
+       GROUP BY pr.id, p.date_pub
+     ) r
+GROUP BY r.year, r.name;
 
 -- 17. Find the publication series with most titles that have been given awards of “World Fantasy Award” type.
 
@@ -231,7 +230,7 @@ FROM publications_series ps
   INNER JOIN awards_types at ON at.id = a.type_id
 WHERE at.name = 'World Fantasy Award'
 GROUP BY ps.id
-ORDER BY COUNT(pc.title_id) DESC;
+ORDER BY COUNT(DISTINCT pc.title_id) DESC;
 
 -- 18. For every award category, list the names of the three most awarded authors.
 
@@ -288,16 +287,12 @@ WHERE a.id = (
   FROM publications p
     INNER JOIN publications_authors pa ON pa.publication_id = p.id
     INNER JOIN publications_contents pc ON pc.publication_id = p.id
-    INNER JOIN (
-                 SELECT *
-                 FROM titles t
-                 WHERE t.type = 'review'
-               ) AS rev ON rev.id = pc.title_id
+    INNER JOIN titles t ON t.id = pc.title_id
+  WHERE t.type = 'review'
   GROUP BY pa.author_id
-  ORDER BY COUNT(*) DESC
+  ORDER BY COUNT(DISTINCT pc.title_id) DESC
   LIMIT 1
 );
--- TODO rewrite
 
 -- 22. For every language, list the three authors with the most translated titles of “novel” type.
 
@@ -340,13 +335,12 @@ FROM authors a
                ORDER BY p.pages / p.price DESC
                LIMIT 10
              ) AS paa ON paa.author_id = a.id;
--- TODO rewrite
 
 -- 24. For publications that have been awarded the Nebula award, find the top 10 with the most extensive web presence
 -- (i.e, the highest number of author websites, publisher websites, publication series websites, and title series
 -- websites in total)
 
-SELECT e.title, COUNT(e.author_id) + COUNT(e.publisher_id) + COUNT(e.publications_series_id) + COUNT(e.title_series_id)
+SELECT r.title
 FROM webpages w
   INNER JOIN (
                SELECT DISTINCT
@@ -367,12 +361,14 @@ FROM webpages w
                  INNER JOIN awards a ON a.id = ta.award_id
                  INNER JOIN awards_types at ON at.id = a.type_id
                WHERE at.name = 'Nebula Award'
-             ) AS e ON e.author_id = w.author_id
-                       OR e.publisher_id = w.publisher_id
-                       OR e.publications_series_id = w.publications_series_id
-                       OR e.title_series_id = w.title_series_id
-GROUP BY (e.publication_id, e.title)
-ORDER BY COUNT(e.author_id) + COUNT(e.publisher_id) + COUNT(e.publications_series_id) + COUNT(e.title_series_id) DESC
+             ) AS r ON r.author_id = w.author_id
+                       OR r.publisher_id = w.publisher_id
+                       OR r.publications_series_id = w.publications_series_id
+                       OR r.title_series_id = w.title_series_id
+GROUP BY (r.publication_id, r.title)
+ORDER BY
+  COUNT(DISTINCT r.author_id)
+  + COUNT(DISTINCT r.publisher_id)
+  + COUNT(DISTINCT r.publications_series_id)
+  + COUNT(DISTINCT r.title_series_id) DESC
 LIMIT 10;
-
--- COUNT DISTINCT
