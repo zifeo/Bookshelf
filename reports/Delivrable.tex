@@ -1230,32 +1230,72 @@ The search field is using ajax to access our backend server in Scala (cf. search
 \section{Modifications and improvements}
 
 \subsection{Justifications}
-
-
-~\\~\\
+~\\
 In the DDL and according to the data, the following changes have been made :
 \begin{itemize}
-	\item \texttt{publisher\char`_id} in publication is now nullable
-	\item \texttt{type} in publication is now nullable
-	\item \texttt{parent} in titles is now nullable
-	\item \texttt{url} in webpages is now not unique, as many url could reference different items
-	\item \texttt{code} in \texttt{award\char`_type} is now not unique, as two awards could share the same initials
-	\item drop table statements have been added to make easier the deletion and creation of the database
-	\item dead foreign key values removal queries have been added to allow the creation of corresponding foreign keys
-	\item a constraint ensuring at least of the entities is linked in each webpages entries has been added for not having a page referencing no entity
+	\item we replaced the \texttt{language} field by \texttt{language\char`_id} in \texttt{title\char`_translator} to be able to join this table with \texttt{language}.
 \end{itemize}
-~\\
-About cascade justifications, we decided with one of the TAs to only specify the behaviour for deleting as updating is not involved in the project. If not specified otherwise, we set the deleted field to null as they entities lifetime are independent of each others :
-\begin{itemize}
-	\item \texttt{authors\char`_id} and \texttt{pseudonym} are linked to the same person, thus requiring a cascade deletion.
-	\item all many to many relationship have a cascade deletion, as there is no meaning of a two entity mapping missing one of the entity.
-	\item \texttt{webpages} have a cascade deletion whenever one the referring entity is deleted.
-	\item \texttt{awards\char`_categories} has a cascade deletion as it is a weak entity.
-\end{itemize}
-~\\
-The enumerations values have been kept as inline values for flexibility and simplicity reasons as discussed with one of the teaching assistants. The full inserts are batched and executed in about 12 minutes.
 
-\newpage
+\subsection{Query modifications}
+~\\
+As discussed in the feedback of our queries of deliverable 2, we also improve some queries :
+
+\subsubsection{Output the names of the ten authors with most publications}
+
+		\begin{enumerate}
+	\item Modification done : 
+	\item SQL statement :
+		\begin{lstlisting}[language=SQL,showspaces=false,basicstyle=\ttfamily,numberstyle=\tiny,commentstyle=\color{gray}]
+SELECT a.name
+FROM authors a
+WHERE a.id IN (
+  SELECT p.author_id
+  FROM publications_authors p
+  GROUP BY p.author_id
+  ORDER BY COUNT(p.author_id) DESC
+  LIMIT 10
+);
+		\end{lstlisting}
+
+\end{enumerate}
+
+\subsubsection{For every publisher, calculate the average price of its published novels (the ones that have a dollar price)}
+
+	\begin{enumerate}
+	\item Modification done : 
+	\item SQL statement :
+		\begin{lstlisting}[language=SQL,showspaces=false,basicstyle=\ttfamily,numberstyle=\tiny,commentstyle=\color{gray}]
+SELECT a.name
+FROM authors a
+  INNER JOIN publications_authors pa ON a.id = pa.author_id
+  INNER JOIN publications_contents pc ON pc.publication_id = pa.publication_id
+  INNER JOIN titles_tags tt ON pc.title_id = tt.title_id
+  INNER JOIN tags ON tt.tag_id = tags.id
+WHERE tags.name LIKE '%science fiction%'
+GROUP BY a.name
+ORDER BY COUNT(DISTINCT pc.title_id) DESC
+LIMIT 1;
+		\end{lstlisting}
+
+\end{enumerate}
+
+\subsubsection{List the three most popular titles (i.e., the ones with the most awards and reviews)}
+
+	\begin{enumerate}
+	\item Modification done : 
+	\item SQL statement :
+		\begin{lstlisting}[language=SQL,showspaces=false,basicstyle=\ttfamily,numberstyle=\tiny,commentstyle=\color{gray}]
+SELECT t.title
+FROM titles t
+  LEFT OUTER JOIN titles_awards ta ON ta.title_id = t.id
+  LEFT OUTER JOIN reviews r ON r.title_id = t.id
+GROUP BY t.id, t.title
+ORDER BY COUNT(DISTINCT ta.award_id) + COUNT(DISTINCT r.review_id) DESC
+LIMIT 3;
+		\end{lstlisting}
+
+\end{enumerate}
+
 \section{Queries implementation}
 
 \subsection{Compute the average price per currency of the publications of the most popular title (i.e, the title with most publications overall)}
@@ -1329,7 +1369,6 @@ Book of The New Sun \\
 \end{tabular}
 
 	\end{enumerate}
-\newpage
 
 \subsection{Output the name of the author who has received the most awards after his/her death}
 
@@ -1852,5 +1891,107 @@ The 1983 Annual World's Best SF\\
 	  \hline
 	\end{tabular}
 \end{enumerate}
+
+\section{Queries optimization}
+
+\subsection{Query 1 : Output the name of the author who has received the most awards after his/her death}
+
+\subsubsection{Initial query}
+		\begin{lstlisting}[language=SQL,showspaces=false,basicstyle=\ttfamily,numberstyle=\tiny,commentstyle=\color{gray}]
+SELECT a.name
+FROM authors a
+  JOIN publications_authors pa ON a.id = pa.author_id
+  JOIN publications_contents pc ON pa.publication_id = pc.publication_id
+  JOIN titles_awards ta ON pc.title_id = ta.title_id
+  JOIN awards aw ON ta.award_id = aw.id
+WHERE
+  a.death_date IS NOT NULL
+  AND aw.date > a.death_date
+GROUP BY a.name
+ORDER BY COUNT(ta.award_id) DESC
+LIMIT 1;
+		\end{lstlisting}
+		
+\subsubsection{Optimized query}
+		\begin{lstlisting}[language=SQL,showspaces=false,basicstyle=\ttfamily,numberstyle=\tiny,commentstyle=\color{gray}]
+
+		\end{lstlisting}
+		
+\subsubsection{Running times}
+\begin{itemize}
+	\item Before optimization :
+	\item After optimization :
+\end{itemize}
+
+\subsubsection{Justifications}
+
+
+\subsection{Query 2 : For each year, compute the average number of authors per publisher}
+
+\subsubsection{Initial query}
+		\begin{lstlisting}[language=SQL,showspaces=false,basicstyle=\ttfamily,numberstyle=\tiny,commentstyle=\color{gray}]
+SELECT
+  r.name,
+  r.year,
+  AVG(r.count)
+FROM (
+       SELECT DISTINCT
+         pr.name,
+         DATE_PART('year', p.date_pub) AS year,
+         COUNT(DISTINCT pa.author_id) as count
+       FROM publications p
+         INNER JOIN publications_authors pa ON pa.publication_id = p.id
+         INNER JOIN publishers pr ON pr.id = p.publisher_id
+       GROUP BY pr.id, p.date_pub
+     ) r
+GROUP BY r.year, r.name;
+		\end{lstlisting}
+		
+\subsubsection{Optimized query}
+		\begin{lstlisting}[language=SQL,showspaces=false,basicstyle=\ttfamily,numberstyle=\tiny,commentstyle=\color{gray}]
+
+		\end{lstlisting}
+		
+\subsubsection{Running times}
+\begin{itemize}
+	\item Before optimization :
+	\item After optimization :
+\end{itemize}
+
+\subsubsection{Justifications}
+
+
+\subsection{Query 3 : Find the author who has reviewed the most titles}
+
+\subsubsection{Initial query}
+		\begin{lstlisting}[language=SQL,showspaces=false,basicstyle=\ttfamily,numberstyle=\tiny,commentstyle=\color{gray}]
+SELECT a.name
+FROM authors a
+WHERE a.id = (
+  SELECT pa.author_id
+  FROM publications p
+    INNER JOIN publications_authors pa ON pa.publication_id = p.id
+    INNER JOIN publications_contents pc ON pc.publication_id = p.id
+    INNER JOIN titles t ON t.id = pc.title_id
+  WHERE t.type = 'review'
+  GROUP BY pa.author_id
+  ORDER BY COUNT(DISTINCT pc.title_id) DESC
+  LIMIT 1
+);
+		\end{lstlisting}
+		
+\subsubsection{Optimized query}
+		\begin{lstlisting}[language=SQL,showspaces=false,basicstyle=\ttfamily,numberstyle=\tiny,commentstyle=\color{gray}]
+
+		\end{lstlisting}
+		
+\subsubsection{Running times}
+\begin{itemize}
+	\item Before optimization :
+	\item After optimization :
+\end{itemize}
+
+\subsubsection{Justifications}
+
 
 \end{document}
