@@ -50,8 +50,7 @@ GROUP BY r.year, r.name;
 ```
 This query uses a subquery for it's FROM clause to select for each year and for each publisher, the number of authors per publisher. Then the main query simply group by the year and the publisher and compute the average number of author.
 ### Running time & optimization
-A few runs of this query showed an average running time of 2,2 seconds. The larger part of the time is spent in the subquery.
-
+A few runs of this query showed an average running time of 2,2 seconds. According to the plan a big part of this time is spent doing sort operations. Once in the subquery for the `GROUP BY pr.id, p.date_pub` which takes approximately 34% of the time. Another one in the subquery for the `SELECT DISTINCT` operation takes ~28% of the time. And a last sort appears in the main query when doing the `GROUP BY r.year, r.name` and also take ~28% of the time. The remaining 10% is scanning and joining the tables.
 
 ### Plan
 ![](query16.png)
