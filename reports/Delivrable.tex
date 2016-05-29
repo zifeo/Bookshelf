@@ -118,8 +118,8 @@
 \vspace*{3cm}
 \titlefont CS-323 : Project delivrable\par
 \vspace*{0.5cm}
-\epigraph{This is our deliverable for the \textit{Bookshelf} project of the introduction to database course (spring 2016 - Pr. Anastasia Ailamaki), which sums up our work. It also contains some justifications.}%
-{\textit{March 2016} - \textsc{Team n°3}}
+\epigraph{This is our deliverable for the \textit{Bookshelf} project of the introduction to database course (spring 2016 - Pr. Anastasia Ailamaki), which sums up our work.~\\ It also contains some justifications.}%
+{\textit{March 2016} - \textsc{Team 3}}
 \null\vfill
 \vspace*{5cm}
 \noindent
@@ -1243,7 +1243,7 @@ As discussed in the feedback of our queries of deliverable 2, we also improve so
 \subsubsection{Output the names of the ten authors with most publications}
 
 		\begin{enumerate}
-	\item Modification done : 
+	\item Modification done : following some advices, we replaced our previous query by this one using an inner query, to avoid an \texttt{INNER JOIN} over all authors.
 	\item SQL statement :
 		\begin{lstlisting}[language=SQL,showspaces=false,basicstyle=\ttfamily,numberstyle=\tiny,commentstyle=\color{gray}]
 SELECT a.name
@@ -1259,10 +1259,10 @@ WHERE a.id IN (
 
 \end{enumerate}
 
-\subsubsection{For every publisher, calculate the average price of its published novels (the ones that have a dollar price)}
+\subsubsection{What is the name of the author with the highest number of titles that are tagged as science fiction}
 
 	\begin{enumerate}
-	\item Modification done : 
+	\item Modification done : our \texttt{LIKE} tag is now stronger to fit the data, and we also remove some unnecessary joins for the purpose of this query.
 	\item SQL statement :
 		\begin{lstlisting}[language=SQL,showspaces=false,basicstyle=\ttfamily,numberstyle=\tiny,commentstyle=\color{gray}]
 SELECT a.name
@@ -1279,10 +1279,12 @@ LIMIT 1;
 
 \end{enumerate}
 
+\newpage
+
 \subsubsection{List the three most popular titles (i.e., the ones with the most awards and reviews)}
 
 	\begin{enumerate}
-	\item Modification done : 
+	\item Modification done : something went wrong while copying the query into this report to the point results were not matching the query as it was underlying in the feedback. This time, the above query behaves exactly as we are expecting, and outputs only title once, by summing them if needed.
 	\item SQL statement :
 		\begin{lstlisting}[language=SQL,showspaces=false,basicstyle=\ttfamily,numberstyle=\tiny,commentstyle=\color{gray}]
 SELECT t.title
@@ -1295,12 +1297,16 @@ LIMIT 3;
 		\end{lstlisting}
 
 \end{enumerate}
+~\\
+We've also modified also queries that were counting something, by replacing \texttt{COUNT(*)} by \texttt{COUNT(id)} for instance to be more precise and know exactly what we were indeed counting (we also think this will remove null values, but in this example it is not likely going to happen since it is a primary key).
 
 \section{Queries implementation}
 
+Note that we are not using an Oracle server but our own one, running with \texttt{Postgres SQL}. Therefore, some queries may contain some syntax that are specific to it.
+
 \subsection{Compute the average price per currency of the publications of the most popular title (i.e, the title with most publications overall)}
 	\begin{enumerate}
-	\item Description of logic : 
+	\item Description of logic : This query relies on a join between \texttt{publications} and \texttt{publications\char`_contents}, where the most popular title is determined by grouping publications by \texttt{title\char`_id}, counting them in descendant and just take the first result. Therefore, our nested query is simply called with an \texttt{=}. We also remove null values to not skew results, and take at the end the average for each currency.
 	\item SQL statement :
 		\begin{lstlisting}[language=SQL,showspaces=false,basicstyle=\ttfamily,numberstyle=\tiny,commentstyle=\color{gray}]
 SELECT
@@ -1320,13 +1326,13 @@ WHERE
 GROUP BY p.currency;
 		\end{lstlisting}
 
-	\item Results (partial):\\
+	\item Results :\\
 
 	\begin{tabular}{|l|c|r|}
   \hline
   avg & currency \\
   \hline
-5.713500000000002	& £ \\
+5.713500000000002	& \pounds \\
 7.784824120603027	& \$ \\
 \hline
 \end{tabular}
@@ -1336,7 +1342,7 @@ GROUP BY p.currency;
 \subsection{Output the names of the top ten title series with most awards}
 
 		\begin{enumerate}
-	\item Description of logic : 
+	\item Description of logic : the logic of this query is, in a sense, the same as the previous one, excepting that we don't need any nested query. Grouping by title and associate to them their award counts allow us to achieve what is asking.
 	\item SQL statement :
 		\begin{lstlisting}[language=SQL,showspaces=false,basicstyle=\ttfamily,numberstyle=\tiny,commentstyle=\color{gray}]
 SELECT ts.title
@@ -1373,7 +1379,7 @@ Book of The New Sun \\
 \subsection{Output the name of the author who has received the most awards after his/her death}
 
 			\begin{enumerate}
-	\item Description of logic : 
+	\item Description of logic : joining tables is the keyword for this query, following our ER model, to go from author to his associated awards, we need to go through 5 different tables (so, it means 4 joins). Once this is done, we simply need to precise the condition \textit{award received after his death}, and we take the initiative to also remove null values to avoid surprises. Eventually, to get only one author, we group them, and simply order them by their number of awards where, once again, we take the first result.
 	\item SQL statement :
 		\begin{lstlisting}[language=SQL,showspaces=false,basicstyle=\ttfamily,numberstyle=\tiny,commentstyle=\color{gray}]
 SELECT a.name
@@ -1404,7 +1410,7 @@ H. G. Wells\\
 \subsection{For a given year, output the three publishers that published the most publications}
 
 	\begin{enumerate}
-	\item Description of logic : 
+	\item Description of logic : this query is parametrised and takes an input, which means the need of a \texttt{?} in the query that, once executed, will be replaced by the input of the user. This query is easy as it only relies on one join, no more explanation are therefore needed.
 	\item SQL statement :
 		\begin{lstlisting}[language=SQL,showspaces=false,basicstyle=\ttfamily,numberstyle=\tiny,commentstyle=\color{gray}]
 SELECT p.name
@@ -1412,7 +1418,7 @@ FROM publishers p
   JOIN publications pu ON p.id = pu.publisher_id
 WHERE DATE_PART('year', pu.date_pub) = ?
 GROUP BY p.name
-ORDER BY COUNT(pu.id) DESC
+ORDER BY COUNT(DISTINCT pu.id) DESC
 LIMIT 3;
 		\end{lstlisting}
 
@@ -1443,7 +1449,7 @@ LIMIT 3;
 \subsection{Given an author, compute his/her most reviewed title(s)}
 
 	\begin{enumerate}
-	\item Description of logic : 
+	\item Description of logic : the \texttt{?} presence is for the same reason as before. According to our ER model, from authors to reviews, we need 5 different tables. Once joins done, we group our results by id and count the number of (previously joined) associated reviews.
 	\item SQL statement :
 		\begin{lstlisting}[language=SQL,showspaces=false,basicstyle=\ttfamily,numberstyle=\tiny,commentstyle=\color{gray}]
 SELECT t.title
@@ -1480,7 +1486,7 @@ ORDER BY COUNT(DISTINCT r.review_id) DESC;
 \subsection{For every language, find the top three title types with most translations}
 
 	\begin{enumerate}
-	\item Description of logic :
+	\item Description of logic : %TODO description of logic
 	\item SQL statement :
 		\begin{lstlisting}[language=SQL,showspaces=false,basicstyle=\ttfamily,numberstyle=\tiny,commentstyle=\color{gray}]
 SELECT
@@ -1519,7 +1525,7 @@ WHERE r.row <= 3;
 \subsection{For each year, compute the average number of authors per publisher}
 
 	\begin{enumerate}
-	\item Description of logic : 
+	\item Description of logic : we are using a nested query that outputs the name of the publisher, the year taken into consideration and the number of authors for that given year. Using such a nested query is required here as we are eager to get the average number of authors, therefore, the inner return return the count and the publisher, the outer one group them according to the year and compute the average.
 	\item SQL statement :
 		\begin{lstlisting}[language=SQL,showspaces=false,basicstyle=\ttfamily,numberstyle=\tiny,commentstyle=\color{gray}]
 SELECT
@@ -1561,7 +1567,7 @@ GROUP BY r.year, r.name;
 \subsection{Find the publication series with most titles that have been given awards of “World Fantasy Award” type}
 
 	\begin{enumerate}
-	\item Description of logic : 
+	\item Description of logic : we are mapping publication series to their award, this requires to join with other tables such as \texttt{publications}, \texttt{publications\char`_contents}, \texttt{titles\char`_awards}, \texttt{awards} and \texttt{awards\char`_types}. Once done, we taken the condition "type of award = world fantasy". Grouping and then ordering by title gives us the expected result.
 	\item SQL statement :
 		\begin{lstlisting}[language=SQL,showspaces=false,basicstyle=\ttfamily,numberstyle=\tiny,commentstyle=\color{gray}]
 SELECT ps.name
@@ -1599,7 +1605,7 @@ ORDER BY COUNT(DISTINCT pc.title_id) DESC;
 \subsection{For every award category, list the names of the three most awarded authors}
 
 	\begin{enumerate}
-	\item Description of logic : 
+	\item Description of logic : %TODO description of logic
 	\item SQL statement :
 		\begin{lstlisting}[language=SQL,showspaces=false,basicstyle=\ttfamily,numberstyle=\tiny,commentstyle=\color{gray}]
 SELECT
@@ -1648,7 +1654,7 @@ Gardner Dozois	& Best Novella\\
 \subsection{Output the names of all living authors that have published at least one anthology from youngest to oldest}
 
 	\begin{enumerate}
-	\item Description of logic : 
+	\item Description of logic : this query is simple and behaves exactly as ones previously written. We simply do some joins, and then apply the conditions. Eventually, we order the results by their birth date.
 	\item SQL statement :
 		\begin{lstlisting}[language=SQL,showspaces=false,basicstyle=\ttfamily,numberstyle=\tiny,commentstyle=\color{gray}]
 SELECT DISTINCT a.name, a.birth_date
@@ -1687,7 +1693,7 @@ Steve Mollmann	& 1985-07-10\\
 \subsection{Compute the average number of publications per publication series (single result/number expected)}
 
 	\begin{enumerate}
-	\item Description of logic : 
+	\item Description of logic : we previously met the case where we wanted an average of a group. We achieved this by using a nested query that is grouping its result on something and outputs the count of these. Then, the outer query needs simply to take the result and do the average as it is already a count.
 	\item SQL statement :
 		\begin{lstlisting}[language=SQL,showspaces=false,basicstyle=\ttfamily,numberstyle=\tiny,commentstyle=\color{gray}]
 SELECT AVG(count.ncount)
@@ -1713,7 +1719,7 @@ FROM (
 \subsection{Find the author who has reviewed the most titles}
 
 	\begin{enumerate}
-	\item Description of logic : 
+	\item Description of logic : we are using here a nested query for efficiency purposes as we know we only want one result and so don't want to join informations with authors that do not respect the condition. This nested query returns the id of the author who has reviewed most titles, by taking only titles with the type 'review', grouping them by \texttt{author\char`_id}, and counting the number of titles.
 	\item SQL statement :
 		\begin{lstlisting}[language=SQL,showspaces=false,basicstyle=\ttfamily,numberstyle=\tiny,commentstyle=\color{gray}]
 SELECT a.name
@@ -1745,7 +1751,7 @@ WHERE a.id = (
 \subsection{For every language, list the three authors with the most translated titles of “novel” type}
 
 	\begin{enumerate}
-	\item Description of logic : 
+	\item Description of logic : %TODO description of logic
 	\item SQL statement :
 		\begin{lstlisting}[language=SQL,showspaces=false,basicstyle=\ttfamily,numberstyle=\tiny,commentstyle=\color{gray}]
 SELECT
@@ -1793,7 +1799,7 @@ Russian	& Boris Strugatsky\\
 \subsection{Order the top ten authors whose publications have the largest pages per dollar ratio (considering all publications of an author that have a dollar price)}
 
 	\begin{enumerate}
-	\item Description of logic : 
+	\item Description of logic : the need of an inner query is for the same reason described in the previous query. The only difference is that this time we do not use a \texttt{FROM} to join our inner query but a \texttt{JOIN} as we do not want to only one result. The inner query join publications to their author since we are interesting in authors. Furthermore, the \texttt{WHERE} clause ensures that publications have a dollar price, and price are not equal to zero (hence, not NULL too) to avoid division by zero. Eventually, we group this by \texttt{author\char`_id}, \texttt{price} and \texttt{pages}, and order by the ratio $\frac{pages}{price}$, limiting the results to ten.
 	\item SQL statement :
 		\begin{lstlisting}[language=SQL,showspaces=false,basicstyle=\ttfamily,numberstyle=\tiny,commentstyle=\color{gray}]
 SELECT a.name
@@ -1892,6 +1898,8 @@ The 1983 Annual World's Best SF\\
 	\end{tabular}
 \end{enumerate}
 
+\newpage
+
 \section{Queries optimization}
 
 \subsection{Query 1 : Output the name of the author who has received the most awards after his/her death}
@@ -1911,19 +1919,27 @@ GROUP BY a.name
 ORDER BY COUNT(ta.award_id) DESC
 LIMIT 1;
 		\end{lstlisting}
+~\\	
+This query basically links the tables `authors` and `awards` by doing multiple joins with tables in between. Then it simply checks if the author is dead and filter to keep only the awards that has been received after his death. Finally we order the final results on the number of awards remaining per author and keep only the first result, the one with most award.~\\
 		
 \subsubsection{Optimized query}
 		\begin{lstlisting}[language=SQL,showspaces=false,basicstyle=\ttfamily,numberstyle=\tiny,commentstyle=\color{gray}]
 
 		\end{lstlisting}
 		
-\subsubsection{Running times}
-\begin{itemize}
-	\item Before optimization :
-	\item After optimization :
-\end{itemize}
+\subsubsection{Running time \& optimization}
 
-\subsubsection{Justifications}
+The query runs in approximately \textbf{700ms}. This time is mainly distributed between the full scans of tables and joins. We already spent 99.96\% of the time when the joins are done. So even if we create an index on fields used in the where clauses or aggregate actions, we won't see any improvement.
+
+\subsubsection{Plan}
+The plan for query 12 is simple to understand. We see that it first does the join between \texttt{authors} and ~\\ \texttt{publications\char`_authors} then joins the resulting table with \texttt{publications\char`_contents}, same thing for \texttt{titles\char`_awards} and finally \texttt{awards}. At this point we still have 3987 rows. The aggregate operation is simply the \texttt{COUNT}, then the sort is on `a.name` and the limit keeps only one result.
+We can see that the time after the joins is 59997 and at the end of the execution 60017. The time of the joins highly depends on the number of processed rows.
+
+\begin{figure}[!htb]
+	\centering
+    \includegraphics[scale = 0.5]{./query_analysis/query12}
+    \caption{Running plan for this query (obtained with Datagrip)}
+\end{figure}
 
 
 \subsection{Query 2 : For each year, compute the average number of authors per publisher}
@@ -1946,19 +1962,26 @@ FROM (
      ) r
 GROUP BY r.year, r.name;
 		\end{lstlisting}
-		
+~\\	
+This query uses a subquery for it's \texttt{FROM} clause to select for each year and for each publisher, the number of authors per publisher. Then the main query simply group by the year and the publisher and compute the average number of author.~\\
+
 \subsubsection{Optimized query}
 		\begin{lstlisting}[language=SQL,showspaces=false,basicstyle=\ttfamily,numberstyle=\tiny,commentstyle=\color{gray}]
 
 		\end{lstlisting}
 		
-\subsubsection{Running times}
-\begin{itemize}
-	\item Before optimization :
-	\item After optimization :
-\end{itemize}
+\subsubsection{Running time \& optimization}
 
-\subsubsection{Justifications}
+A few runs of this query showed an average running time of \textbf{2.2 seconds}. According to the plan a big part of this time is spent doing sort operations. Once in the subquery for the \texttt{GROUP BY pr.id, p.date\char`_pub} which takes approximately 34\% of the time. Another one in the subquery for the \texttt{SELECT DISTINCT} operation takes ~28\% of the time. And a last sort appears in the main query when doing the \texttt{GROUP BY r.year, r.name} and also take ~28\% of the time. The remaining 10\% is scanning and joining the tables.
+
+\subsubsection{Plan}
+The plan is also pretty simple to read. First it joins \texttt{publications} and \texttt{publications\char`_authors} and then the resulting table with \texttt{publishers}. Right after this the first sort is executed on \texttt{pr.id}, \texttt{p.date\char`_pub} followed by an aggregate action to group by these keys. After that it's basically the same thing that is executed by the main query to sort and group by the year and the name of the publisher.
+
+\begin{figure}[!htb]
+	\centering
+    \includegraphics[scale = 0.5]{./query_analysis/query16}
+    \caption{Running plan for this query (obtained with Datagrip)}
+\end{figure}
 
 
 \subsection{Query 3 : Find the author who has reviewed the most titles}
@@ -1979,19 +2002,29 @@ WHERE a.id = (
   LIMIT 1
 );
 		\end{lstlisting}
+
+~\\
+To achieve his goal this query will use the title type \texttt{review} to filter out the titles that aren't reviews. Then it will group by \texttt{author\char`_id} to count for each author the number of distinct titles that are reviews.
+~\\
 		
 \subsubsection{Optimized query}
 		\begin{lstlisting}[language=SQL,showspaces=false,basicstyle=\ttfamily,numberstyle=\tiny,commentstyle=\color{gray}]
 
 		\end{lstlisting}
 		
-\subsubsection{Running times}
-\begin{itemize}
-	\item Before optimization :
-	\item After optimization :
-\end{itemize}
+\subsubsection{Running time \& optimization}
 
-\subsubsection{Justifications}
+This query runs in approximately \textbf{1.1 second}. After the scans and joins we already spent 85\% of the time. The rest is taken by the sort for the group by clause on \texttt{pa.author\char`_id}. 
+
+
+\subsubsection{Plan}
+The join is first applied on \texttt{titles} and \texttt{publications\char`_contents}, then on \texttt{publications} and finally on ~\\ \texttt{publications\char`_authors}.
+
+\begin{figure}[!htb]
+	\centering
+    \includegraphics[scale = 0.5]{./query_analysis/query21}
+    \caption{Running plan for this query (obtained with Datagrip)}
+\end{figure}
 
 
 \end{document}
