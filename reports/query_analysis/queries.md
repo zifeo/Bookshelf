@@ -16,10 +16,10 @@ GROUP BY a.name
 ORDER BY COUNT(ta.award_id) DESC
 LIMIT 1;
 ```
-This query basically links the tables `authors` and `awards` by doing multiple joins with tables in between. Then it simply checks if the author is dead and filter to keep only the awards that has been received after his death. Finally we order the final results on the number of awards that weren't filtered and keep only the first result, the one with most award.
+This query basically links the tables `authors` and `awards` by doing multiple joins with tables in between. Then it simply checks if the author is dead and filter to keep only the awards that has been received after his death. Finally we order the final results on the number of awards remaining per author and keep only the first result, the one with most award.
 
 ### Running time & optimization
-Without any indexes the query runs in approximatly 700ms. This time is mainly distributed between the full scans of tables and joins. We already spent 99.96% of the time after all the joins are done. So even if we create an index on fields used in the where clauses or aggregate actions, we won't see any improvement.
+The query runs in approximatly **700ms**. This time is mainly distributed between the full scans of tables and joins. We already spent 99.96% of the time when the joins are done. So even if we create an index on fields used in the where clauses or aggregate actions, we won't see any improvement.
 
 
 ### Plan
@@ -49,16 +49,38 @@ FROM (
 GROUP BY r.year, r.name;
 ```
 This query uses a subquery for it's FROM clause to select for each year and for each publisher, the number of authors per publisher. Then the main query simply group by the year and the publisher and compute the average number of author.
+
 ### Running time & optimization
-A few runs of this query showed an average running time of 2,2 seconds. According to the plan a big part of this time is spent doing sort operations. Once in the subquery for the `GROUP BY pr.id, p.date_pub` which takes approximately 34% of the time. Another one in the subquery for the `SELECT DISTINCT` operation takes ~28% of the time. And a last sort appears in the main query when doing the `GROUP BY r.year, r.name` and also take ~28% of the time. The remaining 10% is scanning and joining the tables.
+A few runs of this query showed an average running time of **2.2 seconds**. According to the plan a big part of this time is spent doing sort operations. Once in the subquery for the `GROUP BY pr.id, p.date_pub` which takes approximately 34% of the time. Another one in the subquery for the `SELECT DISTINCT` operation takes ~28% of the time. And a last sort appears in the main query when doing the `GROUP BY r.year, r.name` and also take ~28% of the time. The remaining 10% is scanning and joining the tables.
 
 ### Plan
+The plan is also pretty simple to read. First it joins `publications` and `publications_authors` and then the resulting table with `publishers`. Right after this the first sort is executed on `pr.id, p.date_pub` followed by an aggregate action to group by these keys. After that it's basically the same thing that is executed by the main query to sort and group by the year and the name of the publisher.
 ![](query16.png)
 
 ## Query 21
 ### Description
+*Find the author who has reviewed the most titles*
+
+```
+SELECT a.name
+FROM authors a
+WHERE a.id = (
+  SELECT pa.author_id
+  FROM publications p
+    INNER JOIN publications_authors pa ON pa.publication_id = p.id
+    INNER JOIN publications_contents pc ON pc.publication_id = p.id
+    INNER JOIN titles t ON t.id = pc.title_id
+  WHERE t.type = 'review'
+  GROUP BY pa.author_id
+  ORDER BY COUNT(DISTINCT pc.title_id) DESC
+  LIMIT 1
+)
+```
+To achieve his goal this query will use the title type `review` to filter out the titles that aren't reviews. Then it will group by author_id to count for each author the number of distinct titles that are reviews.
 
 ### Running time & optimization
+This query runs in approximately **1.1 second**. After the scans and joins we already spent 85% of the time. The rest is taken by the sort for the group by clause on `pa.author_id`. 
 
 ### Plan
+The join is first applied on `titles` and `publications_contents`, then on `publications` and finally on `publications_authors`. 
 ![](query21.png)
