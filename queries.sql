@@ -168,7 +168,7 @@ FROM publishers p
   JOIN publications pu ON p.id = pu.publisher_id
 WHERE DATE_PART('year', pu.date_pub) = ?
 GROUP BY p.name
-ORDER BY COUNT(pu.id) DESC
+ORDER BY COUNT(DISTINCT pu.id) DESC
 LIMIT 3;
 
 -- 14. Given an author, compute his/her most reviewed title(s).
