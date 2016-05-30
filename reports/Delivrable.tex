@@ -1486,7 +1486,7 @@ ORDER BY COUNT(DISTINCT r.review_id) DESC;
 \subsection{For every language, find the top three title types with most translations}
 
 	\begin{enumerate}
-	\item Description of logic : %TODO description of logic
+	\item Description of logic : After doing the cross product of all titles, languages and translations, we group over title type and then sort them according to their ids. Furthermore, in each of this group, we group them by language using \texttt{PARTITION BY}, and sort them according to the same rule, that allows us to number results by row number to eventually limit the output to 3 results by language by taking only the row whose number is less or equal than 3.
 	\item SQL statement :
 		\begin{lstlisting}[language=SQL,showspaces=false,basicstyle=\ttfamily,numberstyle=\tiny,commentstyle=\color{gray}]
 SELECT
@@ -1602,10 +1602,12 @@ ORDER BY COUNT(DISTINCT pc.title_id) DESC;
 	\end{tabular}
 \end{enumerate}
 
+\newpage
+
 \subsection{For every award category, list the names of the three most awarded authors}
 
 	\begin{enumerate}
-	\item Description of logic : %TODO description of logic
+	\item Description of logic : The nested query behaves more a less as the 6th one. This also outputs the count of awards. The outer query ensures this time on one hand to limit the number of results and on the other hand to return the name of the award as tis category.
 	\item SQL statement :
 		\begin{lstlisting}[language=SQL,showspaces=false,basicstyle=\ttfamily,numberstyle=\tiny,commentstyle=\color{gray}]
 SELECT
@@ -1751,7 +1753,7 @@ WHERE a.id = (
 \subsection{For every language, list the three authors with the most translated titles of “novel” type}
 
 	\begin{enumerate}
-	\item Description of logic : %TODO description of logic
+	\item Description of logic : This query behaves exactly as the ninth one, except that we are not dealing with award but with author this time.
 	\item SQL statement :
 		\begin{lstlisting}[language=SQL,showspaces=false,basicstyle=\ttfamily,numberstyle=\tiny,commentstyle=\color{gray}]
 SELECT
@@ -1796,6 +1798,8 @@ Russian	& Boris Strugatsky\\
 	\end{tabular}
 \end{enumerate}
 
+\newpage
+
 \subsection{Order the top ten authors whose publications have the largest pages per dollar ratio (considering all publications of an author that have a dollar price)}
 
 	\begin{enumerate}
@@ -1838,10 +1842,12 @@ John Gregory Betancourt\\
 	\end{tabular}
 \end{enumerate}
 
+\newpage
+
 \subsection{For publications that have been awarded the Nebula award, find the top 10 with the most extensive web presence  (i.e, the highest number of author websites, publisher websites, publication series websites, and title series websites in total)}
 
 	\begin{enumerate}
-	\item Description of logic : 
+	\item Description of logic : this query requires a lot of workload as it relies in a way on all tables so we will need to join our initial table (webpage as we are looking for web presence). The \texttt{INNER JOIN} takes care to only join needed rows and uses a quite different syntax with \texttt{ON ... OR ...} to allow joining with a table potentially only one key that interests us. Eventually, we group this in the outer query by \texttt{publication\char`_id} and \texttt{title}, and order all this by the sum of what is interesting us here (see below).
 	\item SQL statement :
 		\begin{lstlisting}[language=SQL,showspaces=false,basicstyle=\ttfamily,numberstyle=\tiny,commentstyle=\color{gray}]
 SELECT r.title
