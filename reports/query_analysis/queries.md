@@ -76,7 +76,7 @@ WHERE a.id = (
   LIMIT 1
 )
 ```
-To achieve his goal this query will use the title type `review` to filter out the titles that aren't reviews. Then it will group by author_id to count for each author the number of distinct titles that are reviews.
+To achieve his goal this query will use the title type `review` to filter out the titles that aren't tagged as reviews. Then it will group by author_id to count for each author the number of distinct titles that they have reviewed. All this computation is done in a subquery that gives back only one author_id, the one with most reviews, which is used by the main query to get his name.
 
 ### Running time & optimization
 This query runs in approximately **1.1 second**. After the scans and joins we already spent 85% of the time. The rest is taken by the sort for the group by clause on `pa.author_id`. 
