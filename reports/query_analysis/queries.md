@@ -51,7 +51,9 @@ GROUP BY r.year, r.name;
 This query uses a subquery for it's FROM clause to select for each year and for each publisher, the number of authors per publisher. Then the main query simply group by the year and the publisher and compute the average number of author.
 
 ### Running time & optimization
-A few runs of this query showed an average running time of **2.2 seconds**. According to the plan a big part of this time is spent doing sort operations. Once in the subquery for the `GROUP BY pr.id, p.date_pub` which takes approximately 34% of the time. Another one in the subquery for the `SELECT DISTINCT` operation takes ~28% of the time. And a last sort appears in the main query when doing the `GROUP BY r.year, r.name` and also take ~28% of the time. The remaining 10% is scanning and joining the tables.
+A few runs of this query showed an average running time of **2.1 seconds**. According to the plan a big part of this time is spent doing sort operations. Once in the subquery for the `GROUP BY pr.id, p.date_pub` which takes approximately 34% of the time. Another one in the subquery for the `SELECT DISTINCT` operation takes ~28% of the time. And a last sort appears in the main query when doing the `GROUP BY r.year, r.name` and also take ~28% of the time. The remaining 10% is scanning and joining the tables.
+
+To optimize this query we tried to add an index on fields used in the WHERE, GROUP BY and COUNT operations. The fields are `publications_authors.author_id`, `publishers.id`, `publications.date_pub` and the average running time became around **1.9 seconds**.
 
 ### Plan
 The plan is also pretty simple to read. First it joins `publications` and `publications_authors` and then the resulting table with `publishers`. Right after this the first sort is executed on `pr.id, p.date_pub` followed by an aggregate action to group by these keys. After that it's basically the same thing that is executed by the main query to sort and group by the year and the name of the publisher.
@@ -76,10 +78,10 @@ WHERE a.id = (
   LIMIT 1
 )
 ```
-To achieve his goal this query will use the title type `review` to filter out the titles that aren't tagged as reviews. Then it will group by author_id to count for each author the number of distinct titles that they have reviewed. All this computation is done in a subquery that gives back only one author_id, the one with most reviews, which is used by the main query to get his name.
+To achieve his goal this query will use the title type `review` to filter out the titles that aren't tagged as reviews. Then it will group by author\_id to count for each author the number of distinct titles that they have reviewed. All this computation is done in a subquery that gives back only one author_id, the one with most reviews, which is used by the main query to get his name.
 
 ### Running time & optimization
-This query runs in approximately **1.1 second**. After the scans and joins we already spent 85% of the time. The rest is taken by the sort for the group by clause on `pa.author_id`. 
+This query runs in approximately **1.1 second**. After the scans and joins we already spent 85% of the time. The rest is taken by the sort for the group by clause on `pa.author_id`. By adding indexes on `publications_authors.author_id` and `titles.type` the speedup isn't visible.
 
 ### Plan
 The join is first applied on `titles` and `publications_contents`, then on `publications` and finally on `publications_authors`. 
