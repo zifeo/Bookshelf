@@ -1910,28 +1910,21 @@ The 1983 Annual World's Best SF\\
 
 \subsection{Query 1 : Output the name of the author who has received the most awards after his/her death}
 
-\subsubsection{Initial query}
+\subsubsection{Query}
 		\begin{lstlisting}[language=SQL,showspaces=false,basicstyle=\ttfamily,numberstyle=\tiny,commentstyle=\color{gray}]
 SELECT a.name
 FROM authors a
   JOIN publications_authors pa ON a.id = pa.author_id
   JOIN publications_contents pc ON pa.publication_id = pc.publication_id
   JOIN titles_awards ta ON pc.title_id = ta.title_id
-  JOIN awards aw ON ta.award_id = aw.id
-WHERE
-  a.death_date IS NOT NULL
-  AND aw.date > a.death_date
+  JOIN awards aw ON ta.award_id = aw.id AND aw.date > a.death_date
+WHERE a.death_date IS NOT NULL
 GROUP BY a.name
 ORDER BY COUNT(ta.award_id) DESC
 LIMIT 1;
 		\end{lstlisting}
 ~\\	
-This query basically links the tables `authors` and `awards` by doing multiple joins with tables in between. Then it simply checks if the author is dead and filter to keep only the awards that has been received after his death. Finally we order the final results on the number of awards remaining per author and keep only the first result, the one with most award.~\\
-		
-\subsubsection{Optimized query}
-		\begin{lstlisting}[language=SQL,showspaces=false,basicstyle=\ttfamily,numberstyle=\tiny,commentstyle=\color{gray}]
-
-		\end{lstlisting}
+This query basically links the tables `authors` and `awards` by doing multiple joins with tables in between. Then it simply checks if the author is dead and filter to keep only the awards that has been received after his death. Finally we order the final results on the number of awards remaining per author and keep only the first result, the one with most award. The \texttt{AND} clause is now in the join to allow less joins.~\\
 		
 \subsubsection{Running time \& optimization}
 
@@ -1971,11 +1964,6 @@ GROUP BY r.year, r.name;
 ~\\	
 This query uses a subquery for it's \texttt{FROM} clause to select for each year and for each publisher, the number of authors per publisher. Then the main query simply group by the year and the publisher and compute the average number of author.~\\
 
-\subsubsection{Optimized query}
-		\begin{lstlisting}[language=SQL,showspaces=false,basicstyle=\ttfamily,numberstyle=\tiny,commentstyle=\color{gray}]
-
-		\end{lstlisting}
-		
 \subsubsection{Running time \& optimization}
 
 A few runs of this query showed an average running time of \textbf{2.2 seconds}. According to the plan a big part of this time is spent doing sort operations. Once in the subquery for the \texttt{GROUP BY pr.id, p.date\char`_pub} which takes approximately 34\% of the time. Another one in the subquery for the \texttt{SELECT DISTINCT} operation takes ~28\% of the time. And a last sort appears in the main query when doing the \texttt{GROUP BY r.year, r.name} and also take ~28\% of the time. The remaining 10\% is scanning and joining the tables.
@@ -1989,6 +1977,7 @@ The plan is also pretty simple to read. First it joins \texttt{publications} and
     \caption{Running plan for this query (obtained with Datagrip)}
 \end{figure}
 
+\newpage
 
 \subsection{Query 3 : Find the author who has reviewed the most titles}
 
@@ -2012,11 +2001,6 @@ WHERE a.id = (
 ~\\
 To achieve his goal this query will use the title type \texttt{review} to filter out the titles that aren't reviews. Then it will group by \texttt{author\char`_id} to count for each author the number of distinct titles that are reviews.
 ~\\
-		
-\subsubsection{Optimized query}
-		\begin{lstlisting}[language=SQL,showspaces=false,basicstyle=\ttfamily,numberstyle=\tiny,commentstyle=\color{gray}]
-
-		\end{lstlisting}
 		
 \subsubsection{Running time \& optimization}
 
