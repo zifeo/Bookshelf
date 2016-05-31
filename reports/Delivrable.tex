@@ -59,10 +59,10 @@
     Jeremy Hottinger \\
     259573 \\
     \href{mailto:jeremy.hottinger@epfl.ch}{\texttt{jeremy.hottinger@epfl.ch}}\vspace{20pt} \\
-    Aurélien Soccard \\
+    Aurelien Soccard \\
     235746 \\
     \href{mailto:aurelien.soccard@epfl.ch}{\texttt{aurelien.soccard@epfl.ch}}\vspace{20pt} \\
-    Téo Stocco \\
+    Teo Stocco \\
     235744 \\
     \href{mailto:teo.stocco@epfl.ch}{\texttt{teo.stocco@epfl.ch}}\vspace{20pt} \\
     }
@@ -119,7 +119,7 @@
 \titlefont CS-323 : Project delivrable\par
 \vspace*{0.5cm}
 \epigraph{This is our deliverable for the \textit{Bookshelf} project of the introduction to database course (spring 2016 - Pr. Anastasia Ailamaki), which sums up our work.~\\ It also contains some justifications.}%
-{\textit{March 2016} - \textsc{Team 3}}
+{\textit{May 2016} - \textsc{Team 3}}
 \null\vfill
 \vspace*{5cm}
 \noindent
@@ -1298,7 +1298,7 @@ LIMIT 3;
 
 \end{enumerate}
 ~\\
-We've also modified also queries that were counting something, by replacing \texttt{COUNT(*)} by \texttt{COUNT(id)} for instance to be more precise and know exactly what we were indeed counting (we also think this will remove null values, but in this example it is not likely going to happen since it is a primary key).
+We've also modified also queries that were counting something, by replacing \texttt{COUNT(*)} by \texttt{COUNT(id)} for instance to be more precise and know exactly what we were indeed counting (we also wanted to remove null values, but in this example it is not likely going to happen since it is a primary key).
 
 \section{Queries implementation}
 
@@ -1607,7 +1607,7 @@ ORDER BY COUNT(DISTINCT pc.title_id) DESC;
 \subsection{For every award category, list the names of the three most awarded authors}
 
 	\begin{enumerate}
-	\item Description of logic : The nested query behaves more a less as the 6th one. This also outputs the count of awards. The outer query ensures this time on one hand to limit the number of results and on the other hand to return the name of the award as tis category.
+	\item Description of logic : The nested query behaves more a less as the 6th one. This also outputs the count of awards. The outer query ensures this time on one hand to limit the number of results and on the other hand to return the name of the award as tis category. Note that results may sound incorrect (more than 3 results per category) but in fact they are correct since some category have some similar names.
 	\item SQL statement :
 		\begin{lstlisting}[language=SQL,showspaces=false,basicstyle=\ttfamily,numberstyle=\tiny,commentstyle=\color{gray}]
 SELECT
