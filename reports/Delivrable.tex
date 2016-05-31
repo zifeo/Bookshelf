@@ -919,7 +919,7 @@ ORDER BY year ASC;
 \end{tabular}
 
 	\end{enumerate}
-	
+
 \subsection{Output the names of the ten authors with most publications}
 
 		\begin{enumerate}
@@ -1338,7 +1338,7 @@ GROUP BY p.currency;
 \end{tabular}
 
 	\end{enumerate}
-	
+
 \subsection{Output the names of the top ten title series with most awards}
 
 		\begin{enumerate}
@@ -1496,7 +1496,7 @@ FROM (
        SELECT
          l.name,
          t.type,
-         ROW_NUMBER() OVER 
+         ROW_NUMBER() OVER
              (PARTITION BY l.id ORDER BY COUNT(DISTINCT t.id) DESC) as row
        FROM languages l
          INNER JOIN titles_translators tt ON tt.language_id = l.id
@@ -1618,13 +1618,13 @@ FROM (
          a.name,
          ac.name AS cat_name,
          COUNT(DISTINCT aw.id) as count,
-         ROW_NUMBER() OVER 
+         ROW_NUMBER() OVER
              (PARTITION BY ac.id ORDER BY COUNT(DISTINCT aw.id) DESC) AS row
        FROM awards_categories ac
          INNER JOIN awards aw ON aw.category_id = ac.id
          INNER JOIN titles_awards ta ON ta.award_id = aw.id
          INNER JOIN publications_contents pc ON pc.title_id = ta.title_id
-         INNER JOIN publications_authors pa 
+         INNER JOIN publications_authors pa
          	ON pa.publication_id = pc.publication_id
          INNER JOIN authors a ON a.id = pa.author_id
        GROUP BY a.name, cat_name, ac.id, a.id
@@ -1923,9 +1923,20 @@ GROUP BY a.name
 ORDER BY COUNT(ta.award_id) DESC
 LIMIT 1;
 		\end{lstlisting}
+<<<<<<< HEAD
 ~\\	
 This query basically links the tables `authors` and `awards` by doing multiple joins with tables in between. Then it simply checks if the author is dead and filter to keep only the awards that has been received after his death. Finally we order the final results on the number of awards remaining per author and keep only the first result, the one with most award. The \texttt{AND} clause is now in the join to allow less joins.~\\
 		
+=======
+~\\
+This query basically links the tables `authors` and `awards` by doing multiple joins with tables in between. Then it simply checks if the author is dead and filter to keep only the awards that has been received after his death. Finally we order the final results on the number of awards remaining per author and keep only the first result, the one with most award.~\\
+
+\subsubsection{Optimized query}
+		\begin{lstlisting}[language=SQL,showspaces=false,basicstyle=\ttfamily,numberstyle=\tiny,commentstyle=\color{gray}]
+
+		\end{lstlisting}
+
+>>>>>>> 1011a3acd36c26e17b9cb800fa1b6998145616b5
 \subsubsection{Running time \& optimization}
 
 The query runs in approximately \textbf{700ms}. This time is mainly distributed between the full scans of tables and joins. We already spent 99.96\% of the time when the joins are done. So even if we create an index on fields used in the where clauses or aggregate actions, we won't see any improvement.
@@ -1961,12 +1972,22 @@ FROM (
      ) r
 GROUP BY r.year, r.name;
 		\end{lstlisting}
-~\\	
+~\\
 This query uses a subquery for it's \texttt{FROM} clause to select for each year and for each publisher, the number of authors per publisher. Then the main query simply group by the year and the publisher and compute the average number of author.~\\
 
+<<<<<<< HEAD
+=======
+\subsubsection{Optimized query}
+		\begin{lstlisting}[language=SQL,showspaces=false,basicstyle=\ttfamily,numberstyle=\tiny,commentstyle=\color{gray}]
+
+		\end{lstlisting}
+
+>>>>>>> 1011a3acd36c26e17b9cb800fa1b6998145616b5
 \subsubsection{Running time \& optimization}
 
-A few runs of this query showed an average running time of \textbf{2.2 seconds}. According to the plan a big part of this time is spent doing sort operations. Once in the subquery for the \texttt{GROUP BY pr.id, p.date\char`_pub} which takes approximately 34\% of the time. Another one in the subquery for the \texttt{SELECT DISTINCT} operation takes ~28\% of the time. And a last sort appears in the main query when doing the \texttt{GROUP BY r.year, r.name} and also take ~28\% of the time. The remaining 10\% is scanning and joining the tables.
+A few runs of this query showed an average running time of \textbf{2.1 seconds}. According to the plan a big part of this time is spent doing sort operations. Once in the subquery for the \texttt{GROUP BY pr.id, p.date\char`_pub} which takes approximately 34\% of the time. Another one in the subquery for the \texttt{SELECT DISTINCT} operation takes ~28\% of the time. And a last sort appears in the main query when doing the \texttt{GROUP BY r.year, r.name} and also take ~28\% of the time. The remaining 10\% is scanning and joining the tables.
+
+To optimize this query we tried to add an index on fields used in the WHERE, GROUP BY and COUNT operations. The fields are 'publications_authors.author_id', 'publishers.id', 'publications.date_pub' and the average running time became around \textbf{1.9 seconds}.
 
 \subsubsection{Plan}
 The plan is also pretty simple to read. First it joins \texttt{publications} and \texttt{publications\char`_authors} and then the resulting table with \texttt{publishers}. Right after this the first sort is executed on \texttt{pr.id}, \texttt{p.date\char`_pub} followed by an aggregate action to group by these keys. After that it's basically the same thing that is executed by the main query to sort and group by the year and the name of the publisher.
@@ -1999,12 +2020,21 @@ WHERE a.id = (
 		\end{lstlisting}
 
 ~\\
-To achieve his goal this query will use the title type \texttt{review} to filter out the titles that aren't reviews. Then it will group by \texttt{author\char`_id} to count for each author the number of distinct titles that are reviews.
+To achieve his goal this query will use the title type \texttt{review} to filter out the titles that aren't reviews. Then it will group by \texttt{author\char`_id} to count for each author the number of distinct titles that they have reviewed. All this computation is done in a subquery that gives back only one author_id, the one with most reviews, which is used by the main query to get his name.
 ~\\
+<<<<<<< HEAD
 		
+=======
+
+\subsubsection{Optimized query}
+		\begin{lstlisting}[language=SQL,showspaces=false,basicstyle=\ttfamily,numberstyle=\tiny,commentstyle=\color{gray}]
+
+		\end{lstlisting}
+
+>>>>>>> 1011a3acd36c26e17b9cb800fa1b6998145616b5
 \subsubsection{Running time \& optimization}
 
-This query runs in approximately \textbf{1.1 second}. After the scans and joins we already spent 85\% of the time. The rest is taken by the sort for the group by clause on \texttt{pa.author\char`_id}. 
+This query runs in approximately \textbf{1.1 second}. After the scans and joins we already spent 85\% of the time. The rest is taken by the sort for the group by clause on \texttt{pa.author\char`_id}. By adding indexes on \texttt{publications\char`_authors.author_id} and \texttt{titles.type} the speedup isn't visible.
 
 
 \subsubsection{Plan}
