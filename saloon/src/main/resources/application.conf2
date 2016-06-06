@@ -1,0 +1,18 @@
+
+db {
+  host = wiki.com
+  port = 35432
+  user = bookshelf
+  password = j8z7338uaAHafjs
+  database = data
+  poolMaxQueueSize = 10
+  poolMaxObjects = 10
+  poolMaxIdle = 999999999
+  poolValidationInterval = 100
+}
+
+http {
+  interface = "localhost"
+  port = 8080
+}
+
