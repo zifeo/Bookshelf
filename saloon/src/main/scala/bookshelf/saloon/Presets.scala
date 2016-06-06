@@ -31,6 +31,7 @@ object Presets {
       else
         db.sendQuery(query)
 
+
     q.map { resQuery =>
       resQuery.rows match {
         case Some(res) =>

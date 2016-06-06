@@ -143,7 +143,7 @@ FROM titles t
   JOIN titles_series ts ON t.series_id = ts.id
 WHERE t.series_id IS NOT NULL
 GROUP BY ts.title
-ORDER BY COUNT(ta.award_id) DESC
+ORDER BY COUNT(DISTINCT ta.award_id) DESC
 LIMIT 10;
 
 -- 12. Output the name of the author who has received the most awards after his/her death.
@@ -158,7 +158,7 @@ WHERE
   a.death_date IS NOT NULL
   AND aw.date > a.death_date
 GROUP BY a.name
-ORDER BY COUNT(ta.award_id) DESC
+ORDER BY COUNT(DISTINCT ta.award_id) DESC
 LIMIT 1;
 
 -- 13. For a given year, output the three publishers that published the most publications.
@@ -217,7 +217,8 @@ FROM (
          INNER JOIN publishers pr ON pr.id = p.publisher_id
        GROUP BY pr.id, p.date_pub
      ) r
-GROUP BY r.year, r.name;
+GROUP BY r.year, r.name
+LIMIT 200;
 
 -- 17. Find the publication series with most titles that have been given awards of “World Fantasy Award” type.
 
