@@ -1,0 +1,12 @@
+
+db {
+  dataSourceClassName=org.postgresql.ds.PGSimpleDataSource
+  connectionTimeout=2000
+  dataSource {
+    serverName = wiki.com
+    portNumber = 35432
+    user = bookshelf
+    password = j8z7338uaAHafjs
+    databaseName = data
+  }
+}
